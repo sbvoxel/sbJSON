@@ -146,7 +146,7 @@ static void encode_string_as_pointer(unsigned char *destination,
 }
 
 char *sbJSONUtils_FindPointerFromObjectTo(const sbJSON *const object,
-                                         const sbJSON *const target) {
+                                          const sbJSON *const target) {
     size_t child_index = 0;
     sbJSON *current_child = 0;
 
@@ -164,7 +164,7 @@ char *sbJSONUtils_FindPointerFromObjectTo(const sbJSON *const object,
          (void)(current_child = current_child->next), child_index++) {
         unsigned char *target_pointer =
             (unsigned char *)sbJSONUtils_FindPointerFromObjectTo(current_child,
-                                                                target);
+                                                                 target);
         /* found the target? */
         if (target_pointer != NULL) {
             if (sbJSON_IsArray(object)) {
@@ -249,7 +249,7 @@ static bool decode_array_index_from_pointer(const unsigned char *const pointer,
 }
 
 static sbJSON *get_item_from_pointer(sbJSON *const object, const char *pointer,
-                                    const bool case_sensitive) {
+                                     const bool case_sensitive) {
     sbJSON *current_element = object;
 
     if (pointer == NULL) {
@@ -294,7 +294,7 @@ sbJSON *sbJSONUtils_GetPointer(sbJSON *const object, const char *pointer) {
 }
 
 sbJSON *sbJSONUtils_GetPointerCaseSensitive(sbJSON *const object,
-                                          const char *pointer) {
+                                            const char *pointer) {
     return get_item_from_pointer(object, pointer, true);
 }
 
@@ -355,7 +355,7 @@ static sbJSON *detach_item_from_array(sbJSON *array, size_t which) {
 
 /* detach an item at the given path */
 static sbJSON *detach_path(sbJSON *object, const unsigned char *path,
-                          const bool case_sensitive) {
+                           const bool case_sensitive) {
     unsigned char *parent_pointer = NULL;
     unsigned char *child_pointer = NULL;
     sbJSON *parent = NULL;
@@ -506,11 +506,11 @@ static void sort_object(sbJSON *const object, const bool case_sensitive) {
 }
 
 static bool compare_json(sbJSON *a, sbJSON *b, const bool case_sensitive) {
-    if ((a == NULL) || (b == NULL) || ((a->type & 0xFF) != (b->type & 0xFF))) {
+    if ((a == NULL) || (b == NULL) || ((a->type != b->type))) {
         /* mismatched type. */
         return false;
     }
-    switch (a->type & 0xFF) {
+    switch (a->type) {
     case sbJSON_Number:
         // TODO: This needs updating now.
         /* numeric mismatch. */
@@ -610,7 +610,7 @@ static bool insert_item_in_array(sbJSON *array, size_t which, sbJSON *newitem) {
 }
 
 static sbJSON *get_object_item(const sbJSON *const object, const char *name,
-                              const bool case_sensitive) {
+                               const bool case_sensitive) {
     if (case_sensitive) {
         return sbJSON_GetObjectItemCaseSensitive(object, name);
     }
@@ -705,8 +705,8 @@ static int apply_patch(sbJSON *object, const sbJSON *patch,
     /* special case for replacing the root */
     if (path->u.valuestring[0] == '\0') {
         if (opcode == REMOVE) {
-            static const sbJSON invalid = {NULL, NULL,  NULL, sbJSON_Invalid, 0, 0,
-                                          {0},  false, NULL};
+            static const sbJSON invalid = {
+                NULL, NULL, NULL, sbJSON_Invalid, 0, 0, {0}, false, NULL};
 
             overwrite_item(object, invalid);
 
@@ -848,7 +848,7 @@ static int apply_patch(sbJSON *object, const sbJSON *patch,
     } else if (sbJSON_IsObject(parent)) {
         if (case_sensitive) {
             sbJSON_DeleteItemFromObjectCaseSensitive(parent,
-                                                    (char *)child_pointer);
+                                                     (char *)child_pointer);
         } else {
             sbJSON_DeleteItemFromObject(parent, (char *)child_pointer);
         }
@@ -872,7 +872,8 @@ cleanup:
     return status;
 }
 
-int sbJSONUtils_ApplyPatches(sbJSON *const object, const sbJSON *const patches) {
+int sbJSONUtils_ApplyPatches(sbJSON *const object,
+                             const sbJSON *const patches) {
     const sbJSON *current_patch = NULL;
     int status = 0;
 
@@ -897,7 +898,7 @@ int sbJSONUtils_ApplyPatches(sbJSON *const object, const sbJSON *const patches) 
 }
 
 int sbJSONUtils_ApplyPatchesCaseSensitive(sbJSON *const object,
-                                         const sbJSON *const patches) {
+                                          const sbJSON *const patches) {
     const sbJSON *current_patch = NULL;
     int status = 0;
 
@@ -937,11 +938,11 @@ static void compose_patch(sbJSON *const patches,
         return;
     }
     sbJSON_AddItemToObject(patch, "op",
-                          sbJSON_CreateString((const char *)operation));
+                           sbJSON_CreateString((const char *)operation));
 
     if (suffix == NULL) {
         sbJSON_AddItemToObject(patch, "path",
-                              sbJSON_CreateString((const char *)path));
+                               sbJSON_CreateString((const char *)path));
     } else {
         size_t suffix_length = pointer_encoded_length(suffix);
         size_t path_length = strlen((const char *)path);
@@ -952,7 +953,7 @@ static void compose_patch(sbJSON *const patches,
         encode_string_as_pointer(full_path + path_length + 1, suffix);
 
         sbJSON_AddItemToObject(patch, "path",
-                              sbJSON_CreateString((const char *)full_path));
+                               sbJSON_CreateString((const char *)full_path));
         sbJSON_free(full_path);
     }
 
@@ -962,9 +963,10 @@ static void compose_patch(sbJSON *const patches,
     sbJSON_AddItemToArray(patches, patch);
 }
 
-void sbJSONUtils_AddPatchToArray(sbJSON *const array, const char *const operation,
-                                const char *const path,
-                                const sbJSON *const value) {
+void sbJSONUtils_AddPatchToArray(sbJSON *const array,
+                                 const char *const operation,
+                                 const char *const path,
+                                 const sbJSON *const value) {
     compose_patch(array, (const unsigned char *)operation,
                   (const unsigned char *)path, NULL, value);
 }
@@ -976,12 +978,12 @@ static void create_patches(sbJSON *const patches,
         return;
     }
 
-    if ((from->type & 0xFF) != (to->type & 0xFF)) {
+    if (from->type != to->type) {
         compose_patch(patches, (const unsigned char *)"replace", path, 0, to);
         return;
     }
 
-    switch (from->type & 0xFF) {
+    switch (from->type) {
     case sbJSON_Number:
         // TODO: This needs updating now.
         if ((from->u.valueint != to->u.valueint) ||
@@ -1125,7 +1127,7 @@ sbJSON *sbJSONUtils_GeneratePatches(sbJSON *const from, sbJSON *const to) {
 }
 
 sbJSON *sbJSONUtils_GeneratePatchesCaseSensitive(sbJSON *const from,
-                                               sbJSON *const to) {
+                                                 sbJSON *const to) {
     sbJSON *patches = NULL;
 
     if ((from == NULL) || (to == NULL)) {
@@ -1138,14 +1140,16 @@ sbJSON *sbJSONUtils_GeneratePatchesCaseSensitive(sbJSON *const from,
     return patches;
 }
 
-void sbJSONUtils_SortObject(sbJSON *const object) { sort_object(object, false); }
+void sbJSONUtils_SortObject(sbJSON *const object) {
+    sort_object(object, false);
+}
 
 void sbJSONUtils_SortObjectCaseSensitive(sbJSON *const object) {
     sort_object(object, true);
 }
 
 static sbJSON *merge_patch(sbJSON *target, const sbJSON *const patch,
-                          const bool case_sensitive) {
+                           const bool case_sensitive) {
     sbJSON *patch_child = NULL;
 
     if (!sbJSON_IsObject(patch)) {
@@ -1165,7 +1169,7 @@ static sbJSON *merge_patch(sbJSON *target, const sbJSON *const patch,
             /* NULL is the indicator to remove a value, see RFC7396 */
             if (case_sensitive) {
                 sbJSON_DeleteItemFromObjectCaseSensitive(target,
-                                                        patch_child->string);
+                                                         patch_child->string);
             } else {
                 sbJSON_DeleteItemFromObject(target, patch_child->string);
             }
@@ -1199,12 +1203,12 @@ sbJSON *sbJSONUtils_MergePatch(sbJSON *target, const sbJSON *const patch) {
 }
 
 sbJSON *sbJSONUtils_MergePatchCaseSensitive(sbJSON *target,
-                                          const sbJSON *const patch) {
+                                            const sbJSON *const patch) {
     return merge_patch(target, patch, true);
 }
 
 static sbJSON *generate_merge_patch(sbJSON *const from, sbJSON *const to,
-                                   const bool case_sensitive) {
+                                    const bool case_sensitive) {
     sbJSON *from_child = NULL;
     sbJSON *to_child = NULL;
     sbJSON *patch = NULL;
@@ -1240,13 +1244,13 @@ static sbJSON *generate_merge_patch(sbJSON *const from, sbJSON *const to,
         if (diff < 0) {
             /* from has a value that to doesn't have -> remove */
             sbJSON_AddItemToObject(patch, from_child->string,
-                                  sbJSON_CreateNull());
+                                   sbJSON_CreateNull());
 
             from_child = from_child->next;
         } else if (diff > 0) {
             /* to has a value that from doesn't have -> add to patch */
             sbJSON_AddItemToObject(patch, to_child->string,
-                                  sbJSON_Duplicate(to_child, 1));
+                                   sbJSON_Duplicate(to_child, 1));
 
             to_child = to_child->next;
         } else {
@@ -1277,6 +1281,6 @@ sbJSON *sbJSONUtils_GenerateMergePatch(sbJSON *const from, sbJSON *const to) {
 }
 
 sbJSON *sbJSONUtils_GenerateMergePatchCaseSensitive(sbJSON *const from,
-                                                  sbJSON *const to) {
+                                                    sbJSON *const to) {
     return generate_merge_patch(from, to, true);
 }
