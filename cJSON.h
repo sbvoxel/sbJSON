@@ -31,37 +31,37 @@ extern "C" {
 #include <stddef.h>
 #include <stdint.h>
 
-/* cJSON Types: */
-#define cJSON_Invalid (0)
-#define cJSON_False (1 << 0)
-#define cJSON_True (1 << 1)
-#define cJSON_NULL (1 << 2)
-#define cJSON_Number (1 << 3)
-#define cJSON_String (1 << 4)
-#define cJSON_Array (1 << 5)
-#define cJSON_Object (1 << 6)
-#define cJSON_Raw (1 << 7) /* raw json */
+/* sbJSON Types: */
+#define sbJSON_Invalid (0)
+#define sbJSON_False (1 << 0)
+#define sbJSON_True (1 << 1)
+#define sbJSON_NULL (1 << 2)
+#define sbJSON_Number (1 << 3)
+#define sbJSON_String (1 << 4)
+#define sbJSON_Array (1 << 5)
+#define sbJSON_Object (1 << 6)
+#define sbJSON_Raw (1 << 7) /* raw json */
 
-#define cJSON_IsReference 256
-#define cJSON_StringIsConst 512
+#define sbJSON_IsReference 256
+#define sbJSON_StringIsConst 512
 
-/* The cJSON structure: */
-typedef struct cJSON {
+/* The sbJSON structure: */
+typedef struct sbJSON {
     /* next/prev allow you to walk array/object chains. Alternatively, use
      * GetArraySize/GetArrayItem/GetObjectItem */
-    struct cJSON *next;
-    struct cJSON *prev;
+    struct sbJSON *next;
+    struct sbJSON *prev;
     /* An array or object item will have a child pointer pointing to a chain of
      * the items in the array/object. */
-    struct cJSON *child;
+    struct sbJSON *child;
 
     /* The type of the item, as above. */
     int type;
 
     union U {
-        /* The item's string, if type==cJSON_String  and type == cJSON_Raw */
+        /* The item's string, if type==sbJSON_String  and type == sbJSON_Raw */
         char *valuestring;
-        /* The item's number, if type==cJSON_Number */
+        /* The item's number, if type==sbJSON_Number */
         int64_t valueint;
         double valuedouble;
     } u;
@@ -71,216 +71,216 @@ typedef struct cJSON {
     /* The item's name string, if this item is the child of, or is in the list
      * of subitems of an object. */
     char *string;
-} cJSON;
+} sbJSON;
 
-typedef struct cJSON_Hooks {
+typedef struct sbJSON_Hooks {
     void *(*malloc_fn)(size_t sz);
     void (*free_fn)(void *ptr);
-} cJSON_Hooks;
+} sbJSON_Hooks;
 
-/* Limits how deeply nested arrays/objects can be before cJSON rejects to parse
+/* Limits how deeply nested arrays/objects can be before sbJSON rejects to parse
  * them. This is to prevent stack overflows. */
 #ifndef CJSON_NESTING_LIMIT
 #define CJSON_NESTING_LIMIT 1000
 #endif
 
-/* Supply malloc, realloc and free functions to cJSON */
-void cJSON_InitHooks(cJSON_Hooks *hooks);
+/* Supply malloc, realloc and free functions to sbJSON */
+void sbJSON_InitHooks(sbJSON_Hooks *hooks);
 
 /* Memory Management: the caller is always responsible to free the results from
- * all variants of cJSON_Parse (with cJSON_Delete) and cJSON_Print (with stdlib
- * free, cJSON_Hooks.free_fn, or cJSON_free as appropriate). The exception is
- * cJSON_PrintPreallocated, where the caller has full responsibility of the
+ * all variants of sbJSON_Parse (with sbJSON_Delete) and sbJSON_Print (with stdlib
+ * free, sbJSON_Hooks.free_fn, or sbJSON_free as appropriate). The exception is
+ * sbJSON_PrintPreallocated, where the caller has full responsibility of the
  * buffer. */
-/* Supply a block of JSON, and this returns a cJSON object you can interrogate.
+/* Supply a block of JSON, and this returns a sbJSON object you can interrogate.
  */
-cJSON *cJSON_Parse(const char *value);
-cJSON *cJSON_ParseWithLength(const char *value, size_t buffer_length);
+sbJSON *sbJSON_Parse(const char *value);
+sbJSON *sbJSON_ParseWithLength(const char *value, size_t buffer_length);
 /* ParseWithOpts allows you to require (and check) that the JSON is null
  * terminated, and to retrieve the pointer to the final byte parsed. */
 /* If you supply a ptr in return_parse_end and parsing fails, then
  * return_parse_end will contain a pointer to the error so will match
- * cJSON_GetErrorPtr(). */
-cJSON *cJSON_ParseWithOpts(const char *value, const char **return_parse_end,
+ * sbJSON_GetErrorPtr(). */
+sbJSON *sbJSON_ParseWithOpts(const char *value, const char **return_parse_end,
                            bool require_null_terminated);
-cJSON *cJSON_ParseWithLengthOpts(const char *value, size_t buffer_length,
+sbJSON *sbJSON_ParseWithLengthOpts(const char *value, size_t buffer_length,
                                  const char **return_parse_end,
                                  bool require_null_terminated);
 
-/* Render a cJSON entity to text for transfer/storage. */
-char *cJSON_Print(const cJSON *item);
-/* Render a cJSON entity to text for transfer/storage without any formatting. */
-char *cJSON_PrintUnformatted(const cJSON *item);
-/* Render a cJSON entity to text using a buffered strategy. prebuffer is a guess
+/* Render a sbJSON entity to text for transfer/storage. */
+char *sbJSON_Print(const sbJSON *item);
+/* Render a sbJSON entity to text for transfer/storage without any formatting. */
+char *sbJSON_PrintUnformatted(const sbJSON *item);
+/* Render a sbJSON entity to text using a buffered strategy. prebuffer is a guess
  * at the final size. guessing well reduces reallocation. fmt=0 gives
  * unformatted, =1 gives formatted */
-char *cJSON_PrintBuffered(const cJSON *item, int prebuffer, bool fmt);
-/* Render a cJSON entity to text using a buffer already allocated in memory with
+char *sbJSON_PrintBuffered(const sbJSON *item, int prebuffer, bool fmt);
+/* Render a sbJSON entity to text using a buffer already allocated in memory with
  * given length. Returns 1 on success and 0 on failure. */
-/* NOTE: cJSON is not always 100% accurate in estimating how much memory it will
+/* NOTE: sbJSON is not always 100% accurate in estimating how much memory it will
  * use, so to be safe allocate 5 bytes more than you actually need */
-bool cJSON_PrintPreallocated(cJSON *item, char *buffer, const int length,
+bool sbJSON_PrintPreallocated(sbJSON *item, char *buffer, const int length,
                              const bool format);
-/* Delete a cJSON entity and all subentities. */
-void cJSON_Delete(cJSON *item);
+/* Delete a sbJSON entity and all subentities. */
+void sbJSON_Delete(sbJSON *item);
 
 /* Returns the number of items in an array (or object). */
-int cJSON_GetArraySize(const cJSON *array);
+int sbJSON_GetArraySize(const sbJSON *array);
 /* Retrieve item number "index" from array "array". Returns NULL if
  * unsuccessful. */
-cJSON *cJSON_GetArrayItem(const cJSON *array, int index);
+sbJSON *sbJSON_GetArrayItem(const sbJSON *array, int index);
 /* Get item "string" from object. Case insensitive. */
-cJSON *cJSON_GetObjectItem(const cJSON *const object, const char *const string);
-cJSON *cJSON_GetObjectItemCaseSensitive(const cJSON *const object,
+sbJSON *sbJSON_GetObjectItem(const sbJSON *const object, const char *const string);
+sbJSON *sbJSON_GetObjectItemCaseSensitive(const sbJSON *const object,
                                         const char *const string);
-bool cJSON_HasObjectItem(const cJSON *object, const char *string);
+bool sbJSON_HasObjectItem(const sbJSON *object, const char *string);
 /* For analysing failed parses. This returns a pointer to the parse error.
  * You'll probably need to look a few chars back to make sense of it. Defined
- * when cJSON_Parse() returns 0. 0 when cJSON_Parse() succeeds. */
-const char *cJSON_GetErrorPtr(void);
+ * when sbJSON_Parse() returns 0. 0 when sbJSON_Parse() succeeds. */
+const char *sbJSON_GetErrorPtr(void);
 
 /* Check item type and return its value */
-char *cJSON_GetStringValue(const cJSON *const item);
-double cJSON_GetNumberValue(const cJSON *const item);
+char *sbJSON_GetStringValue(const sbJSON *const item);
+double sbJSON_GetNumberValue(const sbJSON *const item);
 
 /* These functions check the type of an item */
-bool cJSON_IsInvalid(const cJSON *const item);
-bool cJSON_IsFalse(const cJSON *const item);
-bool cJSON_IsTrue(const cJSON *const item);
-bool cJSON_IsBool(const cJSON *const item);
-bool cJSON_IsNull(const cJSON *const item);
-bool cJSON_IsNumber(const cJSON *const item);
-bool cJSON_IsString(const cJSON *const item);
-bool cJSON_IsArray(const cJSON *const item);
-bool cJSON_IsObject(const cJSON *const item);
-bool cJSON_IsRaw(const cJSON *const item);
+bool sbJSON_IsInvalid(const sbJSON *const item);
+bool sbJSON_IsFalse(const sbJSON *const item);
+bool sbJSON_IsTrue(const sbJSON *const item);
+bool sbJSON_IsBool(const sbJSON *const item);
+bool sbJSON_IsNull(const sbJSON *const item);
+bool sbJSON_IsNumber(const sbJSON *const item);
+bool sbJSON_IsString(const sbJSON *const item);
+bool sbJSON_IsArray(const sbJSON *const item);
+bool sbJSON_IsObject(const sbJSON *const item);
+bool sbJSON_IsRaw(const sbJSON *const item);
 
-/* These calls create a cJSON item of the appropriate type. */
-cJSON *cJSON_CreateNull(void);
-cJSON *cJSON_CreateTrue(void);
-cJSON *cJSON_CreateFalse(void);
-cJSON *cJSON_CreateBool(bool boolean);
-cJSON *cJSON_CreateDoubleNumber(double num);
-cJSON *cJSON_CreateIntegerNumber(int64_t num);
-cJSON *cJSON_CreateString(const char *string);
+/* These calls create a sbJSON item of the appropriate type. */
+sbJSON *sbJSON_CreateNull(void);
+sbJSON *sbJSON_CreateTrue(void);
+sbJSON *sbJSON_CreateFalse(void);
+sbJSON *sbJSON_CreateBool(bool boolean);
+sbJSON *sbJSON_CreateDoubleNumber(double num);
+sbJSON *sbJSON_CreateIntegerNumber(int64_t num);
+sbJSON *sbJSON_CreateString(const char *string);
 /* raw json */
-cJSON *cJSON_CreateRaw(const char *raw);
-cJSON *cJSON_CreateArray(void);
-cJSON *cJSON_CreateObject(void);
+sbJSON *sbJSON_CreateRaw(const char *raw);
+sbJSON *sbJSON_CreateArray(void);
+sbJSON *sbJSON_CreateObject(void);
 
 /* Create a string where valuestring references a string so
- * it will not be freed by cJSON_Delete */
-cJSON *cJSON_CreateStringReference(const char *string);
+ * it will not be freed by sbJSON_Delete */
+sbJSON *sbJSON_CreateStringReference(const char *string);
 /* Create an object/array that only references it's elements so
- * they will not be freed by cJSON_Delete */
-cJSON *cJSON_CreateObjectReference(const cJSON *child);
-cJSON *cJSON_CreateArrayReference(const cJSON *child);
+ * they will not be freed by sbJSON_Delete */
+sbJSON *sbJSON_CreateObjectReference(const sbJSON *child);
+sbJSON *sbJSON_CreateArrayReference(const sbJSON *child);
 
 /* These utilities create an Array of count items.
  * The parameter count cannot be greater than the number of elements in the
  * number array, otherwise array access will be out of bounds.*/
-cJSON *cJSON_CreateIntArray(const int *numbers, int count);
-cJSON *cJSON_CreateFloatArray(const float *numbers, int count);
-cJSON *cJSON_CreateDoubleArray(const double *numbers, int count);
-cJSON *cJSON_CreateStringArray(const char *const *strings, int count);
+sbJSON *sbJSON_CreateIntArray(const int *numbers, int count);
+sbJSON *sbJSON_CreateFloatArray(const float *numbers, int count);
+sbJSON *sbJSON_CreateDoubleArray(const double *numbers, int count);
+sbJSON *sbJSON_CreateStringArray(const char *const *strings, int count);
 
 /* Append item to the specified array/object. */
-bool cJSON_AddItemToArray(cJSON *array, cJSON *item);
-bool cJSON_AddItemToObject(cJSON *object, const char *string, cJSON *item);
+bool sbJSON_AddItemToArray(sbJSON *array, sbJSON *item);
+bool sbJSON_AddItemToObject(sbJSON *object, const char *string, sbJSON *item);
 /* Use this when string is definitely const (i.e. a literal, or as good as), and
- * will definitely survive the cJSON object. WARNING: When this function was
- * used, make sure to always check that (item->type & cJSON_StringIsConst) is
+ * will definitely survive the sbJSON object. WARNING: When this function was
+ * used, make sure to always check that (item->type & sbJSON_StringIsConst) is
  * zero before writing to `item->string` */
-bool cJSON_AddItemToObjectCS(cJSON *object, const char *string, cJSON *item);
+bool sbJSON_AddItemToObjectCS(sbJSON *object, const char *string, sbJSON *item);
 /* Append reference to item to the specified array/object. Use this when you
- * want to add an existing cJSON to a new cJSON, but don't want to corrupt your
- * existing cJSON. */
-bool cJSON_AddItemReferenceToArray(cJSON *array, cJSON *item);
-bool cJSON_AddItemReferenceToObject(cJSON *object, const char *string,
-                                    cJSON *item);
+ * want to add an existing sbJSON to a new sbJSON, but don't want to corrupt your
+ * existing sbJSON. */
+bool sbJSON_AddItemReferenceToArray(sbJSON *array, sbJSON *item);
+bool sbJSON_AddItemReferenceToObject(sbJSON *object, const char *string,
+                                    sbJSON *item);
 
 /* Remove/Detach items from Arrays/Objects. */
-cJSON *cJSON_DetachItemViaPointer(cJSON *parent, cJSON *const item);
-cJSON *cJSON_DetachItemFromArray(cJSON *array, int which);
-void cJSON_DeleteItemFromArray(cJSON *array, int which);
-cJSON *cJSON_DetachItemFromObject(cJSON *object, const char *string);
-cJSON *cJSON_DetachItemFromObjectCaseSensitive(cJSON *object,
+sbJSON *sbJSON_DetachItemViaPointer(sbJSON *parent, sbJSON *const item);
+sbJSON *sbJSON_DetachItemFromArray(sbJSON *array, int which);
+void sbJSON_DeleteItemFromArray(sbJSON *array, int which);
+sbJSON *sbJSON_DetachItemFromObject(sbJSON *object, const char *string);
+sbJSON *sbJSON_DetachItemFromObjectCaseSensitive(sbJSON *object,
                                                const char *string);
-void cJSON_DeleteItemFromObject(cJSON *object, const char *string);
-void cJSON_DeleteItemFromObjectCaseSensitive(cJSON *object, const char *string);
+void sbJSON_DeleteItemFromObject(sbJSON *object, const char *string);
+void sbJSON_DeleteItemFromObjectCaseSensitive(sbJSON *object, const char *string);
 
 /* Update array items. */
-bool cJSON_InsertItemInArray(
-    cJSON *array, int which,
-    cJSON *newitem); /* Shifts pre-existing items to the right. */
-bool cJSON_ReplaceItemViaPointer(cJSON *const parent, cJSON *const item,
-                                 cJSON *replacement);
-bool cJSON_ReplaceItemInArray(cJSON *array, int which, cJSON *newitem);
-bool cJSON_ReplaceItemInObject(cJSON *object, const char *string,
-                               cJSON *newitem);
-bool cJSON_ReplaceItemInObjectCaseSensitive(cJSON *object, const char *string,
-                                            cJSON *newitem);
+bool sbJSON_InsertItemInArray(
+    sbJSON *array, int which,
+    sbJSON *newitem); /* Shifts pre-existing items to the right. */
+bool sbJSON_ReplaceItemViaPointer(sbJSON *const parent, sbJSON *const item,
+                                 sbJSON *replacement);
+bool sbJSON_ReplaceItemInArray(sbJSON *array, int which, sbJSON *newitem);
+bool sbJSON_ReplaceItemInObject(sbJSON *object, const char *string,
+                               sbJSON *newitem);
+bool sbJSON_ReplaceItemInObjectCaseSensitive(sbJSON *object, const char *string,
+                                            sbJSON *newitem);
 
-/* Duplicate a cJSON item */
-cJSON *cJSON_Duplicate(const cJSON *item, bool recurse);
-/* Duplicate will create a new, identical cJSON item to the one you pass, in new
+/* Duplicate a sbJSON item */
+sbJSON *sbJSON_Duplicate(const sbJSON *item, bool recurse);
+/* Duplicate will create a new, identical sbJSON item to the one you pass, in new
  * memory that will need to be released. With recurse!=0, it will duplicate any
  * children connected to the item. The item->next and ->prev pointers are always
  * zero on return from Duplicate. */
-/* Recursively compare two cJSON items for equality. If either a or b is NULL or
+/* Recursively compare two sbJSON items for equality. If either a or b is NULL or
  * invalid, they will be considered unequal. case_sensitive determines if object
  * keys are treated case sensitive (1) or case insensitive (0) */
-bool cJSON_Compare(const cJSON *const a, const cJSON *const b,
+bool sbJSON_Compare(const sbJSON *const a, const sbJSON *const b,
                    const bool case_sensitive);
 
 /* Minify a strings, remove blank characters(such as ' ', '\t', '\r', '\n') from
  * strings. The input pointer json cannot point to a read-only address area,
  * such as a string constant, but should point to a readable and writable
  * address area. */
-void cJSON_Minify(char *json);
+void sbJSON_Minify(char *json);
 
 /* Helper functions for creating and adding items to an object at the same time.
  * They return the added item or NULL on failure. */
-cJSON *cJSON_AddNullToObject(cJSON *const object, const char *const name);
-cJSON *cJSON_AddTrueToObject(cJSON *const object, const char *const name);
-cJSON *cJSON_AddFalseToObject(cJSON *const object, const char *const name);
-cJSON *cJSON_AddBoolToObject(cJSON *const object, const char *const name,
+sbJSON *sbJSON_AddNullToObject(sbJSON *const object, const char *const name);
+sbJSON *sbJSON_AddTrueToObject(sbJSON *const object, const char *const name);
+sbJSON *sbJSON_AddFalseToObject(sbJSON *const object, const char *const name);
+sbJSON *sbJSON_AddBoolToObject(sbJSON *const object, const char *const name,
                              const bool boolean);
-cJSON *cJSON_AddDoubleNumberToObject(cJSON *const object, const char *const name,
+sbJSON *sbJSON_AddDoubleNumberToObject(sbJSON *const object, const char *const name,
                                const double number);
-cJSON *cJSON_AddIntegerNumberToObject(cJSON *const object, const char *const name,
+sbJSON *sbJSON_AddIntegerNumberToObject(sbJSON *const object, const char *const name,
                                int64_t number);
-cJSON *cJSON_AddStringToObject(cJSON *const object, const char *const name,
+sbJSON *sbJSON_AddStringToObject(sbJSON *const object, const char *const name,
                                const char *const string);
-cJSON *cJSON_AddRawToObject(cJSON *const object, const char *const name,
+sbJSON *sbJSON_AddRawToObject(sbJSON *const object, const char *const name,
                             const char *const raw);
-cJSON *cJSON_AddObjectToObject(cJSON *const object, const char *const name);
-cJSON *cJSON_AddArrayToObject(cJSON *const object, const char *const name);
+sbJSON *sbJSON_AddObjectToObject(sbJSON *const object, const char *const name);
+sbJSON *sbJSON_AddArrayToObject(sbJSON *const object, const char *const name);
 
-double cJSON_SetDoubleNumber(cJSON *object, double number);
-int64_t cJSON_SetIntegerNumber(cJSON *object, int64_t number);
+double sbJSON_SetDoubleNumber(sbJSON *object, double number);
+int64_t sbJSON_SetIntegerNumber(sbJSON *object, int64_t number);
 
-/* Change the valuestring of a cJSON_String object, only takes effect when type
- * of object is cJSON_String */
-char *cJSON_SetValuestring(cJSON *object, const char *valuestring);
+/* Change the valuestring of a sbJSON_String object, only takes effect when type
+ * of object is sbJSON_String */
+char *sbJSON_SetValuestring(sbJSON *object, const char *valuestring);
 
 /* If the object is not a boolean type this does nothing and returns
- * cJSON_Invalid else it returns the new type*/
-#define cJSON_SetBoolValue(object, boolValue)                                  \
-    ((object != NULL && ((object)->type & (cJSON_False | cJSON_True)))         \
-         ? (object)->type = ((object)->type & (~(cJSON_False | cJSON_True))) | \
-                            ((boolValue) ? cJSON_True : cJSON_False)           \
-         : cJSON_Invalid)
+ * sbJSON_Invalid else it returns the new type*/
+#define sbJSON_SetBoolValue(object, boolValue)                                  \
+    ((object != NULL && ((object)->type & (sbJSON_False | sbJSON_True)))         \
+         ? (object)->type = ((object)->type & (~(sbJSON_False | sbJSON_True))) | \
+                            ((boolValue) ? sbJSON_True : sbJSON_False)           \
+         : sbJSON_Invalid)
 
 /* Macro for iterating over an array or object */
-#define cJSON_ArrayForEach(element, array)                                     \
+#define sbJSON_ArrayForEach(element, array)                                     \
     for (element = (array != NULL) ? (array)->child : NULL; element != NULL;   \
          element = element->next)
 
 /* malloc/free objects using the malloc/free functions that have been set with
- * cJSON_InitHooks */
-void *cJSON_malloc(size_t size);
-void cJSON_free(void *object);
+ * sbJSON_InitHooks */
+void *sbJSON_malloc(size_t size);
+void sbJSON_free(void *object);
 
 #ifdef __cplusplus
 }

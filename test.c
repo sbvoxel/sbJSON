@@ -38,7 +38,7 @@ struct record {
 };
 
 /* Create a bunch of objects as demonstration. */
-static int print_preallocated(cJSON *root) {
+static int print_preallocated(sbJSON *root) {
     /* declarations */
     char *out = NULL;
     char *buf = NULL;
@@ -47,7 +47,7 @@ static int print_preallocated(cJSON *root) {
     size_t len_fail = 0;
 
     /* formatted print */
-    out = cJSON_Print(root);
+    out = sbJSON_Print(root);
 
     /* create buffer to succeed */
     /* the extra 5 bytes are because of inaccuracies when reserving memory */
@@ -67,12 +67,12 @@ static int print_preallocated(cJSON *root) {
     }
 
     /* Print to buffer */
-    if (!cJSON_PrintPreallocated(root, buf, (int)len, 1)) {
-        printf("cJSON_PrintPreallocated failed!\n");
+    if (!sbJSON_PrintPreallocated(root, buf, (int)len, 1)) {
+        printf("sbJSON_PrintPreallocated failed!\n");
         if (strcmp(out, buf) != 0) {
-            printf("cJSON_PrintPreallocated not the same as cJSON_Print!\n");
-            printf("cJSON_Print result:\n%s\n", out);
-            printf("cJSON_PrintPreallocated result:\n%s\n", buf);
+            printf("sbJSON_PrintPreallocated not the same as sbJSON_Print!\n");
+            printf("sbJSON_Print result:\n%s\n", out);
+            printf("sbJSON_PrintPreallocated result:\n%s\n", buf);
         }
         free(out);
         free(buf_fail);
@@ -84,11 +84,11 @@ static int print_preallocated(cJSON *root) {
     printf("%s\n", buf);
 
     /* force it to fail */
-    if (cJSON_PrintPreallocated(root, buf_fail, (int)len_fail, 1)) {
-        printf("cJSON_PrintPreallocated failed to show error with insufficient "
+    if (sbJSON_PrintPreallocated(root, buf_fail, (int)len_fail, 1)) {
+        printf("sbJSON_PrintPreallocated failed to show error with insufficient "
                "memory!\n");
-        printf("cJSON_Print result:\n%s\n", out);
-        printf("cJSON_PrintPreallocated result:\n%s\n", buf_fail);
+        printf("sbJSON_Print result:\n%s\n", out);
+        printf("sbJSON_PrintPreallocated result:\n%s\n", buf_fail);
         free(out);
         free(buf_fail);
         free(buf);
@@ -104,11 +104,11 @@ static int print_preallocated(cJSON *root) {
 /* Create a bunch of objects as demonstration. */
 static void create_objects(void) {
     /* declare a few. */
-    cJSON *root = NULL;
-    cJSON *fmt = NULL;
-    cJSON *img = NULL;
-    cJSON *thm = NULL;
-    cJSON *fld = NULL;
+    sbJSON *root = NULL;
+    sbJSON *fmt = NULL;
+    sbJSON *img = NULL;
+    sbJSON *thm = NULL;
+    sbJSON *fld = NULL;
     int i = 0;
 
     /* Our "days of the week" array: */
@@ -128,96 +128,96 @@ static void create_objects(void) {
     /* Here we construct some JSON standards, from the JSON site. */
 
     /* Our "Video" datatype: */
-    root = cJSON_CreateObject();
-    cJSON_AddItemToObject(root, "name",
-                          cJSON_CreateString("Jack (\"Bee\") Nimble"));
-    cJSON_AddItemToObject(root, "format", fmt = cJSON_CreateObject());
-    cJSON_AddStringToObject(fmt, "type", "rect");
-    cJSON_AddIntegerNumberToObject(fmt, "width", 1920);
-    cJSON_AddIntegerNumberToObject(fmt, "height", 1080);
-    cJSON_AddFalseToObject(fmt, "interlace");
-    cJSON_AddIntegerNumberToObject(fmt, "frame rate", 24);
+    root = sbJSON_CreateObject();
+    sbJSON_AddItemToObject(root, "name",
+                          sbJSON_CreateString("Jack (\"Bee\") Nimble"));
+    sbJSON_AddItemToObject(root, "format", fmt = sbJSON_CreateObject());
+    sbJSON_AddStringToObject(fmt, "type", "rect");
+    sbJSON_AddIntegerNumberToObject(fmt, "width", 1920);
+    sbJSON_AddIntegerNumberToObject(fmt, "height", 1080);
+    sbJSON_AddFalseToObject(fmt, "interlace");
+    sbJSON_AddIntegerNumberToObject(fmt, "frame rate", 24);
 
     /* Print to text */
     if (print_preallocated(root) != 0) {
-        cJSON_Delete(root);
+        sbJSON_Delete(root);
         exit(EXIT_FAILURE);
     }
-    cJSON_Delete(root);
+    sbJSON_Delete(root);
 
     /* Our "days of the week" array: */
-    root = cJSON_CreateStringArray(strings, 7);
+    root = sbJSON_CreateStringArray(strings, 7);
 
     if (print_preallocated(root) != 0) {
-        cJSON_Delete(root);
+        sbJSON_Delete(root);
         exit(EXIT_FAILURE);
     }
-    cJSON_Delete(root);
+    sbJSON_Delete(root);
 
     /* Our matrix: */
-    root = cJSON_CreateArray();
+    root = sbJSON_CreateArray();
     for (i = 0; i < 3; i++) {
-        cJSON_AddItemToArray(root, cJSON_CreateIntArray(numbers[i], 3));
+        sbJSON_AddItemToArray(root, sbJSON_CreateIntArray(numbers[i], 3));
     }
 
-    /* cJSON_ReplaceItemInArray(root, 1, cJSON_CreateString("Replacement")); */
+    /* sbJSON_ReplaceItemInArray(root, 1, sbJSON_CreateString("Replacement")); */
 
     if (print_preallocated(root) != 0) {
-        cJSON_Delete(root);
+        sbJSON_Delete(root);
         exit(EXIT_FAILURE);
     }
-    cJSON_Delete(root);
+    sbJSON_Delete(root);
 
     /* Our "gallery" item: */
-    root = cJSON_CreateObject();
-    cJSON_AddItemToObject(root, "Image", img = cJSON_CreateObject());
-    cJSON_AddIntegerNumberToObject(img, "Width", 800);
-    cJSON_AddIntegerNumberToObject(img, "Height", 600);
-    cJSON_AddStringToObject(img, "Title", "View from 15th Floor");
-    cJSON_AddItemToObject(img, "Thumbnail", thm = cJSON_CreateObject());
-    cJSON_AddStringToObject(thm, "Url",
+    root = sbJSON_CreateObject();
+    sbJSON_AddItemToObject(root, "Image", img = sbJSON_CreateObject());
+    sbJSON_AddIntegerNumberToObject(img, "Width", 800);
+    sbJSON_AddIntegerNumberToObject(img, "Height", 600);
+    sbJSON_AddStringToObject(img, "Title", "View from 15th Floor");
+    sbJSON_AddItemToObject(img, "Thumbnail", thm = sbJSON_CreateObject());
+    sbJSON_AddStringToObject(thm, "Url",
                             "http:/*www.example.com/image/481989943");
-    cJSON_AddIntegerNumberToObject(thm, "Height", 125);
-    cJSON_AddStringToObject(thm, "Width", "100");
-    cJSON_AddItemToObject(img, "IDs", cJSON_CreateIntArray(ids, 4));
+    sbJSON_AddIntegerNumberToObject(thm, "Height", 125);
+    sbJSON_AddStringToObject(thm, "Width", "100");
+    sbJSON_AddItemToObject(img, "IDs", sbJSON_CreateIntArray(ids, 4));
 
     if (print_preallocated(root) != 0) {
-        cJSON_Delete(root);
+        sbJSON_Delete(root);
         exit(EXIT_FAILURE);
     }
-    cJSON_Delete(root);
+    sbJSON_Delete(root);
 
     /* Our array of "records": */
-    root = cJSON_CreateArray();
+    root = sbJSON_CreateArray();
     for (i = 0; i < 2; i++) {
-        cJSON_AddItemToArray(root, fld = cJSON_CreateObject());
-        cJSON_AddStringToObject(fld, "precision", fields[i].precision);
-        cJSON_AddDoubleNumberToObject(fld, "Latitude", fields[i].lat);
-        cJSON_AddDoubleNumberToObject(fld, "Longitude", fields[i].lon);
-        cJSON_AddStringToObject(fld, "Address", fields[i].address);
-        cJSON_AddStringToObject(fld, "City", fields[i].city);
-        cJSON_AddStringToObject(fld, "State", fields[i].state);
-        cJSON_AddStringToObject(fld, "Zip", fields[i].zip);
-        cJSON_AddStringToObject(fld, "Country", fields[i].country);
+        sbJSON_AddItemToArray(root, fld = sbJSON_CreateObject());
+        sbJSON_AddStringToObject(fld, "precision", fields[i].precision);
+        sbJSON_AddDoubleNumberToObject(fld, "Latitude", fields[i].lat);
+        sbJSON_AddDoubleNumberToObject(fld, "Longitude", fields[i].lon);
+        sbJSON_AddStringToObject(fld, "Address", fields[i].address);
+        sbJSON_AddStringToObject(fld, "City", fields[i].city);
+        sbJSON_AddStringToObject(fld, "State", fields[i].state);
+        sbJSON_AddStringToObject(fld, "Zip", fields[i].zip);
+        sbJSON_AddStringToObject(fld, "Country", fields[i].country);
     }
 
-    /* cJSON_ReplaceItemInObject(cJSON_GetArrayItem(root, 1), "City",
-     * cJSON_CreateIntArray(ids, 4)); */
+    /* sbJSON_ReplaceItemInObject(sbJSON_GetArrayItem(root, 1), "City",
+     * sbJSON_CreateIntArray(ids, 4)); */
 
     if (print_preallocated(root) != 0) {
-        cJSON_Delete(root);
+        sbJSON_Delete(root);
         exit(EXIT_FAILURE);
     }
-    cJSON_Delete(root);
+    sbJSON_Delete(root);
 
-    root = cJSON_CreateObject();
-    cJSON_AddDoubleNumberToObject(root, "number", 1.0 / zero);
+    root = sbJSON_CreateObject();
+    sbJSON_AddDoubleNumberToObject(root, "number", 1.0 / zero);
 
     if (print_preallocated(root) != 0) {
-        cJSON_Delete(root);
+        sbJSON_Delete(root);
         exit(EXIT_FAILURE);
     }
-    cJSON_Delete(root);
+    sbJSON_Delete(root);
 }
 
 int main(void) {

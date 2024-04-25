@@ -30,40 +30,40 @@ extern "C" {
 #include "cJSON.h"
 
 /* Implement RFC6901 (https://tools.ietf.org/html/rfc6901) JSON Pointer spec. */
-cJSON *cJSONUtils_GetPointer(cJSON *const object, const char *pointer);
-cJSON *cJSONUtils_GetPointerCaseSensitive(cJSON *const object,
+sbJSON *sbJSONUtils_GetPointer(sbJSON *const object, const char *pointer);
+sbJSON *sbJSONUtils_GetPointerCaseSensitive(sbJSON *const object,
                                           const char *pointer);
 
 /* Implement RFC6902 (https://tools.ietf.org/html/rfc6902) JSON Patch spec. */
 /* NOTE: This modifies objects in 'from' and 'to' by sorting the elements by
  * their key */
-cJSON *cJSONUtils_GeneratePatches(cJSON *const from, cJSON *const to);
-cJSON *cJSONUtils_GeneratePatchesCaseSensitive(cJSON *const from,
-                                               cJSON *const to);
+sbJSON *sbJSONUtils_GeneratePatches(sbJSON *const from, sbJSON *const to);
+sbJSON *sbJSONUtils_GeneratePatchesCaseSensitive(sbJSON *const from,
+                                               sbJSON *const to);
 /* Utility for generating patch array entries. */
-void cJSONUtils_AddPatchToArray(cJSON *const array, const char *const operation,
+void sbJSONUtils_AddPatchToArray(sbJSON *const array, const char *const operation,
                                 const char *const path,
-                                const cJSON *const value);
+                                const sbJSON *const value);
 /* Returns 0 for success. */
-int cJSONUtils_ApplyPatches(cJSON *const object, const cJSON *const patches);
-int cJSONUtils_ApplyPatchesCaseSensitive(cJSON *const object,
-                                         const cJSON *const patches);
+int sbJSONUtils_ApplyPatches(sbJSON *const object, const sbJSON *const patches);
+int sbJSONUtils_ApplyPatchesCaseSensitive(sbJSON *const object,
+                                         const sbJSON *const patches);
 
 /*
 // Note that ApplyPatches is NOT atomic on failure. To implement an atomic
 ApplyPatches, use:
-//int cJSONUtils_AtomicApplyPatches(cJSON **object, cJSON *patches)
+//int sbJSONUtils_AtomicApplyPatches(sbJSON **object, sbJSON *patches)
 //{
-//    cJSON *modme = cJSON_Duplicate(*object, 1);
-//    int error = cJSONUtils_ApplyPatches(modme, patches);
+//    sbJSON *modme = sbJSON_Duplicate(*object, 1);
+//    int error = sbJSONUtils_ApplyPatches(modme, patches);
 //    if (!error)
 //    {
-//        cJSON_Delete(*object);
+//        sbJSON_Delete(*object);
 //        *object = modme;
 //    }
 //    else
 //    {
-//        cJSON_Delete(modme);
+//        sbJSON_Delete(modme);
 //    }
 //
 //    return error;
@@ -74,24 +74,24 @@ ApplyPatches, use:
 /* Implement RFC7386 (https://tools.ietf.org/html/rfc7396) JSON Merge Patch
  * spec. */
 /* target will be modified by patch. return value is new ptr for target. */
-cJSON *cJSONUtils_MergePatch(cJSON *target, const cJSON *const patch);
-cJSON *cJSONUtils_MergePatchCaseSensitive(cJSON *target,
-                                          const cJSON *const patch);
+sbJSON *sbJSONUtils_MergePatch(sbJSON *target, const sbJSON *const patch);
+sbJSON *sbJSONUtils_MergePatchCaseSensitive(sbJSON *target,
+                                          const sbJSON *const patch);
 /* generates a patch to move from -> to */
 /* NOTE: This modifies objects in 'from' and 'to' by sorting the elements by
  * their key */
-cJSON *cJSONUtils_GenerateMergePatch(cJSON *const from, cJSON *const to);
-cJSON *cJSONUtils_GenerateMergePatchCaseSensitive(cJSON *const from,
-                                                  cJSON *const to);
+sbJSON *sbJSONUtils_GenerateMergePatch(sbJSON *const from, sbJSON *const to);
+sbJSON *sbJSONUtils_GenerateMergePatchCaseSensitive(sbJSON *const from,
+                                                  sbJSON *const to);
 
 /* Given a root object and a target object, construct a pointer from one to the
  * other. */
-char *cJSONUtils_FindPointerFromObjectTo(const cJSON *const object,
-                                         const cJSON *const target);
+char *sbJSONUtils_FindPointerFromObjectTo(const sbJSON *const object,
+                                         const sbJSON *const target);
 
 /* Sorts the members of the object into alphabetical order. */
-void cJSONUtils_SortObject(cJSON *const object);
-void cJSONUtils_SortObjectCaseSensitive(cJSON *const object);
+void sbJSONUtils_SortObject(sbJSON *const object);
+void sbJSONUtils_SortObjectCaseSensitive(sbJSON *const object);
 
 #ifdef __cplusplus
 }
