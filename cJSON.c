@@ -1706,7 +1706,7 @@ static cJSON *create_reference(const cJSON *item,
 static bool add_item_to_array(cJSON *array, cJSON *item) {
     cJSON *child = NULL;
 
-    if ((item == NULL) || (array == NULL) || (array == item)) {
+    if ((item == NULL) || (array == item)) {
         return false;
     }
 
@@ -1758,7 +1758,7 @@ static bool add_item_to_object(cJSON *const object, const char *const string,
     char *new_key = NULL;
     int new_type = cJSON_Invalid;
 
-    if ((object == NULL) || (string == NULL) || (item == NULL) ||
+    if ((string == NULL) || (item == NULL) ||
         (object == item)) {
         return false;
     }
@@ -1795,16 +1795,12 @@ bool cJSON_AddItemToObjectCS(cJSON *object, const char *string, cJSON *item) {
 }
 
 bool cJSON_AddItemReferenceToArray(cJSON *array, cJSON *item) {
-    if (array == NULL) {
-        return false;
-    }
-
     return add_item_to_array(array, create_reference(item, &global_hooks));
 }
 
 bool cJSON_AddItemReferenceToObject(cJSON *object, const char *string,
                                     cJSON *item) {
-    if ((object == NULL) || (string == NULL)) {
+    if (string == NULL) {
         return false;
     }
 
