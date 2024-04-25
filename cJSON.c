@@ -80,21 +80,6 @@ double cJSON_GetNumberValue(const cJSON *const item) {
     return item->valuedouble;
 }
 
-/* This is a safeguard to prevent copy-pasters from using incompatible C and
- * header files */
-#if (CJSON_VERSION_MAJOR != 1) || (CJSON_VERSION_MINOR != 7) ||                \
-    (CJSON_VERSION_PATCH != 17)
-#error cJSON.h and cJSON.c have different versions. Make sure that both have the same.
-#endif
-
-const char *cJSON_Version(void) {
-    static char version[15];
-    sprintf(version, "%i.%i.%i", CJSON_VERSION_MAJOR, CJSON_VERSION_MINOR,
-            CJSON_VERSION_PATCH);
-
-    return version;
-}
-
 /* Case insensitive string comparison, doesn't consider two NULL pointers equal
  * though */
 static int case_insensitive_strcmp(const unsigned char *string1,

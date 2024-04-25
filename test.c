@@ -221,9 +221,6 @@ static void create_objects(void) {
 }
 
 int main(void) {
-    /* print the version */
-    printf("Version: %s\n", cJSON_Version());
-
     /* Now some samplecode for building objects concisely: */
     create_objects();
 

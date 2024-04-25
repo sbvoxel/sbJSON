@@ -27,11 +27,6 @@
 extern "C" {
 #endif
 
-/* project version */
-#define CJSON_VERSION_MAJOR 1
-#define CJSON_VERSION_MINOR 7
-#define CJSON_VERSION_PATCH 17
-
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -84,9 +79,6 @@ typedef struct cJSON_Hooks {
 #ifndef CJSON_NESTING_LIMIT
 #define CJSON_NESTING_LIMIT 1000
 #endif
-
-/* returns the version of cJSON as a string */
-const char *cJSON_Version(void);
 
 /* Supply malloc, realloc and free functions to cJSON */
 void cJSON_InitHooks(cJSON_Hooks *hooks);
