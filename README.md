@@ -117,7 +117,7 @@ You can change the build process with a list of different options that you can p
 * `-DBUILD_SHARED_LIBS=On`: Build the shared libraries. (on by default)
 * `-DBUILD_SHARED_AND_STATIC_LIBS=On`: Build both shared and static libraries. (off by default)
 * `-DCMAKE_INSTALL_PREFIX=/usr`: Set a prefix for the installation.
-* `-DENABLE_LOCALES=On`: Enable the usage of localeconv method. ( on by default )
+* `-DENABLE_LOCALES=On`: Enable the usage of localeconv method. ( on by default ) - TODO: REMOVED.
 * `-DCJSON_OVERRIDE_BUILD_SHARED_LIBS=On`: Enable overriding the value of `BUILD_SHARED_LIBS` with `-DCJSON_BUILD_SHARED_LIBS`.
 * `-DENABLE_CJSON_VERSION_SO`: Enable cJSON so version. ( on by default )
 
@@ -229,8 +229,8 @@ Additionally there are the following two flags:
 
 For every value type there is a `cJSON_Create...` function that can be used to create an item of that type.
 All of these will allocate a `cJSON` struct that can later be deleted with `cJSON_Delete`.
-Note that you have to delete them at some point, otherwise you will get a memory leak.  
-**Important**: If you have added an item to an array or an object already, you **mustn't** delete it with `cJSON_Delete`. Adding it to an array or object transfers its ownership so that when that array or object is deleted, 
+Note that you have to delete them at some point, otherwise you will get a memory leak.
+**Important**: If you have added an item to an array or an object already, you **mustn't** delete it with `cJSON_Delete`. Adding it to an array or object transfers its ownership so that when that array or object is deleted,
 it gets deleted as well. You also could use `cJSON_SetValuestring` to change a `cJSON_String`'s `valuestring`, and you needn't to free the previous `valuestring` manually.
 
 #### Basic types

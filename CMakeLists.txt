@@ -157,7 +157,7 @@ install(TARGETS "${CJSON_LIB}"
 )
 if (BUILD_SHARED_AND_STATIC_LIBS)
     install(TARGETS "${CJSON_LIB}-static"
-    EXPORT "${CJSON_LIB}" 
+    EXPORT "${CJSON_LIB}"
     ARCHIVE DESTINATION "${CMAKE_INSTALL_FULL_LIBDIR}"
     INCLUDES DESTINATION "${CMAKE_INSTALL_FULL_INCLUDEDIR}"
 )
@@ -205,8 +205,8 @@ if(ENABLE_CJSON_UTILS)
         INCLUDES DESTINATION "${CMAKE_INSTALL_FULL_INCLUDEDIR}"
     )
     if (BUILD_SHARED_AND_STATIC_LIBS)
-        install(TARGETS "${CJSON_UTILS_LIB}-static" 
-        EXPORT "${CJSON_UTILS_LIB}" 
+        install(TARGETS "${CJSON_UTILS_LIB}-static"
+        EXPORT "${CJSON_UTILS_LIB}"
         ARCHIVE DESTINATION "${CMAKE_INSTALL_FULL_LIBDIR}"
         INCLUDES DESTINATION "${CMAKE_INSTALL_FULL_INCLUDEDIR}"
         )
@@ -271,12 +271,6 @@ option(ENABLE_CJSON_UNINSTALL "Enable creating uninstall target" ON)
 if(ENABLE_CJSON_UNINSTALL)
   add_custom_target(uninstall "${CMAKE_COMMAND}" -P
     "${PROJECT_SOURCE_DIR}/library_config/uninstall.cmake")
-endif()
-
-# Enable the use of locales
-option(ENABLE_LOCALES "Enable the use of locales" ON)
-if(ENABLE_LOCALES)
-	add_definitions(-DENABLE_LOCALES)
 endif()
 
 add_subdirectory(tests)

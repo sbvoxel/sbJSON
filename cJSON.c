@@ -31,10 +31,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef ENABLE_LOCALES
-#include <locale.h>
-#endif
-
 #include "cJSON.h"
 
 /* define isnan and isinf for ANSI C, if in C99 or above, isnan and isinf has
@@ -202,16 +198,6 @@ void cJSON_Delete(cJSON *item) {
     }
 }
 
-/* get the decimal point character of the current locale */
-static unsigned char get_decimal_point(void) {
-#ifdef ENABLE_LOCALES
-    struct lconv *lconv = localeconv();
-    return (unsigned char)lconv->decimal_point[0];
-#else
-    return '.';
-#endif
-}
-
 typedef struct {
     const unsigned char *content;
     size_t length;
@@ -239,7 +225,7 @@ static bool parse_number(cJSON *const item, parse_buffer *const input_buffer) {
     double number = 0;
     unsigned char *after_end = NULL;
     unsigned char number_c_string[64];
-    unsigned char decimal_point = get_decimal_point();
+    unsigned char decimal_point = '.';
     size_t i = 0;
 
     if ((input_buffer == NULL) || (input_buffer->content == NULL)) {
@@ -453,7 +439,7 @@ static bool print_number(const cJSON *const item,
     size_t i = 0;
     unsigned char number_buffer[26] = {
         0}; /* temporary buffer to print the number into */
-    unsigned char decimal_point = get_decimal_point();
+    unsigned char decimal_point = '.';
     double test = 0.0;
 
     if (output_buffer == NULL) {
