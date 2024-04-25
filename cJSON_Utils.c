@@ -20,20 +20,6 @@
   THE SOFTWARE.
 */
 
-/* disable warnings about old C89 functions in MSVC */
-#if !defined(_CRT_SECURE_NO_DEPRECATE) && defined(_MSC_VER)
-#define _CRT_SECURE_NO_DEPRECATE
-#endif
-
-#ifdef __GNUCC__
-#pragma GCC visibility push(default)
-#endif
-#if defined(_MSC_VER)
-#pragma warning (push)
-/* disable warning about single line comments in system headers */
-#pragma warning (disable : 4001)
-#endif
-
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
@@ -42,13 +28,6 @@
 #include <math.h>
 #include <float.h>
 #include <math.h>
-
-#if defined(_MSC_VER)
-#pragma warning (pop)
-#endif
-#ifdef __GNUCC__
-#pragma GCC visibility pop
-#endif
 
 #include "cJSON_Utils.h"
 
