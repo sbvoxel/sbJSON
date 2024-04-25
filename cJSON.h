@@ -34,6 +34,7 @@ extern "C"
 #define CJSON_VERSION_PATCH 17
 
 #include <stddef.h>
+#include <stdbool.h>
 
 /* cJSON Types: */
 #define cJSON_Invalid (0)
@@ -78,8 +79,6 @@ typedef struct cJSON_Hooks
       void (*free_fn)(void *ptr);
 } cJSON_Hooks;
 
-typedef int cJSON_bool;
-
 /* Limits how deeply nested arrays/objects can be before cJSON rejects to parse them.
  * This is to prevent stack overflows. */
 #ifndef CJSON_NESTING_LIMIT
@@ -98,18 +97,18 @@ cJSON * cJSON_Parse(const char *value);
 cJSON * cJSON_ParseWithLength(const char *value, size_t buffer_length);
 /* ParseWithOpts allows you to require (and check) that the JSON is null terminated, and to retrieve the pointer to the final byte parsed. */
 /* If you supply a ptr in return_parse_end and parsing fails, then return_parse_end will contain a pointer to the error so will match cJSON_GetErrorPtr(). */
-cJSON * cJSON_ParseWithOpts(const char *value, const char **return_parse_end, cJSON_bool require_null_terminated);
-cJSON * cJSON_ParseWithLengthOpts(const char *value, size_t buffer_length, const char **return_parse_end, cJSON_bool require_null_terminated);
+cJSON * cJSON_ParseWithOpts(const char *value, const char **return_parse_end, bool require_null_terminated);
+cJSON * cJSON_ParseWithLengthOpts(const char *value, size_t buffer_length, const char **return_parse_end, bool require_null_terminated);
 
 /* Render a cJSON entity to text for transfer/storage. */
 char * cJSON_Print(const cJSON *item);
 /* Render a cJSON entity to text for transfer/storage without any formatting. */
 char * cJSON_PrintUnformatted(const cJSON *item);
 /* Render a cJSON entity to text using a buffered strategy. prebuffer is a guess at the final size. guessing well reduces reallocation. fmt=0 gives unformatted, =1 gives formatted */
-char * cJSON_PrintBuffered(const cJSON *item, int prebuffer, cJSON_bool fmt);
+char * cJSON_PrintBuffered(const cJSON *item, int prebuffer, bool fmt);
 /* Render a cJSON entity to text using a buffer already allocated in memory with given length. Returns 1 on success and 0 on failure. */
 /* NOTE: cJSON is not always 100% accurate in estimating how much memory it will use, so to be safe allocate 5 bytes more than you actually need */
-cJSON_bool cJSON_PrintPreallocated(cJSON *item, char *buffer, const int length, const cJSON_bool format);
+bool cJSON_PrintPreallocated(cJSON *item, char *buffer, const int length, const bool format);
 /* Delete a cJSON entity and all subentities. */
 void cJSON_Delete(cJSON *item);
 
@@ -120,7 +119,7 @@ cJSON * cJSON_GetArrayItem(const cJSON *array, int index);
 /* Get item "string" from object. Case insensitive. */
 cJSON * cJSON_GetObjectItem(const cJSON * const object, const char * const string);
 cJSON * cJSON_GetObjectItemCaseSensitive(const cJSON * const object, const char * const string);
-cJSON_bool cJSON_HasObjectItem(const cJSON *object, const char *string);
+bool cJSON_HasObjectItem(const cJSON *object, const char *string);
 /* For analysing failed parses. This returns a pointer to the parse error. You'll probably need to look a few chars back to make sense of it. Defined when cJSON_Parse() returns 0. 0 when cJSON_Parse() succeeds. */
 const char * cJSON_GetErrorPtr(void);
 
@@ -129,22 +128,22 @@ char * cJSON_GetStringValue(const cJSON * const item);
 double cJSON_GetNumberValue(const cJSON * const item);
 
 /* These functions check the type of an item */
-cJSON_bool cJSON_IsInvalid(const cJSON * const item);
-cJSON_bool cJSON_IsFalse(const cJSON * const item);
-cJSON_bool cJSON_IsTrue(const cJSON * const item);
-cJSON_bool cJSON_IsBool(const cJSON * const item);
-cJSON_bool cJSON_IsNull(const cJSON * const item);
-cJSON_bool cJSON_IsNumber(const cJSON * const item);
-cJSON_bool cJSON_IsString(const cJSON * const item);
-cJSON_bool cJSON_IsArray(const cJSON * const item);
-cJSON_bool cJSON_IsObject(const cJSON * const item);
-cJSON_bool cJSON_IsRaw(const cJSON * const item);
+bool cJSON_IsInvalid(const cJSON * const item);
+bool cJSON_IsFalse(const cJSON * const item);
+bool cJSON_IsTrue(const cJSON * const item);
+bool cJSON_IsBool(const cJSON * const item);
+bool cJSON_IsNull(const cJSON * const item);
+bool cJSON_IsNumber(const cJSON * const item);
+bool cJSON_IsString(const cJSON * const item);
+bool cJSON_IsArray(const cJSON * const item);
+bool cJSON_IsObject(const cJSON * const item);
+bool cJSON_IsRaw(const cJSON * const item);
 
 /* These calls create a cJSON item of the appropriate type. */
 cJSON * cJSON_CreateNull(void);
 cJSON * cJSON_CreateTrue(void);
 cJSON * cJSON_CreateFalse(void);
-cJSON * cJSON_CreateBool(cJSON_bool boolean);
+cJSON * cJSON_CreateBool(bool boolean);
 cJSON * cJSON_CreateNumber(double num);
 cJSON * cJSON_CreateString(const char *string);
 /* raw json */
@@ -168,15 +167,15 @@ cJSON * cJSON_CreateDoubleArray(const double *numbers, int count);
 cJSON * cJSON_CreateStringArray(const char *const *strings, int count);
 
 /* Append item to the specified array/object. */
-cJSON_bool cJSON_AddItemToArray(cJSON *array, cJSON *item);
-cJSON_bool cJSON_AddItemToObject(cJSON *object, const char *string, cJSON *item);
+bool cJSON_AddItemToArray(cJSON *array, cJSON *item);
+bool cJSON_AddItemToObject(cJSON *object, const char *string, cJSON *item);
 /* Use this when string is definitely const (i.e. a literal, or as good as), and will definitely survive the cJSON object.
  * WARNING: When this function was used, make sure to always check that (item->type & cJSON_StringIsConst) is zero before
  * writing to `item->string` */
-cJSON_bool cJSON_AddItemToObjectCS(cJSON *object, const char *string, cJSON *item);
+bool cJSON_AddItemToObjectCS(cJSON *object, const char *string, cJSON *item);
 /* Append reference to item to the specified array/object. Use this when you want to add an existing cJSON to a new cJSON, but don't want to corrupt your existing cJSON. */
-cJSON_bool cJSON_AddItemReferenceToArray(cJSON *array, cJSON *item);
-cJSON_bool cJSON_AddItemReferenceToObject(cJSON *object, const char *string, cJSON *item);
+bool cJSON_AddItemReferenceToArray(cJSON *array, cJSON *item);
+bool cJSON_AddItemReferenceToObject(cJSON *object, const char *string, cJSON *item);
 
 /* Remove/Detach items from Arrays/Objects. */
 cJSON * cJSON_DetachItemViaPointer(cJSON *parent, cJSON * const item);
@@ -188,20 +187,20 @@ void cJSON_DeleteItemFromObject(cJSON *object, const char *string);
 void cJSON_DeleteItemFromObjectCaseSensitive(cJSON *object, const char *string);
 
 /* Update array items. */
-cJSON_bool cJSON_InsertItemInArray(cJSON *array, int which, cJSON *newitem); /* Shifts pre-existing items to the right. */
-cJSON_bool cJSON_ReplaceItemViaPointer(cJSON * const parent, cJSON * const item, cJSON * replacement);
-cJSON_bool cJSON_ReplaceItemInArray(cJSON *array, int which, cJSON *newitem);
-cJSON_bool cJSON_ReplaceItemInObject(cJSON *object,const char *string,cJSON *newitem);
-cJSON_bool cJSON_ReplaceItemInObjectCaseSensitive(cJSON *object,const char *string,cJSON *newitem);
+bool cJSON_InsertItemInArray(cJSON *array, int which, cJSON *newitem); /* Shifts pre-existing items to the right. */
+bool cJSON_ReplaceItemViaPointer(cJSON * const parent, cJSON * const item, cJSON * replacement);
+bool cJSON_ReplaceItemInArray(cJSON *array, int which, cJSON *newitem);
+bool cJSON_ReplaceItemInObject(cJSON *object,const char *string,cJSON *newitem);
+bool cJSON_ReplaceItemInObjectCaseSensitive(cJSON *object,const char *string,cJSON *newitem);
 
 /* Duplicate a cJSON item */
-cJSON * cJSON_Duplicate(const cJSON *item, cJSON_bool recurse);
+cJSON * cJSON_Duplicate(const cJSON *item, bool recurse);
 /* Duplicate will create a new, identical cJSON item to the one you pass, in new memory that will
  * need to be released. With recurse!=0, it will duplicate any children connected to the item.
  * The item->next and ->prev pointers are always zero on return from Duplicate. */
 /* Recursively compare two cJSON items for equality. If either a or b is NULL or invalid, they will be considered unequal.
  * case_sensitive determines if object keys are treated case sensitive (1) or case insensitive (0) */
-cJSON_bool cJSON_Compare(const cJSON * const a, const cJSON * const b, const cJSON_bool case_sensitive);
+bool cJSON_Compare(const cJSON * const a, const cJSON * const b, const bool case_sensitive);
 
 /* Minify a strings, remove blank characters(such as ' ', '\t', '\r', '\n') from strings.
  * The input pointer json cannot point to a read-only address area, such as a string constant,
@@ -213,7 +212,7 @@ void cJSON_Minify(char *json);
 cJSON *cJSON_AddNullToObject(cJSON * const object, const char * const name);
 cJSON *cJSON_AddTrueToObject(cJSON * const object, const char * const name);
 cJSON *cJSON_AddFalseToObject(cJSON * const object, const char * const name);
-cJSON *cJSON_AddBoolToObject(cJSON * const object, const char * const name, const cJSON_bool boolean);
+cJSON *cJSON_AddBoolToObject(cJSON * const object, const char * const name, const bool boolean);
 cJSON *cJSON_AddNumberToObject(cJSON * const object, const char * const name, const double number);
 cJSON *cJSON_AddStringToObject(cJSON * const object, const char * const name, const char * const string);
 cJSON *cJSON_AddRawToObject(cJSON * const object, const char * const name, const char * const raw);
