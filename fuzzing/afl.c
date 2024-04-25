@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../cJSON.h"
+#include "../sbJSON.h"
 
 static char *read_file(const char *filename)
 {
@@ -85,7 +85,7 @@ cleanup:
 int main(int argc, char** argv)
 {
     const char *filename = NULL;
-    cJSON *item = NULL;
+    sbJSON *item = NULL;
     char *json = NULL;
     int status = EXIT_FAILURE;
     char *printed_json = NULL;
@@ -113,7 +113,7 @@ int main(int argc, char** argv)
         status = EXIT_FAILURE;
         goto cleanup;
     }
-    item = cJSON_Parse(json + 2);
+    item = sbJSON_Parse(json + 2);
     if (item == NULL)
     {
         goto cleanup;
@@ -130,18 +130,18 @@ int main(int argc, char** argv)
         if (json[0] == 'b')
         {
             /* buffered printing */
-            printed_json = cJSON_PrintBuffered(item, 1, do_format);
+            printed_json = sbJSON_PrintBuffered(item, 1, do_format);
         }
         else
         {
             /* unbuffered printing */
             if (do_format)
             {
-                printed_json = cJSON_Print(item);
+                printed_json = sbJSON_Print(item);
             }
             else
             {
-                printed_json = cJSON_PrintUnformatted(item);
+                printed_json = sbJSON_PrintUnformatted(item);
             }
         }
         if (printed_json == NULL)
@@ -155,7 +155,7 @@ int main(int argc, char** argv)
 cleanup:
     if (item != NULL)
     {
-        cJSON_Delete(item);
+        sbJSON_Delete(item);
         item = NULL;
     }
     if (json != NULL)

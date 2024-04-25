@@ -33,7 +33,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "cJSON.h"
+#include "sbJSON.h"
 
 /* define isnan and isinf for ANSI C, if in C99 or above, isnan and isinf has
  * been defined in math.h */

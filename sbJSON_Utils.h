@@ -20,14 +20,14 @@
   THE SOFTWARE.
 */
 
-#ifndef cJSON_Utils__h
-#define cJSON_Utils__h
+#ifndef sbJSON_Utils__h
+#define sbJSON_Utils__h
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "cJSON.h"
+#include "sbJSON.h"
 
 /* Implement RFC6901 (https://tools.ietf.org/html/rfc6901) JSON Pointer spec. */
 sbJSON *sbJSONUtils_GetPointer(sbJSON *const object, const char *pointer);
