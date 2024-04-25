@@ -1,14 +1,14 @@
 Contributors
 ============
 
-Original Author: 
-- [Dave Gamble](https://github.com/DaveGamble)  
+Original Author:
+- [Dave Gamble](https://github.com/DaveGamble)
 
-Current Maintainer: 
-- [Max Bruckner](https://github.com/FSMaxB) 
+Current Maintainer:
+- [Max Bruckner](https://github.com/FSMaxB)
 - [Alan Wang](https://github.com/Alanscut)
 
-Contributors:  
+Contributors:
 * [Ajay Bhargav](https://github.com/ajaybhargav)
 * [AlexanderVasiljev](https://github.com/AlexanderVasiljev)
 * [Alper Akcan](https://github.com/alperakcan)
