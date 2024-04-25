@@ -1343,10 +1343,6 @@ static bool print_array(const cJSON *const item,
     size_t length = 0;
     cJSON *current_element = item->child;
 
-    if (output_buffer == NULL) {
-        return false;
-    }
-
     /* Compose the output array. */
     /* opening square bracket */
     output_pointer = ensure(output_buffer, 1);
