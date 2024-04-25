@@ -173,13 +173,13 @@ void sbJSON_Delete(sbJSON *item) {
     sbJSON *next = NULL;
     while (item != NULL) {
         next = item->next;
-        if (!(item->is_reference) && (item->child != NULL)) {
+        if ((!item->is_reference) && (item->child != NULL)) {
             sbJSON_Delete(item->child);
         }
-        if (!(item->is_reference) && (item->u.valuestring != NULL)) {
+        if ((!item->is_reference) && (item->u.valuestring != NULL)) {
             global_hooks.deallocate(item->u.valuestring);
         }
-        if (!(item->string_is_const) && (item->string != NULL)) {
+        if ((!item->string_is_const) && (item->string != NULL)) {
             global_hooks.deallocate(item->string);
         }
         global_hooks.deallocate(item);
@@ -1770,7 +1770,7 @@ static bool add_item_to_object(sbJSON *const object, const char *const string,
         string_is_const = false;
     }
 
-    if (!(item->string_is_const) && (item->string != NULL)) {
+    if ((!item->string_is_const) && (item->string != NULL)) {
         hooks->deallocate(item->string);
     }
 
@@ -2061,7 +2061,7 @@ static bool replace_item_in_object(sbJSON *object, const char *string,
     }
 
     /* replace the name in the replacement */
-    if (!(replacement->string_is_const) && (replacement->string != NULL)) {
+    if ((!replacement->string_is_const) && (replacement->string != NULL)) {
         sbJSON_free(replacement->string);
     }
     replacement->string =
