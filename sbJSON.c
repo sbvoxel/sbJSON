@@ -279,7 +279,6 @@ loop_end:
     }
 
     if (decimal_number) {
-        // TODO: strtod is locale dependent and we've removed locale logic
         double number = strtod((const char *)number_c_string, (char **)&after_end);
         sbJSON_SetDoubleNumber(item, number);
     } else {
