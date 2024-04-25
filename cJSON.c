@@ -1761,7 +1761,7 @@ static bool add_item_to_object(cJSON *const object, const char *const string,
     char *new_key = NULL;
     int new_type = cJSON_Invalid;
 
-    if ((string == NULL) || (item == NULL)) {
+    if (item == NULL) {
         return false;
     }
 
@@ -1804,10 +1804,6 @@ bool cJSON_AddItemReferenceToArray(cJSON *array, cJSON *item) {
 
 bool cJSON_AddItemReferenceToObject(cJSON *object, const char *string,
                                     cJSON *item) {
-    if (string == NULL) {
-        return false;
-    }
-
     return add_item_to_object(object, string,
                               create_reference(item, &global_hooks),
                               &global_hooks, false);
