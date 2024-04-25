@@ -195,7 +195,7 @@ static void encode_string_as_pointer(unsigned char *destination, const unsigned 
     destination[0] = '\0';
 }
 
-CJSON_PUBLIC(char *) cJSONUtils_FindPointerFromObjectTo(const cJSON * const object, const cJSON * const target)
+char * cJSONUtils_FindPointerFromObjectTo(const cJSON * const object, const cJSON * const target)
 {
     size_t child_index = 0;
     cJSON *current_child = 0;
@@ -345,12 +345,12 @@ static cJSON *get_item_from_pointer(cJSON * const object, const char * pointer, 
     return current_element;
 }
 
-CJSON_PUBLIC(cJSON *) cJSONUtils_GetPointer(cJSON * const object, const char *pointer)
+cJSON * cJSONUtils_GetPointer(cJSON * const object, const char *pointer)
 {
     return get_item_from_pointer(object, pointer, false);
 }
 
-CJSON_PUBLIC(cJSON *) cJSONUtils_GetPointerCaseSensitive(cJSON * const object, const char *pointer)
+cJSON * cJSONUtils_GetPointerCaseSensitive(cJSON * const object, const char *pointer)
 {
     return get_item_from_pointer(object, pointer, true);
 }
@@ -1035,7 +1035,7 @@ cleanup:
     return status;
 }
 
-CJSON_PUBLIC(int) cJSONUtils_ApplyPatches(cJSON * const object, const cJSON * const patches)
+int cJSONUtils_ApplyPatches(cJSON * const object, const cJSON * const patches)
 {
     const cJSON *current_patch = NULL;
     int status = 0;
@@ -1064,7 +1064,7 @@ CJSON_PUBLIC(int) cJSONUtils_ApplyPatches(cJSON * const object, const cJSON * co
     return 0;
 }
 
-CJSON_PUBLIC(int) cJSONUtils_ApplyPatchesCaseSensitive(cJSON * const object, const cJSON * const patches)
+int cJSONUtils_ApplyPatchesCaseSensitive(cJSON * const object, const cJSON * const patches)
 {
     const cJSON *current_patch = NULL;
     int status = 0;
@@ -1133,7 +1133,7 @@ static void compose_patch(cJSON * const patches, const unsigned char * const ope
     cJSON_AddItemToArray(patches, patch);
 }
 
-CJSON_PUBLIC(void) cJSONUtils_AddPatchToArray(cJSON * const array, const char * const operation, const char * const path, const cJSON * const value)
+void cJSONUtils_AddPatchToArray(cJSON * const array, const char * const operation, const char * const path, const cJSON * const value)
 {
     compose_patch(array, (const unsigned char*)operation, (const unsigned char*)path, NULL, value);
 }
@@ -1278,7 +1278,7 @@ static void create_patches(cJSON * const patches, const unsigned char * const pa
     }
 }
 
-CJSON_PUBLIC(cJSON *) cJSONUtils_GeneratePatches(cJSON * const from, cJSON * const to)
+cJSON * cJSONUtils_GeneratePatches(cJSON * const from, cJSON * const to)
 {
     cJSON *patches = NULL;
 
@@ -1293,7 +1293,7 @@ CJSON_PUBLIC(cJSON *) cJSONUtils_GeneratePatches(cJSON * const from, cJSON * con
     return patches;
 }
 
-CJSON_PUBLIC(cJSON *) cJSONUtils_GeneratePatchesCaseSensitive(cJSON * const from, cJSON * const to)
+cJSON * cJSONUtils_GeneratePatchesCaseSensitive(cJSON * const from, cJSON * const to)
 {
     cJSON *patches = NULL;
 
@@ -1308,12 +1308,12 @@ CJSON_PUBLIC(cJSON *) cJSONUtils_GeneratePatchesCaseSensitive(cJSON * const from
     return patches;
 }
 
-CJSON_PUBLIC(void) cJSONUtils_SortObject(cJSON * const object)
+void cJSONUtils_SortObject(cJSON * const object)
 {
     sort_object(object, false);
 }
 
-CJSON_PUBLIC(void) cJSONUtils_SortObjectCaseSensitive(cJSON * const object)
+void cJSONUtils_SortObjectCaseSensitive(cJSON * const object)
 {
     sort_object(object, true);
 }
@@ -1378,12 +1378,12 @@ static cJSON *merge_patch(cJSON *target, const cJSON * const patch, const cJSON_
     return target;
 }
 
-CJSON_PUBLIC(cJSON *) cJSONUtils_MergePatch(cJSON *target, const cJSON * const patch)
+cJSON * cJSONUtils_MergePatch(cJSON *target, const cJSON * const patch)
 {
     return merge_patch(target, patch, false);
 }
 
-CJSON_PUBLIC(cJSON *) cJSONUtils_MergePatchCaseSensitive(cJSON *target, const cJSON * const patch)
+cJSON * cJSONUtils_MergePatchCaseSensitive(cJSON *target, const cJSON * const patch)
 {
     return merge_patch(target, patch, true);
 }
@@ -1470,12 +1470,12 @@ static cJSON *generate_merge_patch(cJSON * const from, cJSON * const to, const c
     return patch;
 }
 
-CJSON_PUBLIC(cJSON *) cJSONUtils_GenerateMergePatch(cJSON * const from, cJSON * const to)
+cJSON * cJSONUtils_GenerateMergePatch(cJSON * const from, cJSON * const to)
 {
     return generate_merge_patch(from, to, false);
 }
 
-CJSON_PUBLIC(cJSON *) cJSONUtils_GenerateMergePatchCaseSensitive(cJSON * const from, cJSON * const to)
+cJSON * cJSONUtils_GenerateMergePatchCaseSensitive(cJSON * const from, cJSON * const to)
 {
     return generate_merge_patch(from, to, true);
 }
