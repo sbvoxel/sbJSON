@@ -505,6 +505,18 @@ static void sort_object(sbJSON *const object, const bool case_sensitive) {
     object->child = sort_list(object->child, case_sensitive);
 }
 
+static bool numbers_match(sbJSON *a, sbJSON *b) {
+    if (a->is_number_double != b->is_number_double) {
+        return false;
+    }
+
+    if (a->is_number_double) {
+        return compare_double(a->u.valuedouble, b->u.valuedouble);
+    } else {
+        return a->u.valueint == b->u.valueint;
+    }
+}
+
 static bool compare_json(sbJSON *a, sbJSON *b, const bool case_sensitive) {
     if ((a == NULL) || (b == NULL) || ((a->type != b->type))) {
         /* mismatched type. */
@@ -512,14 +524,7 @@ static bool compare_json(sbJSON *a, sbJSON *b, const bool case_sensitive) {
     }
     switch (a->type) {
     case sbJSON_Number:
-        // TODO: This needs updating now.
-        /* numeric mismatch. */
-        if ((a->u.valueint != b->u.valueint) ||
-            (!compare_double(a->u.valuedouble, b->u.valuedouble))) {
-            return false;
-        } else {
-            return true;
-        }
+        return numbers_match(a, b);
 
     case sbJSON_String:
         /* string mismatch. */
@@ -985,9 +990,7 @@ static void create_patches(sbJSON *const patches,
 
     switch (from->type) {
     case sbJSON_Number:
-        // TODO: This needs updating now.
-        if ((from->u.valueint != to->u.valueint) ||
-            !compare_double(from->u.valuedouble, to->u.valuedouble)) {
+        if (!numbers_match(from, to)) {
             compose_patch(patches, (const unsigned char *)"replace", path, NULL,
                           to);
         }
