@@ -271,12 +271,7 @@ char *sbJSON_SetValuestring(sbJSON *object, const char *valuestring);
 
 /* If the object is not a boolean type this does nothing and returns
  * sbJSON_Invalid else it returns the new type*/
-#define sbJSON_SetBoolValue(object, boolValue)                                 \
-    ((object != NULL && ((object)->type & (sbJSON_False | sbJSON_True)))       \
-         ? (object)->type =                                                    \
-               ((object)->type & (~(sbJSON_False | sbJSON_True))) |            \
-               ((boolValue) ? sbJSON_True : sbJSON_False)                      \
-         : sbJSON_Invalid)
+enum sbJSON_Kind sbJSON_SetBoolValue(sbJSON *object, bool boolValue);
 
 /* Macro for iterating over an array or object */
 #define sbJSON_ArrayForEach(element, array)                                    \

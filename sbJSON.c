@@ -318,6 +318,26 @@ char *sbJSON_SetValuestring(sbJSON *object, const char *valuestring) {
     return copy;
 }
 
+enum sbJSON_Kind sbJSON_SetBoolValue(sbJSON *object, bool boolValue) {
+    if (object == NULL) {
+        return sbJSON_Invalid;
+    }
+
+    if (object->type != sbJSON_False && object->type != sbJSON_True) {
+        return sbJSON_Invalid;
+    }
+
+    assert(!object->is_reference && !object->string_is_const);
+
+    if (boolValue) {
+        object->type = sbJSON_True;
+        return sbJSON_True;
+    } else {
+        object->type = sbJSON_False;
+        return sbJSON_False;
+    }
+}
+
 typedef struct {
     unsigned char *buffer;
     size_t length;
