@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #include "cJSON.h"
 
@@ -1706,9 +1707,11 @@ static cJSON *create_reference(const cJSON *item,
 static bool add_item_to_array(cJSON *array, cJSON *item) {
     cJSON *child = NULL;
 
-    if ((item == NULL) || (array == item)) {
+    if (item == NULL) {
         return false;
     }
+
+    assert(array != item);
 
     child = array->child;
     /*
@@ -1758,10 +1761,11 @@ static bool add_item_to_object(cJSON *const object, const char *const string,
     char *new_key = NULL;
     int new_type = cJSON_Invalid;
 
-    if ((string == NULL) || (item == NULL) ||
-        (object == item)) {
+    if ((string == NULL) || (item == NULL)) {
         return false;
     }
+
+    assert(object != item);
 
     if (constant_key) {
         new_key = (char *)cast_away_const(string);
