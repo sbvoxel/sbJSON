@@ -416,7 +416,7 @@ static unsigned char *ensure(printbuffer *const p, size_t needed) {
  */
 static void update_offset(printbuffer *const buffer) {
     const unsigned char *buffer_pointer = NULL;
-    if ((buffer == NULL) || (buffer->buffer == NULL)) {
+    if (buffer->buffer == NULL) {
         return;
     }
     buffer_pointer = buffer->buffer + buffer->offset;
