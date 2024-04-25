@@ -705,7 +705,7 @@ static int apply_patch(sbJSON *object, const sbJSON *patch,
     /* special case for replacing the root */
     if (path->u.valuestring[0] == '\0') {
         if (opcode == REMOVE) {
-            static const sbJSON invalid = {NULL, NULL,  NULL, sbJSON_Invalid,
+            static const sbJSON invalid = {NULL, NULL,  NULL, sbJSON_Invalid, 0, 0,
                                           {0},  false, NULL};
 
             overwrite_item(object, invalid);

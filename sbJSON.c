@@ -173,13 +173,13 @@ void sbJSON_Delete(sbJSON *item) {
     sbJSON *next = NULL;
     while (item != NULL) {
         next = item->next;
-        if (!(item->type & sbJSON_IsReference) && (item->child != NULL)) {
+        if (!(item->is_reference) && (item->child != NULL)) {
             sbJSON_Delete(item->child);
         }
-        if (!(item->type & sbJSON_IsReference) && (item->u.valuestring != NULL)) {
+        if (!(item->is_reference) && (item->u.valuestring != NULL)) {
             global_hooks.deallocate(item->u.valuestring);
         }
-        if (!(item->type & sbJSON_StringIsConst) && (item->string != NULL)) {
+        if (!(item->string_is_const) && (item->string != NULL)) {
             global_hooks.deallocate(item->string);
         }
         global_hooks.deallocate(item);
@@ -291,8 +291,8 @@ char *sbJSON_SetValuestring(sbJSON *object, const char *valuestring) {
     char *copy = NULL;
     /* if object's type is not sbJSON_String or is sbJSON_IsReference, it should
      * not set valuestring */
-    if ((object == NULL) || !(object->type & sbJSON_String) ||
-        (object->type & sbJSON_IsReference)) {
+    if ((object == NULL) || !(object->type == sbJSON_String) ||
+        (object->is_reference)) {
         return NULL;
     }
     /* return NULL if the object is corrupted */
@@ -1176,7 +1176,7 @@ static bool print_value(const sbJSON *const item,
         return false;
     }
 
-    switch ((item->type) & 0xFF) {
+    switch (item->type) {
     case sbJSON_NULL:
         output = ensure(output_buffer, 5);
         if (output == NULL) {
@@ -1682,7 +1682,7 @@ static sbJSON *create_reference(const sbJSON *item,
 
     memcpy(reference, item, sizeof(sbJSON));
     reference->string = NULL;
-    reference->type |= sbJSON_IsReference;
+    reference->is_reference = true;
     reference->next = reference->prev = NULL;
     return reference;
 }
@@ -1742,7 +1742,9 @@ static bool add_item_to_object(sbJSON *const object, const char *const string,
                                const internal_hooks *const hooks,
                                const bool constant_key) {
     char *new_key = NULL;
-    int new_type = sbJSON_Invalid;
+    uint16_t new_type = sbJSON_Invalid;
+    bool is_reference = false;
+    bool string_is_const = false;
 
     if (item == NULL) {
         return false;
@@ -1752,22 +1754,27 @@ static bool add_item_to_object(sbJSON *const object, const char *const string,
 
     if (constant_key) {
         new_key = (char *)cast_away_const(string);
-        new_type = item->type | sbJSON_StringIsConst;
+        new_type = item->type;
+        string_is_const = true;
     } else {
         new_key = (char *)sbJSON_strdup((const unsigned char *)string, hooks);
         if (new_key == NULL) {
             return false;
         }
 
-        new_type = item->type & ~sbJSON_StringIsConst;
+        new_type = item->type;
+        is_reference = item->is_reference;
+        string_is_const = false;
     }
 
-    if (!(item->type & sbJSON_StringIsConst) && (item->string != NULL)) {
+    if (!(item->string_is_const) && (item->string != NULL)) {
         hooks->deallocate(item->string);
     }
 
     item->string = new_key;
     item->type = new_type;
+    item->is_reference = is_reference;
+    item->string_is_const = string_is_const;
 
     return add_item_to_array(object, item);
 }
@@ -2048,7 +2055,7 @@ static bool replace_item_in_object(sbJSON *object, const char *string,
     }
 
     /* replace the name in the replacement */
-    if (!(replacement->type & sbJSON_StringIsConst) &&
+    if (!(replacement->string_is_const) &&
         (replacement->string != NULL)) {
         sbJSON_free(replacement->string);
     }
@@ -2058,7 +2065,7 @@ static bool replace_item_in_object(sbJSON *object, const char *string,
         return false;
     }
 
-    replacement->type &= ~sbJSON_StringIsConst;
+    replacement->string_is_const = false;
 
     return sbJSON_ReplaceItemViaPointer(
         object, get_object_item(object, string, case_sensitive), replacement);
@@ -2151,7 +2158,8 @@ sbJSON *sbJSON_CreateString(const char *string) {
 sbJSON *sbJSON_CreateStringReference(const char *string) {
     sbJSON *item = sbJSON_New_Item(&global_hooks);
     if (item != NULL) {
-        item->type = sbJSON_String | sbJSON_IsReference;
+        item->type = sbJSON_String;
+        item->is_reference = true;
         item->u.valuestring = (char *)cast_away_const(string);
     }
 
@@ -2161,7 +2169,8 @@ sbJSON *sbJSON_CreateStringReference(const char *string) {
 sbJSON *sbJSON_CreateObjectReference(const sbJSON *child) {
     sbJSON *item = sbJSON_New_Item(&global_hooks);
     if (item != NULL) {
-        item->type = sbJSON_Object | sbJSON_IsReference;
+        item->type = sbJSON_Object;
+        item->is_reference = true;
         item->child = (sbJSON *)cast_away_const(child);
     }
 
@@ -2171,7 +2180,8 @@ sbJSON *sbJSON_CreateObjectReference(const sbJSON *child) {
 sbJSON *sbJSON_CreateArrayReference(const sbJSON *child) {
     sbJSON *item = sbJSON_New_Item(&global_hooks);
     if (item != NULL) {
-        item->type = sbJSON_Array | sbJSON_IsReference;
+        item->type = sbJSON_Array;
+        item->is_reference = true;
         item->child = (sbJSON *)cast_away_const(child);
     }
 
@@ -2361,7 +2371,10 @@ sbJSON *sbJSON_Duplicate(const sbJSON *item, bool recurse) {
         goto fail;
     }
     /* Copy over all vars */
-    newitem->type = item->type & (~sbJSON_IsReference);
+    newitem->type = item->type;
+    newitem->is_reference = false;
+    newitem->string_is_const = item->string_is_const;
+
     newitem->u.valueint = item->u.valueint;
     newitem->u.valuedouble = item->u.valuedouble;
     newitem->is_number_double = item->is_number_double;
@@ -2374,7 +2387,7 @@ sbJSON *sbJSON_Duplicate(const sbJSON *item, bool recurse) {
     }
     if (item->string) {
         newitem->string =
-            (item->type & sbJSON_StringIsConst)
+            (item->string_is_const)
                 ? item->string
                 : (char *)sbJSON_strdup((unsigned char *)item->string,
                                        &global_hooks);
@@ -2511,7 +2524,7 @@ bool sbJSON_IsInvalid(const sbJSON *const item) {
         return false;
     }
 
-    return (item->type & 0xFF) == sbJSON_Invalid;
+    return item->type == sbJSON_Invalid;
 }
 
 bool sbJSON_IsFalse(const sbJSON *const item) {
@@ -2519,7 +2532,7 @@ bool sbJSON_IsFalse(const sbJSON *const item) {
         return false;
     }
 
-    return (item->type & 0xFF) == sbJSON_False;
+    return item->type == sbJSON_False;
 }
 
 bool sbJSON_IsTrue(const sbJSON *const item) {
@@ -2527,7 +2540,7 @@ bool sbJSON_IsTrue(const sbJSON *const item) {
         return false;
     }
 
-    return (item->type & 0xff) == sbJSON_True;
+    return item->type == sbJSON_True;
 }
 
 bool sbJSON_IsBool(const sbJSON *const item) {
@@ -2535,14 +2548,15 @@ bool sbJSON_IsBool(const sbJSON *const item) {
         return false;
     }
 
-    return (item->type & (sbJSON_True | sbJSON_False)) != 0;
+    return item->type == sbJSON_True || item->type == sbJSON_False;
 }
+
 bool sbJSON_IsNull(const sbJSON *const item) {
     if (item == NULL) {
         return false;
     }
 
-    return (item->type & 0xFF) == sbJSON_NULL;
+    return item->type == sbJSON_NULL;
 }
 
 bool sbJSON_IsNumber(const sbJSON *const item) {
@@ -2550,7 +2564,7 @@ bool sbJSON_IsNumber(const sbJSON *const item) {
         return false;
     }
 
-    return (item->type & 0xFF) == sbJSON_Number;
+    return item->type == sbJSON_Number;
 }
 
 bool sbJSON_IsString(const sbJSON *const item) {
@@ -2558,7 +2572,7 @@ bool sbJSON_IsString(const sbJSON *const item) {
         return false;
     }
 
-    return (item->type & 0xFF) == sbJSON_String;
+    return item->type == sbJSON_String;
 }
 
 bool sbJSON_IsArray(const sbJSON *const item) {
@@ -2566,7 +2580,7 @@ bool sbJSON_IsArray(const sbJSON *const item) {
         return false;
     }
 
-    return (item->type & 0xFF) == sbJSON_Array;
+    return item->type == sbJSON_Array;
 }
 
 bool sbJSON_IsObject(const sbJSON *const item) {
@@ -2574,7 +2588,7 @@ bool sbJSON_IsObject(const sbJSON *const item) {
         return false;
     }
 
-    return (item->type & 0xFF) == sbJSON_Object;
+    return item->type == sbJSON_Object;
 }
 
 bool sbJSON_IsRaw(const sbJSON *const item) {
@@ -2582,7 +2596,7 @@ bool sbJSON_IsRaw(const sbJSON *const item) {
         return false;
     }
 
-    return (item->type & 0xFF) == sbJSON_Raw;
+    return item->type == sbJSON_Raw;
 }
 
 bool sbJSON_Compare(const sbJSON *const a, const sbJSON *const b,

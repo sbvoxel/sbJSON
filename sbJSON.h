@@ -32,18 +32,17 @@ extern "C" {
 #include <stdint.h>
 
 /* sbJSON Types: */
-#define sbJSON_Invalid (0)
-#define sbJSON_False (1 << 0)
-#define sbJSON_True (1 << 1)
-#define sbJSON_NULL (1 << 2)
-#define sbJSON_Number (1 << 3)
-#define sbJSON_String (1 << 4)
-#define sbJSON_Array (1 << 5)
-#define sbJSON_Object (1 << 6)
-#define sbJSON_Raw (1 << 7) /* raw json */
-
-#define sbJSON_IsReference 256
-#define sbJSON_StringIsConst 512
+enum sbJSON_Kind {
+    sbJSON_Invalid,
+    sbJSON_False,
+    sbJSON_True,
+    sbJSON_NULL,
+    sbJSON_Number,
+    sbJSON_String,
+    sbJSON_Array,
+    sbJSON_Object,
+    sbJSON_Raw,
+};
 
 /* The sbJSON structure: */
 typedef struct sbJSON {
@@ -56,7 +55,9 @@ typedef struct sbJSON {
     struct sbJSON *child;
 
     /* The type of the item, as above. */
-    int type;
+    uint8_t type;
+    bool is_reference;
+    bool string_is_const;
 
     union U {
         /* The item's string, if type==sbJSON_String  and type == sbJSON_Raw */
@@ -189,8 +190,8 @@ bool sbJSON_AddItemToArray(sbJSON *array, sbJSON *item);
 bool sbJSON_AddItemToObject(sbJSON *object, const char *string, sbJSON *item);
 /* Use this when string is definitely const (i.e. a literal, or as good as), and
  * will definitely survive the sbJSON object. WARNING: When this function was
- * used, make sure to always check that (item->type & sbJSON_StringIsConst) is
- * zero before writing to `item->string` */
+ * used, make sure to always check that item->string_is_const is false
+ * before writing to `item->string` */
 bool sbJSON_AddItemToObjectCS(sbJSON *object, const char *string, sbJSON *item);
 /* Append reference to item to the specified array/object. Use this when you
  * want to add an existing sbJSON to a new sbJSON, but don't want to corrupt your
