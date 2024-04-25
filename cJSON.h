@@ -29,6 +29,7 @@ extern "C" {
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 
 /* cJSON Types: */
 #define cJSON_Invalid (0)
@@ -57,12 +58,15 @@ typedef struct cJSON {
     /* The type of the item, as above. */
     int type;
 
-    /* The item's string, if type==cJSON_String  and type == cJSON_Raw */
-    char *valuestring;
-    /* writing to valueint is DEPRECATED, use cJSON_SetNumberValue instead */
-    int valueint;
-    /* The item's number, if type==cJSON_Number */
-    double valuedouble;
+    union U {
+        /* The item's string, if type==cJSON_String  and type == cJSON_Raw */
+        char *valuestring;
+        /* The item's number, if type==cJSON_Number */
+        int64_t valueint;
+        double valuedouble;
+    } u;
+
+    bool is_number_double;
 
     /* The item's name string, if this item is the child of, or is in the list
      * of subitems of an object. */
@@ -156,7 +160,8 @@ cJSON *cJSON_CreateNull(void);
 cJSON *cJSON_CreateTrue(void);
 cJSON *cJSON_CreateFalse(void);
 cJSON *cJSON_CreateBool(bool boolean);
-cJSON *cJSON_CreateNumber(double num);
+cJSON *cJSON_CreateDoubleNumber(double num);
+cJSON *cJSON_CreateIntegerNumber(int64_t num);
 cJSON *cJSON_CreateString(const char *string);
 /* raw json */
 cJSON *cJSON_CreateRaw(const char *raw);
@@ -241,8 +246,10 @@ cJSON *cJSON_AddTrueToObject(cJSON *const object, const char *const name);
 cJSON *cJSON_AddFalseToObject(cJSON *const object, const char *const name);
 cJSON *cJSON_AddBoolToObject(cJSON *const object, const char *const name,
                              const bool boolean);
-cJSON *cJSON_AddNumberToObject(cJSON *const object, const char *const name,
+cJSON *cJSON_AddDoubleNumberToObject(cJSON *const object, const char *const name,
                                const double number);
+cJSON *cJSON_AddIntegerNumberToObject(cJSON *const object, const char *const name,
+                               int64_t number);
 cJSON *cJSON_AddStringToObject(cJSON *const object, const char *const name,
                                const char *const string);
 cJSON *cJSON_AddRawToObject(cJSON *const object, const char *const name,
@@ -250,16 +257,9 @@ cJSON *cJSON_AddRawToObject(cJSON *const object, const char *const name,
 cJSON *cJSON_AddObjectToObject(cJSON *const object, const char *const name);
 cJSON *cJSON_AddArrayToObject(cJSON *const object, const char *const name);
 
-/* When assigning an integer value, it needs to be propagated to valuedouble
- * too. */
-#define cJSON_SetIntValue(object, number)                                      \
-    ((object) ? (object)->valueint = (object)->valuedouble = (number)          \
-              : (number))
-/* helper for the cJSON_SetNumberValue macro */
-double cJSON_SetNumberHelper(cJSON *object, double number);
-#define cJSON_SetNumberValue(object, number)                                   \
-    ((object != NULL) ? cJSON_SetNumberHelper(object, (double)number)          \
-                      : (number))
+double cJSON_SetDoubleNumber(cJSON *object, double number);
+int64_t cJSON_SetIntegerNumber(cJSON *object, int64_t number);
+
 /* Change the valuestring of a cJSON_String object, only takes effect when type
  * of object is cJSON_String */
 char *cJSON_SetValuestring(cJSON *object, const char *valuestring);

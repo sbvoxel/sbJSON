@@ -512,9 +512,10 @@ static bool compare_json(cJSON *a, cJSON *b, const bool case_sensitive) {
     }
     switch (a->type & 0xFF) {
     case cJSON_Number:
+        // TODO: This needs updating now.
         /* numeric mismatch. */
-        if ((a->valueint != b->valueint) ||
-            (!compare_double(a->valuedouble, b->valuedouble))) {
+        if ((a->u.valueint != b->u.valueint) ||
+            (!compare_double(a->u.valuedouble, b->u.valuedouble))) {
             return false;
         } else {
             return true;
@@ -522,7 +523,7 @@ static bool compare_json(cJSON *a, cJSON *b, const bool case_sensitive) {
 
     case cJSON_String:
         /* string mismatch. */
-        if (strcmp(a->valuestring, b->valuestring) != 0) {
+        if (strcmp(a->u.valuestring, b->u.valuestring) != 0) {
             return false;
         } else {
             return true;
@@ -626,27 +627,27 @@ static enum patch_operation decode_patch_operation(const cJSON *const patch,
         return INVALID;
     }
 
-    if (strcmp(operation->valuestring, "add") == 0) {
+    if (strcmp(operation->u.valuestring, "add") == 0) {
         return ADD;
     }
 
-    if (strcmp(operation->valuestring, "remove") == 0) {
+    if (strcmp(operation->u.valuestring, "remove") == 0) {
         return REMOVE;
     }
 
-    if (strcmp(operation->valuestring, "replace") == 0) {
+    if (strcmp(operation->u.valuestring, "replace") == 0) {
         return REPLACE;
     }
 
-    if (strcmp(operation->valuestring, "move") == 0) {
+    if (strcmp(operation->u.valuestring, "move") == 0) {
         return MOVE;
     }
 
-    if (strcmp(operation->valuestring, "copy") == 0) {
+    if (strcmp(operation->u.valuestring, "copy") == 0) {
         return COPY;
     }
 
-    if (strcmp(operation->valuestring, "test") == 0) {
+    if (strcmp(operation->u.valuestring, "test") == 0) {
         return TEST;
     }
 
@@ -662,8 +663,8 @@ static void overwrite_item(cJSON *const root, const cJSON replacement) {
     if (root->string != NULL) {
         cJSON_free(root->string);
     }
-    if (root->valuestring != NULL) {
-        cJSON_free(root->valuestring);
+    if (root->u.valuestring != NULL) {
+        cJSON_free(root->u.valuestring);
     }
     if (root->child != NULL) {
         cJSON_Delete(root->child);
@@ -696,16 +697,16 @@ static int apply_patch(cJSON *object, const cJSON *patch,
     } else if (opcode == TEST) {
         /* compare value: {...} with the given path */
         status = !compare_json(
-            get_item_from_pointer(object, path->valuestring, case_sensitive),
+            get_item_from_pointer(object, path->u.valuestring, case_sensitive),
             get_object_item(patch, "value", case_sensitive), case_sensitive);
         goto cleanup;
     }
 
     /* special case for replacing the root */
-    if (path->valuestring[0] == '\0') {
+    if (path->u.valuestring[0] == '\0') {
         if (opcode == REMOVE) {
-            static const cJSON invalid = {NULL, NULL, NULL, cJSON_Invalid,
-                                          NULL, 0,    0,    NULL};
+            static const cJSON invalid = {NULL, NULL,  NULL, cJSON_Invalid,
+                                          {0},  false, NULL};
 
             overwrite_item(object, invalid);
 
@@ -748,7 +749,7 @@ static int apply_patch(cJSON *object, const cJSON *patch,
     if ((opcode == REMOVE) || (opcode == REPLACE)) {
         /* Get rid of old. */
         cJSON *old_item = detach_path(
-            object, (unsigned char *)path->valuestring, case_sensitive);
+            object, (unsigned char *)path->u.valuestring, case_sensitive);
         if (old_item == NULL) {
             status = 13;
             goto cleanup;
@@ -771,11 +772,11 @@ static int apply_patch(cJSON *object, const cJSON *patch,
         }
 
         if (opcode == MOVE) {
-            value = detach_path(object, (unsigned char *)from->valuestring,
+            value = detach_path(object, (unsigned char *)from->u.valuestring,
                                 case_sensitive);
         }
         if (opcode == COPY) {
-            value = get_item_from_pointer(object, from->valuestring,
+            value = get_item_from_pointer(object, from->u.valuestring,
                                           case_sensitive);
         }
         if (value == NULL) {
@@ -810,7 +811,7 @@ static int apply_patch(cJSON *object, const cJSON *patch,
     /* Now, just add "value" to "path". */
 
     /* split pointer in parent and child */
-    parent_pointer = cJSONUtils_strdup((unsigned char *)path->valuestring);
+    parent_pointer = cJSONUtils_strdup((unsigned char *)path->u.valuestring);
     if (parent_pointer) {
         child_pointer = (unsigned char *)strrchr((char *)parent_pointer, '/');
     }
@@ -982,15 +983,16 @@ static void create_patches(cJSON *const patches,
 
     switch (from->type & 0xFF) {
     case cJSON_Number:
-        if ((from->valueint != to->valueint) ||
-            !compare_double(from->valuedouble, to->valuedouble)) {
+        // TODO: This needs updating now.
+        if ((from->u.valueint != to->u.valueint) ||
+            !compare_double(from->u.valuedouble, to->u.valuedouble)) {
             compose_patch(patches, (const unsigned char *)"replace", path, NULL,
                           to);
         }
         return;
 
     case cJSON_String:
-        if (strcmp(from->valuestring, to->valuestring) != 0) {
+        if (strcmp(from->u.valuestring, to->u.valuestring) != 0) {
             compose_patch(patches, (const unsigned char *)"replace", path, NULL,
                           to);
         }

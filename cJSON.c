@@ -23,14 +23,15 @@
 /* cJSON */
 /* JSON parser in C. */
 
+#include <assert.h>
 #include <ctype.h>
 #include <float.h>
+#include <inttypes.h>
 #include <limits.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 
 #include "cJSON.h"
 
@@ -66,7 +67,7 @@ char *cJSON_GetStringValue(const cJSON *const item) {
         return NULL;
     }
 
-    return item->valuestring;
+    return item->u.valuestring;
 }
 
 double cJSON_GetNumberValue(const cJSON *const item) {
@@ -74,7 +75,11 @@ double cJSON_GetNumberValue(const cJSON *const item) {
         return (double)NAN;
     }
 
-    return item->valuedouble;
+    if (item->is_number_double) {
+        return item->u.valuedouble;
+    }
+
+    assert(false);
 }
 
 /* Case insensitive string comparison, doesn't consider two NULL pointers equal
@@ -188,8 +193,8 @@ void cJSON_Delete(cJSON *item) {
         if (!(item->type & cJSON_IsReference) && (item->child != NULL)) {
             cJSON_Delete(item->child);
         }
-        if (!(item->type & cJSON_IsReference) && (item->valuestring != NULL)) {
-            global_hooks.deallocate(item->valuestring);
+        if (!(item->type & cJSON_IsReference) && (item->u.valuestring != NULL)) {
+            global_hooks.deallocate(item->u.valuestring);
         }
         if (!(item->type & cJSON_StringIsConst) && (item->string != NULL)) {
             global_hooks.deallocate(item->string);
@@ -223,7 +228,6 @@ typedef struct {
 /* Parse the input text to generate a number, and populate the result into item.
  */
 static bool parse_number(cJSON *const item, parse_buffer *const input_buffer) {
-    double number = 0;
     unsigned char *after_end = NULL;
     unsigned char number_c_string[64];
     unsigned char decimal_point = '.';
@@ -233,8 +237,9 @@ static bool parse_number(cJSON *const item, parse_buffer *const input_buffer) {
         return false;
     }
 
-    /* copy the number into a temporary buffer and replace '.' with the decimal
-     * point of the current locale (for strtod) This also takes care of '\0' not
+    bool decimal_number = false;
+
+    /* copy the number into a temporary buffer. This also takes care of '\0' not
      * necessarily being available for marking the end of the input */
     for (i = 0; (i < (sizeof(number_c_string) - 1)) &&
                 can_access_at_index(input_buffer, i);
@@ -259,6 +264,7 @@ static bool parse_number(cJSON *const item, parse_buffer *const input_buffer) {
 
         case '.':
             number_c_string[i] = decimal_point;
+            decimal_number = true;
             break;
 
         default:
@@ -268,20 +274,17 @@ static bool parse_number(cJSON *const item, parse_buffer *const input_buffer) {
 loop_end:
     number_c_string[i] = '\0';
 
-    number = strtod((const char *)number_c_string, (char **)&after_end);
     if (number_c_string == after_end) {
         return false; /* parse_error */
     }
 
-    item->valuedouble = number;
-
-    /* use saturation in case of overflow */
-    if (number >= INT_MAX) {
-        item->valueint = INT_MAX;
-    } else if (number <= (double)INT_MIN) {
-        item->valueint = INT_MIN;
+    if (decimal_number) {
+        // TODO: strtod is locale dependent and we've removed locale logic
+        double number = strtod((const char *)number_c_string, (char **)&after_end);
+        cJSON_SetDoubleNumber(item, number);
     } else {
-        item->valueint = (int)number;
+        int64_t number = strtoll((const char *)number_c_string, (char **)&after_end, 10);
+        cJSON_SetIntegerNumber(item, number);
     }
 
     item->type = cJSON_Number;
@@ -290,18 +293,16 @@ loop_end:
     return true;
 }
 
-/* don't ask me, but the original cJSON_SetNumberValue returns an integer or
- * double */
-double cJSON_SetNumberHelper(cJSON *object, double number) {
-    if (number >= INT_MAX) {
-        object->valueint = INT_MAX;
-    } else if (number <= (double)INT_MIN) {
-        object->valueint = INT_MIN;
-    } else {
-        object->valueint = (int)number;
-    }
+double cJSON_SetDoubleNumber(cJSON *object, double number) {
+    object->u.valuedouble = number;
+    object->is_number_double = true;
+    return number;
+}
 
-    return object->valuedouble = number;
+int64_t cJSON_SetIntegerNumber(cJSON *object, int64_t number) {
+    object->u.valueint = number;
+    object->is_number_double = false;
+    return number;
 }
 
 char *cJSON_SetValuestring(cJSON *object, const char *valuestring) {
@@ -313,22 +314,22 @@ char *cJSON_SetValuestring(cJSON *object, const char *valuestring) {
         return NULL;
     }
     /* return NULL if the object is corrupted */
-    if (object->valuestring == NULL) {
+    if (object->u.valuestring == NULL) {
         return NULL;
     }
-    if (strlen(valuestring) <= strlen(object->valuestring)) {
-        strcpy(object->valuestring, valuestring);
-        return object->valuestring;
+    if (strlen(valuestring) <= strlen(object->u.valuestring)) {
+        strcpy(object->u.valuestring, valuestring);
+        return object->u.valuestring;
     }
     copy =
         (char *)cJSON_strdup((const unsigned char *)valuestring, &global_hooks);
     if (copy == NULL) {
         return NULL;
     }
-    if (object->valuestring != NULL) {
-        cJSON_free(object->valuestring);
+    if (object->u.valuestring != NULL) {
+        cJSON_free(object->u.valuestring);
     }
-    object->valuestring = copy;
+    object->u.valuestring = copy;
 
     return copy;
 }
@@ -435,7 +436,7 @@ static bool compare_double(double a, double b) {
 static bool print_number(const cJSON *const item,
                          printbuffer *const output_buffer) {
     unsigned char *output_pointer = NULL;
-    double d = item->valuedouble;
+    double d = item->u.valuedouble;
     int length = 0;
     size_t i = 0;
     unsigned char number_buffer[26] = {
@@ -450,8 +451,9 @@ static bool print_number(const cJSON *const item,
     /* This checks for NaN and Infinity */
     if (isnan(d) || isinf(d)) {
         length = sprintf((char *)number_buffer, "null");
-    } else if (d == (double)item->valueint) {
-        length = sprintf((char *)number_buffer, "%d", item->valueint);
+    } else if (d == (double)item->u.valueint) {
+        length =
+            sprintf((char *)number_buffer, "%" PRId64, (long)item->u.valueint);
     } else {
         /* Try 15 decimal places of precision to avoid nonsignificant nonzero
          * digits */
@@ -731,7 +733,7 @@ static bool parse_string(cJSON *const item, parse_buffer *const input_buffer) {
     *output_pointer = '\0';
 
     item->type = cJSON_String;
-    item->valuestring = (char *)output;
+    item->u.valuestring = (char *)output;
 
     input_buffer->offset = (size_t)(input_end - input_buffer->content);
     input_buffer->offset++;
@@ -863,7 +865,7 @@ static bool print_string_ptr(const unsigned char *const input,
 
 /* Invoke print_string_ptr (which is useful) on an item. */
 static bool print_string(const cJSON *const item, printbuffer *const p) {
-    return print_string_ptr((unsigned char *)item->valuestring, p);
+    return print_string_ptr((unsigned char *)item->u.valuestring, p);
 }
 
 /* Predeclare these prototypes. */
@@ -1154,7 +1156,6 @@ static bool parse_value(cJSON *const item, parse_buffer *const input_buffer) {
         (strncmp((const char *)buffer_at_offset(input_buffer), "true", 4) ==
          0)) {
         item->type = cJSON_True;
-        item->valueint = 1;
         input_buffer->offset += 4;
         return true;
     }
@@ -1223,16 +1224,16 @@ static bool print_value(const cJSON *const item,
 
     case cJSON_Raw: {
         size_t raw_length = 0;
-        if (item->valuestring == NULL) {
+        if (item->u.valuestring == NULL) {
             return false;
         }
 
-        raw_length = strlen(item->valuestring) + sizeof("");
+        raw_length = strlen(item->u.valuestring) + sizeof("");
         output = ensure(output_buffer, raw_length);
         if (output == NULL) {
             return false;
         }
-        memcpy(output, item->valuestring, raw_length);
+        memcpy(output, item->u.valuestring, raw_length);
         return true;
     }
 
@@ -1445,8 +1446,8 @@ static bool parse_object(cJSON *const item, parse_buffer *const input_buffer) {
         buffer_skip_whitespace(input_buffer);
 
         /* swap valuestring and string, because we parsed the name */
-        current_item->string = current_item->valuestring;
-        current_item->valuestring = NULL;
+        current_item->string = current_item->u.valuestring;
+        current_item->u.valuestring = NULL;
 
         if (cannot_access_at_index(input_buffer, 0) ||
             (buffer_at_offset(input_buffer)[0] != ':')) {
@@ -1850,9 +1851,20 @@ cJSON *cJSON_AddBoolToObject(cJSON *const object, const char *const name,
     return NULL;
 }
 
-cJSON *cJSON_AddNumberToObject(cJSON *const object, const char *const name,
+cJSON *cJSON_AddDoubleNumberToObject(cJSON *const object, const char *const name,
                                const double number) {
-    cJSON *number_item = cJSON_CreateNumber(number);
+    cJSON *number_item = cJSON_CreateDoubleNumber(number);
+    if (add_item_to_object(object, name, number_item, &global_hooks, false)) {
+        return number_item;
+    }
+
+    cJSON_Delete(number_item);
+    return NULL;
+}
+
+cJSON *cJSON_AddIntegerNumberToObject(cJSON *const object, const char *const name,
+                               const int64_t number) {
+    cJSON *number_item = cJSON_CreateIntegerNumber(number);
     if (add_item_to_object(object, name, number_item, &global_hooks, false)) {
         return number_item;
     }
@@ -2117,20 +2129,23 @@ cJSON *cJSON_CreateBool(bool boolean) {
     return item;
 }
 
-cJSON *cJSON_CreateNumber(double num) {
+cJSON *cJSON_CreateDoubleNumber(double num) {
     cJSON *item = cJSON_New_Item(&global_hooks);
     if (item) {
         item->type = cJSON_Number;
-        item->valuedouble = num;
+        item->u.valuedouble = num;
+        item->is_number_double = true;
+    }
 
-        /* use saturation in case of overflow */
-        if (num >= INT_MAX) {
-            item->valueint = INT_MAX;
-        } else if (num <= (double)INT_MIN) {
-            item->valueint = INT_MIN;
-        } else {
-            item->valueint = (int)num;
-        }
+    return item;
+}
+
+cJSON *cJSON_CreateIntegerNumber(int64_t num) {
+    cJSON *item = cJSON_New_Item(&global_hooks);
+    if (item) {
+        item->type = cJSON_Number;
+        item->u.valueint = num;
+        item->is_number_double = false;
     }
 
     return item;
@@ -2140,9 +2155,9 @@ cJSON *cJSON_CreateString(const char *string) {
     cJSON *item = cJSON_New_Item(&global_hooks);
     if (item) {
         item->type = cJSON_String;
-        item->valuestring =
+        item->u.valuestring =
             (char *)cJSON_strdup((const unsigned char *)string, &global_hooks);
-        if (!item->valuestring) {
+        if (!item->u.valuestring) {
             cJSON_Delete(item);
             return NULL;
         }
@@ -2155,7 +2170,7 @@ cJSON *cJSON_CreateStringReference(const char *string) {
     cJSON *item = cJSON_New_Item(&global_hooks);
     if (item != NULL) {
         item->type = cJSON_String | cJSON_IsReference;
-        item->valuestring = (char *)cast_away_const(string);
+        item->u.valuestring = (char *)cast_away_const(string);
     }
 
     return item;
@@ -2185,9 +2200,9 @@ cJSON *cJSON_CreateRaw(const char *raw) {
     cJSON *item = cJSON_New_Item(&global_hooks);
     if (item) {
         item->type = cJSON_Raw;
-        item->valuestring =
+        item->u.valuestring =
             (char *)cJSON_strdup((const unsigned char *)raw, &global_hooks);
-        if (!item->valuestring) {
+        if (!item->u.valuestring) {
             cJSON_Delete(item);
             return NULL;
         }
@@ -2228,7 +2243,7 @@ cJSON *cJSON_CreateIntArray(const int *numbers, int count) {
     a = cJSON_CreateArray();
 
     for (i = 0; a && (i < (size_t)count); i++) {
-        n = cJSON_CreateNumber(numbers[i]);
+        n = cJSON_CreateIntegerNumber(numbers[i]);
         if (!n) {
             cJSON_Delete(a);
             return NULL;
@@ -2261,7 +2276,7 @@ cJSON *cJSON_CreateFloatArray(const float *numbers, int count) {
     a = cJSON_CreateArray();
 
     for (i = 0; a && (i < (size_t)count); i++) {
-        n = cJSON_CreateNumber((double)numbers[i]);
+        n = cJSON_CreateDoubleNumber((double)numbers[i]);
         if (!n) {
             cJSON_Delete(a);
             return NULL;
@@ -2294,7 +2309,7 @@ cJSON *cJSON_CreateDoubleArray(const double *numbers, int count) {
     a = cJSON_CreateArray();
 
     for (i = 0; a && (i < (size_t)count); i++) {
-        n = cJSON_CreateNumber(numbers[i]);
+        n = cJSON_CreateDoubleNumber(numbers[i]);
         if (!n) {
             cJSON_Delete(a);
             return NULL;
@@ -2365,12 +2380,13 @@ cJSON *cJSON_Duplicate(const cJSON *item, bool recurse) {
     }
     /* Copy over all vars */
     newitem->type = item->type & (~cJSON_IsReference);
-    newitem->valueint = item->valueint;
-    newitem->valuedouble = item->valuedouble;
-    if (item->valuestring) {
-        newitem->valuestring = (char *)cJSON_strdup(
-            (unsigned char *)item->valuestring, &global_hooks);
-        if (!newitem->valuestring) {
+    newitem->u.valueint = item->u.valueint;
+    newitem->u.valuedouble = item->u.valuedouble;
+    newitem->is_number_double = item->is_number_double;
+    if (item->u.valuestring) {
+        newitem->u.valuestring = (char *)cJSON_strdup(
+            (unsigned char *)item->u.valuestring, &global_hooks);
+        if (!newitem->u.valuestring) {
             goto fail;
         }
     }
@@ -2622,17 +2638,21 @@ bool cJSON_Compare(const cJSON *const a, const cJSON *const b,
         return true;
 
     case cJSON_Number:
-        if (compare_double(a->valuedouble, b->valuedouble)) {
-            return true;
-        }
-        return false;
-
-    case cJSON_String:
-    case cJSON_Raw:
-        if ((a->valuestring == NULL) || (b->valuestring == NULL)) {
+        if (a->is_number_double != b->is_number_double) {
             return false;
         }
-        if (strcmp(a->valuestring, b->valuestring) == 0) {
+
+        if (a->is_number_double) {
+            return compare_double(a->u.valuedouble, b->u.valuedouble);
+        } else {
+            return a->u.valueint == b->u.valueint;
+        }
+    case cJSON_String:
+    case cJSON_Raw:
+        if ((a->u.valuestring == NULL) || (b->u.valuestring == NULL)) {
+            return false;
+        }
+        if (strcmp(a->u.valuestring, b->u.valuestring) == 0) {
             return true;
         }
 
