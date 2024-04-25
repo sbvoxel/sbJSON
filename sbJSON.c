@@ -1724,21 +1724,8 @@ bool sbJSON_AddItemToArray(sbJSON *array, sbJSON *item) {
     return add_item_to_array(array, item);
 }
 
-#if defined(__clang__) ||                                                      \
-    (defined(__GNUC__) &&                                                      \
-     ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ > 5))))
-#pragma GCC diagnostic push
-#endif
-#ifdef __GNUC__
-#pragma GCC diagnostic ignored "-Wcast-qual"
-#endif
 /* helper function to cast away const */
 static void *cast_away_const(const void *string) { return (void *)string; }
-#if defined(__clang__) ||                                                      \
-    (defined(__GNUC__) &&                                                      \
-     ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ > 5))))
-#pragma GCC diagnostic pop
-#endif
 
 static bool add_item_to_object(sbJSON *const object, const char *const string,
                                sbJSON *const item,
