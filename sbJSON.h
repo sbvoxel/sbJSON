@@ -89,10 +89,10 @@ typedef struct sbJSON_Hooks {
 void sbJSON_InitHooks(sbJSON_Hooks *hooks);
 
 /* Memory Management: the caller is always responsible to free the results from
- * all variants of sbJSON_Parse (with sbJSON_Delete) and sbJSON_Print (with stdlib
- * free, sbJSON_Hooks.free_fn, or sbJSON_free as appropriate). The exception is
- * sbJSON_PrintPreallocated, where the caller has full responsibility of the
- * buffer. */
+ * all variants of sbJSON_Parse (with sbJSON_Delete) and sbJSON_Print (with
+ * stdlib free, sbJSON_Hooks.free_fn, or sbJSON_free as appropriate). The
+ * exception is sbJSON_PrintPreallocated, where the caller has full
+ * responsibility of the buffer. */
 /* Supply a block of JSON, and this returns a sbJSON object you can interrogate.
  */
 sbJSON *sbJSON_Parse(const char *value);
@@ -103,25 +103,26 @@ sbJSON *sbJSON_ParseWithLength(const char *value, size_t buffer_length);
  * return_parse_end will contain a pointer to the error so will match
  * sbJSON_GetErrorPtr(). */
 sbJSON *sbJSON_ParseWithOpts(const char *value, const char **return_parse_end,
-                           bool require_null_terminated);
+                             bool require_null_terminated);
 sbJSON *sbJSON_ParseWithLengthOpts(const char *value, size_t buffer_length,
-                                 const char **return_parse_end,
-                                 bool require_null_terminated);
+                                   const char **return_parse_end,
+                                   bool require_null_terminated);
 
 /* Render a sbJSON entity to text for transfer/storage. */
 char *sbJSON_Print(const sbJSON *item);
-/* Render a sbJSON entity to text for transfer/storage without any formatting. */
+/* Render a sbJSON entity to text for transfer/storage without any formatting.
+ */
 char *sbJSON_PrintUnformatted(const sbJSON *item);
-/* Render a sbJSON entity to text using a buffered strategy. prebuffer is a guess
- * at the final size. guessing well reduces reallocation. fmt=0 gives
+/* Render a sbJSON entity to text using a buffered strategy. prebuffer is a
+ * guess at the final size. guessing well reduces reallocation. fmt=0 gives
  * unformatted, =1 gives formatted */
 char *sbJSON_PrintBuffered(const sbJSON *item, int prebuffer, bool fmt);
-/* Render a sbJSON entity to text using a buffer already allocated in memory with
- * given length. Returns 1 on success and 0 on failure. */
-/* NOTE: sbJSON is not always 100% accurate in estimating how much memory it will
- * use, so to be safe allocate 5 bytes more than you actually need */
+/* Render a sbJSON entity to text using a buffer already allocated in memory
+ * with given length. Returns 1 on success and 0 on failure. */
+/* NOTE: sbJSON is not always 100% accurate in estimating how much memory it
+ * will use, so to be safe allocate 5 bytes more than you actually need */
 bool sbJSON_PrintPreallocated(sbJSON *item, char *buffer, const int length,
-                             const bool format);
+                              const bool format);
 /* Delete a sbJSON entity and all subentities. */
 void sbJSON_Delete(sbJSON *item);
 
@@ -131,9 +132,10 @@ int sbJSON_GetArraySize(const sbJSON *array);
  * unsuccessful. */
 sbJSON *sbJSON_GetArrayItem(const sbJSON *array, int index);
 /* Get item "string" from object. Case insensitive. */
-sbJSON *sbJSON_GetObjectItem(const sbJSON *const object, const char *const string);
+sbJSON *sbJSON_GetObjectItem(const sbJSON *const object,
+                             const char *const string);
 sbJSON *sbJSON_GetObjectItemCaseSensitive(const sbJSON *const object,
-                                        const char *const string);
+                                          const char *const string);
 bool sbJSON_HasObjectItem(const sbJSON *object, const char *string);
 /* For analysing failed parses. This returns a pointer to the parse error.
  * You'll probably need to look a few chars back to make sense of it. Defined
@@ -194,11 +196,11 @@ bool sbJSON_AddItemToObject(sbJSON *object, const char *string, sbJSON *item);
  * before writing to `item->string` */
 bool sbJSON_AddItemToObjectCS(sbJSON *object, const char *string, sbJSON *item);
 /* Append reference to item to the specified array/object. Use this when you
- * want to add an existing sbJSON to a new sbJSON, but don't want to corrupt your
- * existing sbJSON. */
+ * want to add an existing sbJSON to a new sbJSON, but don't want to corrupt
+ * your existing sbJSON. */
 bool sbJSON_AddItemReferenceToArray(sbJSON *array, sbJSON *item);
 bool sbJSON_AddItemReferenceToObject(sbJSON *object, const char *string,
-                                    sbJSON *item);
+                                     sbJSON *item);
 
 /* Remove/Detach items from Arrays/Objects. */
 sbJSON *sbJSON_DetachItemViaPointer(sbJSON *parent, sbJSON *const item);
@@ -206,33 +208,34 @@ sbJSON *sbJSON_DetachItemFromArray(sbJSON *array, int which);
 void sbJSON_DeleteItemFromArray(sbJSON *array, int which);
 sbJSON *sbJSON_DetachItemFromObject(sbJSON *object, const char *string);
 sbJSON *sbJSON_DetachItemFromObjectCaseSensitive(sbJSON *object,
-                                               const char *string);
+                                                 const char *string);
 void sbJSON_DeleteItemFromObject(sbJSON *object, const char *string);
-void sbJSON_DeleteItemFromObjectCaseSensitive(sbJSON *object, const char *string);
+void sbJSON_DeleteItemFromObjectCaseSensitive(sbJSON *object,
+                                              const char *string);
 
 /* Update array items. */
 bool sbJSON_InsertItemInArray(
     sbJSON *array, int which,
     sbJSON *newitem); /* Shifts pre-existing items to the right. */
 bool sbJSON_ReplaceItemViaPointer(sbJSON *const parent, sbJSON *const item,
-                                 sbJSON *replacement);
+                                  sbJSON *replacement);
 bool sbJSON_ReplaceItemInArray(sbJSON *array, int which, sbJSON *newitem);
 bool sbJSON_ReplaceItemInObject(sbJSON *object, const char *string,
-                               sbJSON *newitem);
+                                sbJSON *newitem);
 bool sbJSON_ReplaceItemInObjectCaseSensitive(sbJSON *object, const char *string,
-                                            sbJSON *newitem);
+                                             sbJSON *newitem);
 
 /* Duplicate a sbJSON item */
 sbJSON *sbJSON_Duplicate(const sbJSON *item, bool recurse);
-/* Duplicate will create a new, identical sbJSON item to the one you pass, in new
- * memory that will need to be released. With recurse!=0, it will duplicate any
- * children connected to the item. The item->next and ->prev pointers are always
- * zero on return from Duplicate. */
-/* Recursively compare two sbJSON items for equality. If either a or b is NULL or
- * invalid, they will be considered unequal. case_sensitive determines if object
- * keys are treated case sensitive (1) or case insensitive (0) */
+/* Duplicate will create a new, identical sbJSON item to the one you pass, in
+ * new memory that will need to be released. With recurse!=0, it will duplicate
+ * any children connected to the item. The item->next and ->prev pointers are
+ * always zero on return from Duplicate. */
+/* Recursively compare two sbJSON items for equality. If either a or b is NULL
+ * or invalid, they will be considered unequal. case_sensitive determines if
+ * object keys are treated case sensitive (1) or case insensitive (0) */
 bool sbJSON_Compare(const sbJSON *const a, const sbJSON *const b,
-                   const bool case_sensitive);
+                    const bool case_sensitive);
 
 /* Minify a strings, remove blank characters(such as ' ', '\t', '\r', '\n') from
  * strings. The input pointer json cannot point to a read-only address area,
@@ -246,15 +249,16 @@ sbJSON *sbJSON_AddNullToObject(sbJSON *const object, const char *const name);
 sbJSON *sbJSON_AddTrueToObject(sbJSON *const object, const char *const name);
 sbJSON *sbJSON_AddFalseToObject(sbJSON *const object, const char *const name);
 sbJSON *sbJSON_AddBoolToObject(sbJSON *const object, const char *const name,
-                             const bool boolean);
-sbJSON *sbJSON_AddDoubleNumberToObject(sbJSON *const object, const char *const name,
-                               const double number);
-sbJSON *sbJSON_AddIntegerNumberToObject(sbJSON *const object, const char *const name,
-                               int64_t number);
+                               const bool boolean);
+sbJSON *sbJSON_AddDoubleNumberToObject(sbJSON *const object,
+                                       const char *const name,
+                                       const double number);
+sbJSON *sbJSON_AddIntegerNumberToObject(sbJSON *const object,
+                                        const char *const name, int64_t number);
 sbJSON *sbJSON_AddStringToObject(sbJSON *const object, const char *const name,
-                               const char *const string);
+                                 const char *const string);
 sbJSON *sbJSON_AddRawToObject(sbJSON *const object, const char *const name,
-                            const char *const raw);
+                              const char *const raw);
 sbJSON *sbJSON_AddObjectToObject(sbJSON *const object, const char *const name);
 sbJSON *sbJSON_AddArrayToObject(sbJSON *const object, const char *const name);
 
@@ -267,14 +271,15 @@ char *sbJSON_SetValuestring(sbJSON *object, const char *valuestring);
 
 /* If the object is not a boolean type this does nothing and returns
  * sbJSON_Invalid else it returns the new type*/
-#define sbJSON_SetBoolValue(object, boolValue)                                  \
-    ((object != NULL && ((object)->type & (sbJSON_False | sbJSON_True)))         \
-         ? (object)->type = ((object)->type & (~(sbJSON_False | sbJSON_True))) | \
-                            ((boolValue) ? sbJSON_True : sbJSON_False)           \
+#define sbJSON_SetBoolValue(object, boolValue)                                 \
+    ((object != NULL && ((object)->type & (sbJSON_False | sbJSON_True)))       \
+         ? (object)->type =                                                    \
+               ((object)->type & (~(sbJSON_False | sbJSON_True))) |            \
+               ((boolValue) ? sbJSON_True : sbJSON_False)                      \
          : sbJSON_Invalid)
 
 /* Macro for iterating over an array or object */
-#define sbJSON_ArrayForEach(element, array)                                     \
+#define sbJSON_ArrayForEach(element, array)                                    \
     for (element = (array != NULL) ? (array)->child : NULL; element != NULL;   \
          element = element->next)
 
