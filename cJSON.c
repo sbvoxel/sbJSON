@@ -23,20 +23,6 @@
 /* cJSON */
 /* JSON parser in C. */
 
-/* disable warnings about old C89 functions in MSVC */
-#if !defined(_CRT_SECURE_NO_DEPRECATE) && defined(_MSC_VER)
-#define _CRT_SECURE_NO_DEPRECATE
-#endif
-
-#ifdef __GNUC__
-#pragma GCC visibility push(default)
-#endif
-#if defined(_MSC_VER)
-#pragma warning (push)
-/* disable warning about single line comments in system headers */
-#pragma warning (disable : 4001)
-#endif
-
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
@@ -47,13 +33,6 @@
 
 #ifdef ENABLE_LOCALES
 #include <locale.h>
-#endif
-
-#if defined(_MSC_VER)
-#pragma warning (pop)
-#endif
-#ifdef __GNUC__
-#pragma GCC visibility pop
 #endif
 
 #include "cJSON.h"
@@ -155,22 +134,22 @@ static int case_insensitive_strcmp(const unsigned char *string1, const unsigned 
 
 typedef struct internal_hooks
 {
-    void *(CJSON_CDECL *allocate)(size_t size);
-    void (CJSON_CDECL *deallocate)(void *pointer);
-    void *(CJSON_CDECL *reallocate)(void *pointer, size_t size);
+    void *(*allocate)(size_t size);
+    void (*deallocate)(void *pointer);
+    void *(*reallocate)(void *pointer, size_t size);
 } internal_hooks;
 
 #if defined(_MSC_VER)
 /* work around MSVC error C2322: '...' address of dllimport '...' is not static */
-static void * CJSON_CDECL internal_malloc(size_t size)
+static void * internal_malloc(size_t size)
 {
     return malloc(size);
 }
-static void CJSON_CDECL internal_free(void *pointer)
+static void internal_free(void *pointer)
 {
     free(pointer);
 }
-static void * CJSON_CDECL internal_realloc(void *pointer, size_t size)
+static void * internal_realloc(void *pointer, size_t size)
 {
     return realloc(pointer, size);
 }
