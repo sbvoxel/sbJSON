@@ -293,7 +293,7 @@ char *sbJSON_SetValuestring(sbJSON *object, const char *valuestring) {
     char *copy = NULL;
     /* if object's type is not sbJSON_String or is sbJSON_IsReference, it should
      * not set valuestring */
-    if ((object == NULL) || !(object->type == sbJSON_String) ||
+    if ((object == NULL) || (object->type != sbJSON_String) ||
         (object->is_reference)) {
         return NULL;
     }
@@ -2606,12 +2606,12 @@ bool sbJSON_IsRaw(const sbJSON *const item) {
 
 bool sbJSON_Compare(const sbJSON *const a, const sbJSON *const b,
                     const bool case_sensitive) {
-    if ((a == NULL) || (b == NULL) || ((a->type & 0xFF) != (b->type & 0xFF))) {
+    if ((a == NULL) || (b == NULL) || (a->type != b->type)) {
         return false;
     }
 
     /* check if type is valid */
-    switch (a->type & 0xFF) {
+    switch (a->type) {
     case sbJSON_False:
     case sbJSON_True:
     case sbJSON_NULL:
@@ -2631,7 +2631,7 @@ bool sbJSON_Compare(const sbJSON *const a, const sbJSON *const b,
         return true;
     }
 
-    switch (a->type & 0xFF) {
+    switch (a->type) {
     /* in these cases and equal type is enough */
     case sbJSON_False:
     case sbJSON_True:
