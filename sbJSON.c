@@ -1018,7 +1018,7 @@ sbJSON *sbJSON_ParseWithLength(const char *value, size_t buffer_length) {
     return sbJSON_ParseWithLengthOpts(value, buffer_length, 0, 0);
 }
 
-#define cjson_min(a, b) (((a) < (b)) ? (a) : (b))
+#define sbjson_min(a, b) (((a) < (b)) ? (a) : (b))
 
 static unsigned char *print(const sbJSON *const item, bool format,
                             const internal_hooks *const hooks) {
@@ -1058,7 +1058,7 @@ static unsigned char *print(const sbJSON *const item, bool format,
             goto fail;
         }
         memcpy(printed, buffer->buffer,
-               cjson_min(buffer->length, buffer->offset + 1));
+               sbjson_min(buffer->length, buffer->offset + 1));
         printed[buffer->offset] = '\0'; /* just to be sure */
 
         /* free the buffer */
@@ -1260,7 +1260,7 @@ static bool parse_array(sbJSON *const item, parse_buffer *const input_buffer) {
     sbJSON *head = NULL; /* head of the linked list */
     sbJSON *current_item = NULL;
 
-    if (input_buffer->depth >= CJSON_NESTING_LIMIT) {
+    if (input_buffer->depth >= SBJSON_NESTING_LIMIT) {
         return false; /* to deeply nested */
     }
     input_buffer->depth++;
@@ -1397,7 +1397,7 @@ static bool parse_object(sbJSON *const item, parse_buffer *const input_buffer) {
     sbJSON *head = NULL; /* linked list head */
     sbJSON *current_item = NULL;
 
-    if (input_buffer->depth >= CJSON_NESTING_LIMIT) {
+    if (input_buffer->depth >= SBJSON_NESTING_LIMIT) {
         return false; /* to deeply nested */
     }
     input_buffer->depth++;

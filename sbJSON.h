@@ -81,8 +81,8 @@ typedef struct sbJSON_Hooks {
 
 /* Limits how deeply nested arrays/objects can be before sbJSON rejects to parse
  * them. This is to prevent stack overflows. */
-#ifndef CJSON_NESTING_LIMIT
-#define CJSON_NESTING_LIMIT 1000
+#ifndef SBJSON_NESTING_LIMIT
+#define SBJSON_NESTING_LIMIT 1000
 #endif
 
 /* Supply malloc, realloc and free functions to sbJSON */
