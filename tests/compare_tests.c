@@ -20,12 +20,12 @@
   THE SOFTWARE.
 */
 
+#include "common.h"
 #include "unity/examples/unity_config.h"
 #include "unity/src/unity.h"
-#include "common.h"
 
-static cJSON_bool compare_from_string(const char * const a, const char * const b, const cJSON_bool case_sensitive)
-{
+static cJSON_bool compare_from_string(const char *const a, const char *const b,
+                                      const cJSON_bool case_sensitive) {
     cJSON *a_json = NULL;
     cJSON *b_json = NULL;
     cJSON_bool result = false;
@@ -43,14 +43,12 @@ static cJSON_bool compare_from_string(const char * const a, const char * const b
     return result;
 }
 
-static void cjson_compare_should_compare_null_pointer_as_not_equal(void)
-{
+static void cjson_compare_should_compare_null_pointer_as_not_equal(void) {
     TEST_ASSERT_FALSE(cJSON_Compare(NULL, NULL, true));
     TEST_ASSERT_FALSE(cJSON_Compare(NULL, NULL, false));
 }
 
-static void cjson_compare_should_compare_invalid_as_not_equal(void)
-{
+static void cjson_compare_should_compare_invalid_as_not_equal(void) {
     cJSON invalid[1];
     memset(invalid, '\0', sizeof(invalid));
 
@@ -58,8 +56,7 @@ static void cjson_compare_should_compare_invalid_as_not_equal(void)
     TEST_ASSERT_FALSE(cJSON_Compare(invalid, invalid, true));
 }
 
-static void cjson_compare_should_compare_numbers(void)
-{
+static void cjson_compare_should_compare_numbers(void) {
     TEST_ASSERT_TRUE(compare_from_string("1", "1", true));
     TEST_ASSERT_TRUE(compare_from_string("1", "1", false));
     TEST_ASSERT_TRUE(compare_from_string("0.0001", "0.0001", true));
@@ -72,8 +69,7 @@ static void cjson_compare_should_compare_numbers(void)
     TEST_ASSERT_FALSE(compare_from_string("1", "2", false));
 }
 
-static void cjson_compare_should_compare_booleans(void)
-{
+static void cjson_compare_should_compare_booleans(void) {
     /* true */
     TEST_ASSERT_TRUE(compare_from_string("true", "true", true));
     TEST_ASSERT_TRUE(compare_from_string("true", "true", false));
@@ -89,8 +85,7 @@ static void cjson_compare_should_compare_booleans(void)
     TEST_ASSERT_FALSE(compare_from_string("false", "true", false));
 }
 
-static void cjson_compare_should_compare_null(void)
-{
+static void cjson_compare_should_compare_null(void) {
     TEST_ASSERT_TRUE(compare_from_string("null", "null", true));
     TEST_ASSERT_TRUE(compare_from_string("null", "null", false));
 
@@ -98,8 +93,7 @@ static void cjson_compare_should_compare_null(void)
     TEST_ASSERT_FALSE(compare_from_string("null", "true", false));
 }
 
-static void cjson_compare_should_not_accept_invalid_types(void)
-{
+static void cjson_compare_should_not_accept_invalid_types(void) {
     cJSON invalid[1];
     memset(invalid, '\0', sizeof(invalid));
 
@@ -109,8 +103,7 @@ static void cjson_compare_should_not_accept_invalid_types(void)
     TEST_ASSERT_FALSE(cJSON_Compare(invalid, invalid, false));
 }
 
-static void cjson_compare_should_compare_strings(void)
-{
+static void cjson_compare_should_compare_strings(void) {
     TEST_ASSERT_TRUE(compare_from_string("\"abcdefg\"", "\"abcdefg\"", true));
     TEST_ASSERT_TRUE(compare_from_string("\"abcdefg\"", "\"abcdefg\"", false));
 
@@ -118,8 +111,7 @@ static void cjson_compare_should_compare_strings(void)
     TEST_ASSERT_FALSE(compare_from_string("\"ABCDEFG\"", "\"abcdefg\"", false));
 }
 
-static void cjson_compare_should_compare_raw(void)
-{
+static void cjson_compare_should_compare_raw(void) {
     cJSON *raw1 = NULL;
     cJSON *raw2 = NULL;
 
@@ -138,59 +130,70 @@ static void cjson_compare_should_compare_raw(void)
     cJSON_Delete(raw2);
 }
 
-static void cjson_compare_should_compare_arrays(void)
-{
+static void cjson_compare_should_compare_arrays(void) {
     TEST_ASSERT_TRUE(compare_from_string("[]", "[]", true));
     TEST_ASSERT_TRUE(compare_from_string("[]", "[]", false));
 
-    TEST_ASSERT_TRUE(compare_from_string("[false,true,null,42,\"string\",[],{}]", "[false, true, null, 42, \"string\", [], {}]", true));
-    TEST_ASSERT_TRUE(compare_from_string("[false,true,null,42,\"string\",[],{}]", "[false, true, null, 42, \"string\", [], {}]", false));
+    TEST_ASSERT_TRUE(compare_from_string(
+        "[false,true,null,42,\"string\",[],{}]",
+        "[false, true, null, 42, \"string\", [], {}]", true));
+    TEST_ASSERT_TRUE(compare_from_string(
+        "[false,true,null,42,\"string\",[],{}]",
+        "[false, true, null, 42, \"string\", [], {}]", false));
 
     TEST_ASSERT_TRUE(compare_from_string("[[[1], 2]]", "[[[1], 2]]", true));
     TEST_ASSERT_TRUE(compare_from_string("[[[1], 2]]", "[[[1], 2]]", false));
 
-    TEST_ASSERT_FALSE(compare_from_string("[true,null,42,\"string\",[],{}]", "[false, true, null, 42, \"string\", [], {}]", true));
-    TEST_ASSERT_FALSE(compare_from_string("[true,null,42,\"string\",[],{}]", "[false, true, null, 42, \"string\", [], {}]", false));
+    TEST_ASSERT_FALSE(compare_from_string(
+        "[true,null,42,\"string\",[],{}]",
+        "[false, true, null, 42, \"string\", [], {}]", true));
+    TEST_ASSERT_FALSE(compare_from_string(
+        "[true,null,42,\"string\",[],{}]",
+        "[false, true, null, 42, \"string\", [], {}]", false));
 
     /* Arrays that are a prefix of another array */
     TEST_ASSERT_FALSE(compare_from_string("[1,2,3]", "[1,2]", true));
     TEST_ASSERT_FALSE(compare_from_string("[1,2,3]", "[1,2]", false));
 }
 
-static void cjson_compare_should_compare_objects(void)
-{
+static void cjson_compare_should_compare_objects(void) {
     TEST_ASSERT_TRUE(compare_from_string("{}", "{}", true));
     TEST_ASSERT_TRUE(compare_from_string("{}", "{}", false));
 
     TEST_ASSERT_TRUE(compare_from_string(
-                "{\"false\": false, \"true\": true, \"null\": null, \"number\": 42, \"string\": \"string\", \"array\": [], \"object\": {}}",
-                "{\"true\": true, \"false\": false, \"null\": null, \"number\": 42, \"string\": \"string\", \"array\": [], \"object\": {}}",
-                true));
+        "{\"false\": false, \"true\": true, \"null\": null, \"number\": 42, "
+        "\"string\": \"string\", \"array\": [], \"object\": {}}",
+        "{\"true\": true, \"false\": false, \"null\": null, \"number\": 42, "
+        "\"string\": \"string\", \"array\": [], \"object\": {}}",
+        true));
     TEST_ASSERT_FALSE(compare_from_string(
-                "{\"False\": false, \"true\": true, \"null\": null, \"number\": 42, \"string\": \"string\", \"array\": [], \"object\": {}}",
-                "{\"true\": true, \"false\": false, \"null\": null, \"number\": 42, \"string\": \"string\", \"array\": [], \"object\": {}}",
-                true));
+        "{\"False\": false, \"true\": true, \"null\": null, \"number\": 42, "
+        "\"string\": \"string\", \"array\": [], \"object\": {}}",
+        "{\"true\": true, \"false\": false, \"null\": null, \"number\": 42, "
+        "\"string\": \"string\", \"array\": [], \"object\": {}}",
+        true));
     TEST_ASSERT_TRUE(compare_from_string(
-                "{\"False\": false, \"true\": true, \"null\": null, \"number\": 42, \"string\": \"string\", \"array\": [], \"object\": {}}",
-                "{\"true\": true, \"false\": false, \"null\": null, \"number\": 42, \"string\": \"string\", \"array\": [], \"object\": {}}",
-                false));
+        "{\"False\": false, \"true\": true, \"null\": null, \"number\": 42, "
+        "\"string\": \"string\", \"array\": [], \"object\": {}}",
+        "{\"true\": true, \"false\": false, \"null\": null, \"number\": 42, "
+        "\"string\": \"string\", \"array\": [], \"object\": {}}",
+        false));
     TEST_ASSERT_FALSE(compare_from_string(
-                "{\"Flse\": false, \"true\": true, \"null\": null, \"number\": 42, \"string\": \"string\", \"array\": [], \"object\": {}}",
-                "{\"true\": true, \"false\": false, \"null\": null, \"number\": 42, \"string\": \"string\", \"array\": [], \"object\": {}}",
-                false));
+        "{\"Flse\": false, \"true\": true, \"null\": null, \"number\": 42, "
+        "\"string\": \"string\", \"array\": [], \"object\": {}}",
+        "{\"true\": true, \"false\": false, \"null\": null, \"number\": 42, "
+        "\"string\": \"string\", \"array\": [], \"object\": {}}",
+        false));
     /* test objects that are a subset of each other */
-    TEST_ASSERT_FALSE(compare_from_string(
-                "{\"one\": 1, \"two\": 2}",
-                "{\"one\": 1, \"two\": 2, \"three\": 3}",
-                true))
-    TEST_ASSERT_FALSE(compare_from_string(
-                "{\"one\": 1, \"two\": 2}",
-                "{\"one\": 1, \"two\": 2, \"three\": 3}",
-                false))
+    TEST_ASSERT_FALSE(
+        compare_from_string("{\"one\": 1, \"two\": 2}",
+                            "{\"one\": 1, \"two\": 2, \"three\": 3}", true))
+    TEST_ASSERT_FALSE(
+        compare_from_string("{\"one\": 1, \"two\": 2}",
+                            "{\"one\": 1, \"two\": 2, \"three\": 3}", false))
 }
 
-int CJSON_CDECL main(void)
-{
+int CJSON_CDECL main(void) {
     UNITY_BEGIN();
 
     RUN_TEST(cjson_compare_should_compare_null_pointer_as_not_equal);

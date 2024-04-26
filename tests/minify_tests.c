@@ -24,13 +24,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "common.h"
 #include "unity/examples/unity_config.h"
 #include "unity/src/unity.h"
-#include "common.h"
 
-
-static void cjson_minify_should_not_overflow_buffer(void)
-{
+static void cjson_minify_should_not_overflow_buffer(void) {
     char unclosed_multiline_comment[] = "/* bla";
     char pending_escape[] = "\"\\";
 
@@ -41,11 +39,11 @@ static void cjson_minify_should_not_overflow_buffer(void)
     TEST_ASSERT_EQUAL_STRING("\"\\", pending_escape);
 }
 
-static void cjson_minify_should_remove_single_line_comments(void)
-{
-    const char to_minify[] = "{// this is {} \"some kind\" of [] comment /*, don't you see\n}";
+static void cjson_minify_should_remove_single_line_comments(void) {
+    const char to_minify[] =
+        "{// this is {} \"some kind\" of [] comment /*, don't you see\n}";
 
-    char* minified = (char*) malloc(sizeof(to_minify));
+    char *minified = (char *)malloc(sizeof(to_minify));
     TEST_ASSERT_NOT_NULL(minified);
     strcpy(minified, to_minify);
 
@@ -55,11 +53,10 @@ static void cjson_minify_should_remove_single_line_comments(void)
     free(minified);
 }
 
-static void cjson_minify_should_remove_spaces(void)
-{
+static void cjson_minify_should_remove_spaces(void) {
     const char to_minify[] = "{ \"key\":\ttrue\r\n    }";
 
-    char* minified = (char*) malloc(sizeof(to_minify));
+    char *minified = (char *)malloc(sizeof(to_minify));
     TEST_ASSERT_NOT_NULL(minified);
     strcpy(minified, to_minify);
 
@@ -69,11 +66,11 @@ static void cjson_minify_should_remove_spaces(void)
     free(minified);
 }
 
-static void cjson_minify_should_remove_multiline_comments(void)
-{
-    const char to_minify[] = "{/* this is\n a /* multi\n //line \n {comment \"\\\" */}";
+static void cjson_minify_should_remove_multiline_comments(void) {
+    const char to_minify[] =
+        "{/* this is\n a /* multi\n //line \n {comment \"\\\" */}";
 
-    char* minified = (char*) malloc(sizeof(to_minify));
+    char *minified = (char *)malloc(sizeof(to_minify));
     TEST_ASSERT_NOT_NULL(minified);
     strcpy(minified, to_minify);
 
@@ -83,11 +80,10 @@ static void cjson_minify_should_remove_multiline_comments(void)
     free(minified);
 }
 
-static void cjson_minify_should_not_modify_strings(void)
-{
+static void cjson_minify_should_not_modify_strings(void) {
     const char to_minify[] = "\"this is a string \\\" \\t bla\"";
 
-    char* minified = (char*) malloc(sizeof(to_minify));
+    char *minified = (char *)malloc(sizeof(to_minify));
     TEST_ASSERT_NOT_NULL(minified);
     strcpy(minified, to_minify);
 
@@ -99,51 +95,52 @@ static void cjson_minify_should_not_modify_strings(void)
 
 static void cjson_minify_should_minify_json(void) {
     const char to_minify[] =
-            "{\n"
-            "    \"glossary\": { // comment\n"
-            "        \"title\": \"example glossary\",\n"
-            "  /* multi\n"
-            " line */\n"
-            "		\"GlossDiv\": {\n"
-            "            \"title\": \"S\",\n"
-            "			\"GlossList\": {\n"
-            "                \"GlossEntry\": {\n"
-            "                    \"ID\": \"SGML\",\n"
-            "					\"SortAs\": \"SGML\",\n"
-            "					\"Acronym\": \"SGML\",\n"
-            "					\"Abbrev\": \"ISO 8879:1986\",\n"
-            "					\"GlossDef\": {\n"
-            "						\"GlossSeeAlso\": [\"GML\", \"XML\"]\n"
-            "                    },\n"
-            "					\"GlossSee\": \"markup\"\n"
-            "                }\n"
-            "            }\n"
-            "        }\n"
-            "    }\n"
-            "}";
-    const char* minified =
-            "{"
-            "\"glossary\":{"
-            "\"title\":\"example glossary\","
-            "\"GlossDiv\":{"
-            "\"title\":\"S\","
-            "\"GlossList\":{"
-            "\"GlossEntry\":{"
-            "\"ID\":\"SGML\","
-            "\"SortAs\":\"SGML\","
-            "\"Acronym\":\"SGML\","
-            "\"Abbrev\":\"ISO 8879:1986\","
-            "\"GlossDef\":{"
-            "\"GlossSeeAlso\":[\"GML\",\"XML\"]"
-            "},"
-            "\"GlossSee\":\"markup\""
-            "}"
-            "}"
-            "}"
-            "}"
-            "}";
+        "{\n"
+        "    \"glossary\": { // comment\n"
+        "        \"title\": \"example glossary\",\n"
+        "  /* multi\n"
+        " line */\n"
+        "		\"GlossDiv\": {\n"
+        "            \"title\": \"S\",\n"
+        "			\"GlossList\": {\n"
+        "                \"GlossEntry\": {\n"
+        "                    \"ID\": \"SGML\",\n"
+        "					\"SortAs\": \"SGML\",\n"
+        "					\"Acronym\": \"SGML\",\n"
+        "					\"Abbrev\": \"ISO "
+        "8879:1986\",\n"
+        "					\"GlossDef\": {\n"
+        "						\"GlossSeeAlso\": "
+        "[\"GML\", \"XML\"]\n"
+        "                    },\n"
+        "					\"GlossSee\": \"markup\"\n"
+        "                }\n"
+        "            }\n"
+        "        }\n"
+        "    }\n"
+        "}";
+    const char *minified = "{"
+                           "\"glossary\":{"
+                           "\"title\":\"example glossary\","
+                           "\"GlossDiv\":{"
+                           "\"title\":\"S\","
+                           "\"GlossList\":{"
+                           "\"GlossEntry\":{"
+                           "\"ID\":\"SGML\","
+                           "\"SortAs\":\"SGML\","
+                           "\"Acronym\":\"SGML\","
+                           "\"Abbrev\":\"ISO 8879:1986\","
+                           "\"GlossDef\":{"
+                           "\"GlossSeeAlso\":[\"GML\",\"XML\"]"
+                           "},"
+                           "\"GlossSee\":\"markup\""
+                           "}"
+                           "}"
+                           "}"
+                           "}"
+                           "}";
 
-    char *buffer = (char*) malloc(sizeof(to_minify));
+    char *buffer = (char *)malloc(sizeof(to_minify));
     strcpy(buffer, to_minify);
 
     cJSON_Minify(buffer);
@@ -153,13 +150,12 @@ static void cjson_minify_should_minify_json(void) {
 }
 
 static void cjson_minify_should_not_loop_infinitely(void) {
-    char string[] = { '8', ' ', '/', ' ', '5', '\n', '\0' };
+    char string[] = {'8', ' ', '/', ' ', '5', '\n', '\0'};
     /* this should not be an infinite loop */
     cJSON_Minify(string);
 }
 
-int CJSON_CDECL main(void)
-{
+int CJSON_CDECL main(void) {
     UNITY_BEGIN();
 
     RUN_TEST(cjson_minify_should_not_overflow_buffer);

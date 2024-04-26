@@ -20,24 +20,26 @@
   THE SOFTWARE.
 */
 
+#include "common.h"
 #include "unity/examples/unity_config.h"
 #include "unity/src/unity.h"
-#include "common.h"
 
-static void parse_with_opts_should_handle_null(void)
-{
+static void parse_with_opts_should_handle_null(void) {
     const char *error_pointer = NULL;
     cJSON *item = NULL;
-    TEST_ASSERT_NULL_MESSAGE(cJSON_ParseWithOpts(NULL, &error_pointer, false), "Failed to handle NULL input.");
+    TEST_ASSERT_NULL_MESSAGE(cJSON_ParseWithOpts(NULL, &error_pointer, false),
+                             "Failed to handle NULL input.");
     item = cJSON_ParseWithOpts("{}", NULL, false);
     TEST_ASSERT_NOT_NULL_MESSAGE(item, "Failed to handle NULL error pointer.");
     cJSON_Delete(item);
-    TEST_ASSERT_NULL_MESSAGE(cJSON_ParseWithOpts(NULL, NULL, false), "Failed to handle both NULL.");
-    TEST_ASSERT_NULL_MESSAGE(cJSON_ParseWithOpts("{", NULL, false), "Failed to handle NULL error pointer with parse error.");
+    TEST_ASSERT_NULL_MESSAGE(cJSON_ParseWithOpts(NULL, NULL, false),
+                             "Failed to handle both NULL.");
+    TEST_ASSERT_NULL_MESSAGE(
+        cJSON_ParseWithOpts("{", NULL, false),
+        "Failed to handle NULL error pointer with parse error.");
 }
 
-static void parse_with_opts_should_handle_empty_strings(void)
-{
+static void parse_with_opts_should_handle_empty_strings(void) {
     const char empty_string[] = "";
     const char *error_pointer = NULL;
 
@@ -49,8 +51,7 @@ static void parse_with_opts_should_handle_empty_strings(void)
     TEST_ASSERT_EQUAL_PTR(empty_string, cJSON_GetErrorPtr());
 }
 
-static void parse_with_opts_should_handle_incomplete_json(void)
-{
+static void parse_with_opts_should_handle_incomplete_json(void) {
     const char json[] = "{ \"name\": ";
     const char *parse_end = NULL;
 
@@ -59,8 +60,7 @@ static void parse_with_opts_should_handle_incomplete_json(void)
     TEST_ASSERT_EQUAL_PTR(json + strlen(json), cJSON_GetErrorPtr());
 }
 
-static void parse_with_opts_should_require_null_if_requested(void)
-{
+static void parse_with_opts_should_require_null_if_requested(void) {
     cJSON *item = cJSON_ParseWithOpts("{}", NULL, true);
     TEST_ASSERT_NOT_NULL(item);
     cJSON_Delete(item);
@@ -70,8 +70,7 @@ static void parse_with_opts_should_require_null_if_requested(void)
     TEST_ASSERT_NULL(cJSON_ParseWithOpts("{}x", NULL, true));
 }
 
-static void parse_with_opts_should_return_parse_end(void)
-{
+static void parse_with_opts_should_return_parse_end(void) {
     const char json[] = "[] empty array XD";
     const char *parse_end = NULL;
 
@@ -81,8 +80,7 @@ static void parse_with_opts_should_return_parse_end(void)
     cJSON_Delete(item);
 }
 
-static void parse_with_opts_should_parse_utf8_bom(void)
-{
+static void parse_with_opts_should_parse_utf8_bom(void) {
     cJSON *with_bom = NULL;
     cJSON *without_bom = NULL;
 
@@ -97,8 +95,7 @@ static void parse_with_opts_should_parse_utf8_bom(void)
     cJSON_Delete(without_bom);
 }
 
-int CJSON_CDECL main(void)
-{
+int CJSON_CDECL main(void) {
     UNITY_BEGIN();
 
     RUN_TEST(parse_with_opts_should_handle_null);

@@ -24,13 +24,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../cJSON_Utils.h"
+#include "common.h"
 #include "unity/examples/unity_config.h"
 #include "unity/src/unity.h"
-#include "common.h"
-#include "../cJSON_Utils.h"
 
-static void cjson_utils_functions_shouldnt_crash_with_null_pointers(void)
-{
+static void cjson_utils_functions_shouldnt_crash_with_null_pointers(void) {
     cJSON *item = cJSON_CreateString("item");
     TEST_ASSERT_NOT_NULL(item);
 
@@ -70,8 +69,7 @@ static void cjson_utils_functions_shouldnt_crash_with_null_pointers(void)
     cJSON_Delete(item);
 }
 
-int main(void)
-{
+int main(void) {
     UNITY_BEGIN();
 
     RUN_TEST(cjson_utils_functions_shouldnt_crash_with_null_pointers);
