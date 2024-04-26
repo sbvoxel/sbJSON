@@ -257,10 +257,6 @@ static bool parse_number(sbJSON *const item, parse_buffer *const input_buffer) {
 loop_end:
     number_c_string[i] = '\0';
 
-    if (number_c_string == after_end) {
-        return false; /* parse_error */
-    }
-
     if (decimal_number) {
         double number =
             strtod((const char *)number_c_string, (char **)&after_end);
@@ -269,6 +265,10 @@ loop_end:
         int64_t number =
             strtoll((const char *)number_c_string, (char **)&after_end, 10);
         sbJSON_SetIntegerNumber(item, number);
+    }
+
+    if (number_c_string == after_end) {
+        return false; /* parse_error */
     }
 
     item->type = sbJSON_Number;
