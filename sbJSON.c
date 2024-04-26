@@ -211,7 +211,6 @@ typedef struct {
 /* Parse the input text to generate a number, and populate the result into item.
  */
 static bool parse_number(sbJSON *const item, parse_buffer *const input_buffer) {
-    unsigned char *after_end = NULL;
     unsigned char number_c_string[64];
     size_t i = 0;
 
@@ -221,12 +220,13 @@ static bool parse_number(sbJSON *const item, parse_buffer *const input_buffer) {
 
     bool decimal_number = false;
 
-    /* copy the number into a temporary buffer. This also takes care of '\0' not
+    const unsigned char *buffer = buffer_at_offset(input_buffer);
+    const size_t length = input_buffer->length - input_buffer->offset;
+
+    /* Copy the number into a temporary buffer. This takes care of '\0' not
      * necessarily being available for marking the end of the input */
-    for (i = 0; (i < (sizeof(number_c_string) - 1)) &&
-                can_access_at_index(input_buffer, i);
-         i++) {
-        const unsigned char c = buffer_at_offset(input_buffer)[i];
+    for (i = 0; (i < (sizeof(number_c_string) - 1)) && i < length; i++) {
+        const unsigned char c = buffer[i];
 
         switch (c) {
         case '0':
@@ -257,6 +257,8 @@ static bool parse_number(sbJSON *const item, parse_buffer *const input_buffer) {
     }
 loop_end:
     number_c_string[i] = '\0';
+
+    unsigned char *after_end = NULL;
 
     if (decimal_number) {
         double number =
