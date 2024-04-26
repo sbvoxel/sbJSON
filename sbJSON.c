@@ -176,12 +176,15 @@ void sbJSON_Delete(sbJSON *item) {
         if ((!item->is_reference) && (item->child != NULL)) {
             sbJSON_Delete(item->child);
         }
-        if ((!item->is_reference) && (item->u.valuestring != NULL)) {
+
+        if (!item->is_reference && (item->type == sbJSON_String || item->type == sbJSON_Raw)) {
             global_hooks.deallocate(item->u.valuestring);
         }
+
         if ((!item->string_is_const) && (item->string != NULL)) {
             global_hooks.deallocate(item->string);
         }
+
         global_hooks.deallocate(item);
         item = next;
     }
