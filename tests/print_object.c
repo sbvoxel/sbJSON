@@ -29,7 +29,7 @@ static void assert_print_object(const char *const expected,
     unsigned char printed_unformatted[1024];
     unsigned char printed_formatted[1024];
 
-    cJSON item[1];
+    sbJSON item[1];
 
     printbuffer formatted_buffer = {0, 0, 0, 0, 0, 0, {0, 0, 0}};
     printbuffer unformatted_buffer = {0, 0, 0, 0, 0, 0, {0, 0, 0}};
@@ -97,8 +97,8 @@ static void print_object_should_print_objects_with_multiple_elements(void) {
         "\"world\":\"hello\",\"object\":{}}");
 }
 
-int CJSON_CDECL main(void) {
-    /* initialize cJSON item */
+int main(void) {
+    /* initialize sbJSON item */
     UNITY_BEGIN();
 
     RUN_TEST(print_object_should_print_empty_objects);

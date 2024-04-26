@@ -28,18 +28,18 @@
 #include "unity/examples/unity_config.h"
 #include "unity/src/unity.h"
 
-static void cjson_minify_should_not_overflow_buffer(void) {
+static void sbjson_minify_should_not_overflow_buffer(void) {
     char unclosed_multiline_comment[] = "/* bla";
     char pending_escape[] = "\"\\";
 
-    cJSON_Minify(unclosed_multiline_comment);
+    sbJSON_Minify(unclosed_multiline_comment);
     TEST_ASSERT_EQUAL_STRING("", unclosed_multiline_comment);
 
-    cJSON_Minify(pending_escape);
+    sbJSON_Minify(pending_escape);
     TEST_ASSERT_EQUAL_STRING("\"\\", pending_escape);
 }
 
-static void cjson_minify_should_remove_single_line_comments(void) {
+static void sbjson_minify_should_remove_single_line_comments(void) {
     const char to_minify[] =
         "{// this is {} \"some kind\" of [] comment /*, don't you see\n}";
 
@@ -47,26 +47,26 @@ static void cjson_minify_should_remove_single_line_comments(void) {
     TEST_ASSERT_NOT_NULL(minified);
     strcpy(minified, to_minify);
 
-    cJSON_Minify(minified);
+    sbJSON_Minify(minified);
     TEST_ASSERT_EQUAL_STRING("{}", minified);
 
     free(minified);
 }
 
-static void cjson_minify_should_remove_spaces(void) {
+static void sbjson_minify_should_remove_spaces(void) {
     const char to_minify[] = "{ \"key\":\ttrue\r\n    }";
 
     char *minified = (char *)malloc(sizeof(to_minify));
     TEST_ASSERT_NOT_NULL(minified);
     strcpy(minified, to_minify);
 
-    cJSON_Minify(minified);
+    sbJSON_Minify(minified);
     TEST_ASSERT_EQUAL_STRING("{\"key\":true}", minified);
 
     free(minified);
 }
 
-static void cjson_minify_should_remove_multiline_comments(void) {
+static void sbjson_minify_should_remove_multiline_comments(void) {
     const char to_minify[] =
         "{/* this is\n a /* multi\n //line \n {comment \"\\\" */}";
 
@@ -74,26 +74,26 @@ static void cjson_minify_should_remove_multiline_comments(void) {
     TEST_ASSERT_NOT_NULL(minified);
     strcpy(minified, to_minify);
 
-    cJSON_Minify(minified);
+    sbJSON_Minify(minified);
     TEST_ASSERT_EQUAL_STRING("{}", minified);
 
     free(minified);
 }
 
-static void cjson_minify_should_not_modify_strings(void) {
+static void sbjson_minify_should_not_modify_strings(void) {
     const char to_minify[] = "\"this is a string \\\" \\t bla\"";
 
     char *minified = (char *)malloc(sizeof(to_minify));
     TEST_ASSERT_NOT_NULL(minified);
     strcpy(minified, to_minify);
 
-    cJSON_Minify(minified);
+    sbJSON_Minify(minified);
     TEST_ASSERT_EQUAL_STRING(to_minify, minified);
 
     free(minified);
 }
 
-static void cjson_minify_should_minify_json(void) {
+static void sbjson_minify_should_minify_json(void) {
     const char to_minify[] =
         "{\n"
         "    \"glossary\": { // comment\n"
@@ -143,28 +143,28 @@ static void cjson_minify_should_minify_json(void) {
     char *buffer = (char *)malloc(sizeof(to_minify));
     strcpy(buffer, to_minify);
 
-    cJSON_Minify(buffer);
+    sbJSON_Minify(buffer);
     TEST_ASSERT_EQUAL_STRING(minified, buffer);
 
     free(buffer);
 }
 
-static void cjson_minify_should_not_loop_infinitely(void) {
+static void sbjson_minify_should_not_loop_infinitely(void) {
     char string[] = {'8', ' ', '/', ' ', '5', '\n', '\0'};
     /* this should not be an infinite loop */
-    cJSON_Minify(string);
+    sbJSON_Minify(string);
 }
 
 int CJSON_CDECL main(void) {
     UNITY_BEGIN();
 
-    RUN_TEST(cjson_minify_should_not_overflow_buffer);
-    RUN_TEST(cjson_minify_should_minify_json);
-    RUN_TEST(cjson_minify_should_remove_single_line_comments);
-    RUN_TEST(cjson_minify_should_remove_multiline_comments);
-    RUN_TEST(cjson_minify_should_remove_spaces);
-    RUN_TEST(cjson_minify_should_not_modify_strings);
-    RUN_TEST(cjson_minify_should_not_loop_infinitely);
+    RUN_TEST(sbjson_minify_should_not_overflow_buffer);
+    RUN_TEST(sbjson_minify_should_minify_json);
+    RUN_TEST(sbjson_minify_should_remove_single_line_comments);
+    RUN_TEST(sbjson_minify_should_remove_multiline_comments);
+    RUN_TEST(sbjson_minify_should_remove_spaces);
+    RUN_TEST(sbjson_minify_should_not_modify_strings);
+    RUN_TEST(sbjson_minify_should_not_loop_infinitely);
 
     return UNITY_END();
 }

@@ -55,7 +55,7 @@ if(ENABLE_CJSON_TEST)
         misc_tests
         parse_with_opts
         compare_tests
-        cjson_add
+        sbjson_add
         readme_examples
         minify_tests
     )
@@ -94,26 +94,26 @@ if(ENABLE_CJSON_TEST)
         file(GLOB test_files "json-patch-tests/*")
         file(COPY ${test_files} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/json-patch-tests/")
 
-        set (cjson_utils_tests
+        set (sbjson_utils_tests
             json_patch_tests
             old_utils_tests
             misc_utils_tests)
 
-        foreach (cjson_utils_test ${cjson_utils_tests})
-            add_executable("${cjson_utils_test}" "${cjson_utils_test}.c")
-            target_link_libraries("${cjson_utils_test}" "${CJSON_LIB}" "${CJSON_UTILS_LIB}" unity)
+        foreach (sbjson_utils_test ${sbjson_utils_tests})
+            add_executable("${sbjson_utils_test}" "${sbjson_utils_test}.c")
+            target_link_libraries("${sbjson_utils_test}" "${CJSON_LIB}" "${CJSON_UTILS_LIB}" unity)
             if("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
-                target_sources(${cjson_utils_test} PRIVATE unity_setup.c)
+                target_sources(${sbjson_utils_test} PRIVATE unity_setup.c)
             endif()
             if(MEMORYCHECK_COMMAND)
-                add_test(NAME "${cjson_utils_test}"
-                    COMMAND "${MEMORYCHECK_COMMAND}" ${MEMORYCHECK_COMMAND_OPTIONS} "${CMAKE_CURRENT_BINARY_DIR}/${cjson_utils_test}")
+                add_test(NAME "${sbjson_utils_test}"
+                    COMMAND "${MEMORYCHECK_COMMAND}" ${MEMORYCHECK_COMMAND_OPTIONS} "${CMAKE_CURRENT_BINARY_DIR}/${sbjson_utils_test}")
             else()
-                add_test(NAME "${cjson_utils_test}"
-                    COMMAND "./${cjson_utils_test}")
+                add_test(NAME "${sbjson_utils_test}"
+                    COMMAND "./${sbjson_utils_test}")
             endif()
         endforeach()
 
-        add_dependencies(check ${cjson_utils_tests})
+        add_dependencies(check ${sbjson_utils_tests})
     endif()
 endif()

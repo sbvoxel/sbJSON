@@ -24,39 +24,39 @@
 #include "unity/examples/unity_config.h"
 #include "unity/src/unity.h"
 
-static cJSON_bool compare_from_string(const char *const a, const char *const b,
-                                      const cJSON_bool case_sensitive) {
-    cJSON *a_json = NULL;
-    cJSON *b_json = NULL;
-    cJSON_bool result = false;
+static sbJSON_bool compare_from_string(const char *const a, const char *const b,
+                                      const sbJSON_bool case_sensitive) {
+    sbJSON *a_json = NULL;
+    sbJSON *b_json = NULL;
+    sbJSON_bool result = false;
 
-    a_json = cJSON_Parse(a);
+    a_json = sbJSON_Parse(a);
     TEST_ASSERT_NOT_NULL_MESSAGE(a_json, "Failed to parse a.");
-    b_json = cJSON_Parse(b);
+    b_json = sbJSON_Parse(b);
     TEST_ASSERT_NOT_NULL_MESSAGE(b_json, "Failed to parse b.");
 
-    result = cJSON_Compare(a_json, b_json, case_sensitive);
+    result = sbJSON_Compare(a_json, b_json, case_sensitive);
 
-    cJSON_Delete(a_json);
-    cJSON_Delete(b_json);
+    sbJSON_Delete(a_json);
+    sbJSON_Delete(b_json);
 
     return result;
 }
 
-static void cjson_compare_should_compare_null_pointer_as_not_equal(void) {
-    TEST_ASSERT_FALSE(cJSON_Compare(NULL, NULL, true));
-    TEST_ASSERT_FALSE(cJSON_Compare(NULL, NULL, false));
+static void sbjson_compare_should_compare_null_pointer_as_not_equal(void) {
+    TEST_ASSERT_FALSE(sbJSON_Compare(NULL, NULL, true));
+    TEST_ASSERT_FALSE(sbJSON_Compare(NULL, NULL, false));
 }
 
-static void cjson_compare_should_compare_invalid_as_not_equal(void) {
-    cJSON invalid[1];
+static void sbjson_compare_should_compare_invalid_as_not_equal(void) {
+    sbJSON invalid[1];
     memset(invalid, '\0', sizeof(invalid));
 
-    TEST_ASSERT_FALSE(cJSON_Compare(invalid, invalid, false));
-    TEST_ASSERT_FALSE(cJSON_Compare(invalid, invalid, true));
+    TEST_ASSERT_FALSE(sbJSON_Compare(invalid, invalid, false));
+    TEST_ASSERT_FALSE(sbJSON_Compare(invalid, invalid, true));
 }
 
-static void cjson_compare_should_compare_numbers(void) {
+static void sbjson_compare_should_compare_numbers(void) {
     TEST_ASSERT_TRUE(compare_from_string("1", "1", true));
     TEST_ASSERT_TRUE(compare_from_string("1", "1", false));
     TEST_ASSERT_TRUE(compare_from_string("0.0001", "0.0001", true));
@@ -69,7 +69,7 @@ static void cjson_compare_should_compare_numbers(void) {
     TEST_ASSERT_FALSE(compare_from_string("1", "2", false));
 }
 
-static void cjson_compare_should_compare_booleans(void) {
+static void sbjson_compare_should_compare_booleans(void) {
     /* true */
     TEST_ASSERT_TRUE(compare_from_string("true", "true", true));
     TEST_ASSERT_TRUE(compare_from_string("true", "true", false));
@@ -85,7 +85,7 @@ static void cjson_compare_should_compare_booleans(void) {
     TEST_ASSERT_FALSE(compare_from_string("false", "true", false));
 }
 
-static void cjson_compare_should_compare_null(void) {
+static void sbjson_compare_should_compare_null(void) {
     TEST_ASSERT_TRUE(compare_from_string("null", "null", true));
     TEST_ASSERT_TRUE(compare_from_string("null", "null", false));
 
@@ -93,17 +93,17 @@ static void cjson_compare_should_compare_null(void) {
     TEST_ASSERT_FALSE(compare_from_string("null", "true", false));
 }
 
-static void cjson_compare_should_not_accept_invalid_types(void) {
-    cJSON invalid[1];
+static void sbjson_compare_should_not_accept_invalid_types(void) {
+    sbJSON invalid[1];
     memset(invalid, '\0', sizeof(invalid));
 
-    invalid->type = cJSON_Number | cJSON_String;
+    invalid->type = sbJSON_Number | sbJSON_String;
 
-    TEST_ASSERT_FALSE(cJSON_Compare(invalid, invalid, true));
-    TEST_ASSERT_FALSE(cJSON_Compare(invalid, invalid, false));
+    TEST_ASSERT_FALSE(sbJSON_Compare(invalid, invalid, true));
+    TEST_ASSERT_FALSE(sbJSON_Compare(invalid, invalid, false));
 }
 
-static void cjson_compare_should_compare_strings(void) {
+static void sbjson_compare_should_compare_strings(void) {
     TEST_ASSERT_TRUE(compare_from_string("\"abcdefg\"", "\"abcdefg\"", true));
     TEST_ASSERT_TRUE(compare_from_string("\"abcdefg\"", "\"abcdefg\"", false));
 
@@ -111,26 +111,26 @@ static void cjson_compare_should_compare_strings(void) {
     TEST_ASSERT_FALSE(compare_from_string("\"ABCDEFG\"", "\"abcdefg\"", false));
 }
 
-static void cjson_compare_should_compare_raw(void) {
-    cJSON *raw1 = NULL;
-    cJSON *raw2 = NULL;
+static void sbjson_compare_should_compare_raw(void) {
+    sbJSON *raw1 = NULL;
+    sbJSON *raw2 = NULL;
 
-    raw1 = cJSON_Parse("\"[true, false]\"");
+    raw1 = sbJSON_Parse("\"[true, false]\"");
     TEST_ASSERT_NOT_NULL(raw1);
-    raw2 = cJSON_Parse("\"[true, false]\"");
+    raw2 = sbJSON_Parse("\"[true, false]\"");
     TEST_ASSERT_NOT_NULL(raw2);
 
-    raw1->type = cJSON_Raw;
-    raw2->type = cJSON_Raw;
+    raw1->type = sbJSON_Raw;
+    raw2->type = sbJSON_Raw;
 
-    TEST_ASSERT_TRUE(cJSON_Compare(raw1, raw2, true));
-    TEST_ASSERT_TRUE(cJSON_Compare(raw1, raw2, false));
+    TEST_ASSERT_TRUE(sbJSON_Compare(raw1, raw2, true));
+    TEST_ASSERT_TRUE(sbJSON_Compare(raw1, raw2, false));
 
-    cJSON_Delete(raw1);
-    cJSON_Delete(raw2);
+    sbJSON_Delete(raw1);
+    sbJSON_Delete(raw2);
 }
 
-static void cjson_compare_should_compare_arrays(void) {
+static void sbjson_compare_should_compare_arrays(void) {
     TEST_ASSERT_TRUE(compare_from_string("[]", "[]", true));
     TEST_ASSERT_TRUE(compare_from_string("[]", "[]", false));
 
@@ -156,7 +156,7 @@ static void cjson_compare_should_compare_arrays(void) {
     TEST_ASSERT_FALSE(compare_from_string("[1,2,3]", "[1,2]", false));
 }
 
-static void cjson_compare_should_compare_objects(void) {
+static void sbjson_compare_should_compare_objects(void) {
     TEST_ASSERT_TRUE(compare_from_string("{}", "{}", true));
     TEST_ASSERT_TRUE(compare_from_string("{}", "{}", false));
 
@@ -196,16 +196,16 @@ static void cjson_compare_should_compare_objects(void) {
 int CJSON_CDECL main(void) {
     UNITY_BEGIN();
 
-    RUN_TEST(cjson_compare_should_compare_null_pointer_as_not_equal);
-    RUN_TEST(cjson_compare_should_compare_invalid_as_not_equal);
-    RUN_TEST(cjson_compare_should_compare_numbers);
-    RUN_TEST(cjson_compare_should_compare_booleans);
-    RUN_TEST(cjson_compare_should_compare_null);
-    RUN_TEST(cjson_compare_should_not_accept_invalid_types);
-    RUN_TEST(cjson_compare_should_compare_strings);
-    RUN_TEST(cjson_compare_should_compare_raw);
-    RUN_TEST(cjson_compare_should_compare_arrays);
-    RUN_TEST(cjson_compare_should_compare_objects);
+    RUN_TEST(sbjson_compare_should_compare_null_pointer_as_not_equal);
+    RUN_TEST(sbjson_compare_should_compare_invalid_as_not_equal);
+    RUN_TEST(sbjson_compare_should_compare_numbers);
+    RUN_TEST(sbjson_compare_should_compare_booleans);
+    RUN_TEST(sbjson_compare_should_compare_null);
+    RUN_TEST(sbjson_compare_should_not_accept_invalid_types);
+    RUN_TEST(sbjson_compare_should_compare_strings);
+    RUN_TEST(sbjson_compare_should_compare_raw);
+    RUN_TEST(sbjson_compare_should_compare_arrays);
+    RUN_TEST(sbjson_compare_should_compare_objects);
 
     return UNITY_END();
 }

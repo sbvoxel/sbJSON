@@ -30,7 +30,7 @@
 
 static void assert_print_value(const char *input) {
     unsigned char printed[1024];
-    cJSON item[1];
+    sbJSON item[1];
     printbuffer buffer = {0, 0, 0, 0, 0, 0, {0, 0, 0}};
     parse_buffer parsebuffer = {0, 0, 0, 0, {0, 0, 0}};
     buffer.buffer = printed;
@@ -75,8 +75,8 @@ static void print_value_should_print_array(void) { assert_print_value("[]"); }
 
 static void print_value_should_print_object(void) { assert_print_value("{}"); }
 
-int CJSON_CDECL main(void) {
-    /* initialize cJSON item */
+int main(void) {
+    /* initialize sbJSON item */
     UNITY_BEGIN();
 
     RUN_TEST(print_value_should_print_null);

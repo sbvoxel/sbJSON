@@ -67,7 +67,7 @@ static void parse_hex4_should_parse_mixed_case(void) {
     TEST_ASSERT_EQUAL_INT(0xBEEF, parse_hex4((const unsigned char *)"BEEF"));
 }
 
-int CJSON_CDECL main(void) {
+int main(void) {
     UNITY_BEGIN();
     RUN_TEST(parse_hex4_should_parse_all_combinations);
     RUN_TEST(parse_hex4_should_parse_mixed_case);

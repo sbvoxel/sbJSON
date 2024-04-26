@@ -28,14 +28,14 @@
 #include "unity/examples/unity_config.h"
 #include "unity/src/unity.h"
 
-static cJSON item[1];
+static sbJSON item[1];
 
-static void assert_is_number(cJSON *number_item) {
+static void assert_is_number(sbJSON *number_item) {
     TEST_ASSERT_NOT_NULL_MESSAGE(number_item, "Item is NULL.");
 
     assert_not_in_list(number_item);
     assert_has_no_child(number_item);
-    assert_has_type(number_item, cJSON_Number);
+    assert_has_type(number_item, sbJSON_Number);
     assert_has_no_reference(number_item);
     assert_has_no_const_string(number_item);
     assert_has_no_valuestring(number_item);
@@ -89,9 +89,9 @@ static void parse_number_should_parse_negative_reals(void) {
     assert_parse_number("-123e-128", 0, -123e-128);
 }
 
-int CJSON_CDECL main(void) {
-    /* initialize cJSON item */
-    memset(item, 0, sizeof(cJSON));
+int main(void) {
+    /* initialize sbJSON item */
+    memset(item, 0, sizeof(sbJSON));
     UNITY_BEGIN();
     RUN_TEST(parse_number_should_parse_zero);
     RUN_TEST(parse_number_should_parse_negative_integers);

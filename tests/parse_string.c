@@ -28,14 +28,14 @@
 #include "unity/examples/unity_config.h"
 #include "unity/src/unity.h"
 
-static cJSON item[1];
+static sbJSON item[1];
 
-static void assert_is_string(cJSON *string_item) {
+static void assert_is_string(sbJSON *string_item) {
     TEST_ASSERT_NOT_NULL_MESSAGE(string_item, "Item is NULL.");
 
     assert_not_in_list(string_item);
     assert_has_no_child(string_item);
-    assert_has_type(string_item, cJSON_String);
+    assert_has_type(string_item, sbJSON_String);
     assert_has_no_reference(string_item);
     assert_has_no_const_string(string_item);
     assert_has_valuestring(string_item);
@@ -116,9 +116,9 @@ static void parse_string_should_parse_bug_94(void) {
     reset(item);
 }
 
-int CJSON_CDECL main(void) {
-    /* initialize cJSON item and error pointer */
-    memset(item, 0, sizeof(cJSON));
+int main(void) {
+    /* initialize sbJSON item and error pointer */
+    memset(item, 0, sizeof(sbJSON));
 
     UNITY_BEGIN();
     RUN_TEST(parse_string_should_parse_strings);

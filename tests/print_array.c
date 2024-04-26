@@ -29,7 +29,7 @@ static void assert_print_array(const char *const expected,
     unsigned char printed_unformatted[1024];
     unsigned char printed_formatted[1024];
 
-    cJSON item[1];
+    sbJSON item[1];
 
     printbuffer formatted_buffer = {0, 0, 0, 0, 0, 0, {0, 0, 0}};
     printbuffer unformatted_buffer = {0, 0, 0, 0, 0, 0, {0, 0, 0}};
@@ -90,8 +90,8 @@ static void print_array_should_print_arrays_with_multiple_elements(void) {
                        "[1,null,true,false,[],\"hello\",{}]");
 }
 
-int CJSON_CDECL main(void) {
-    /* initialize cJSON item */
+int main(void) {
+    /* initialize sbJSON item */
     UNITY_BEGIN();
 
     RUN_TEST(print_array_should_print_empty_arrays);
