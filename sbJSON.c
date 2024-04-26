@@ -221,11 +221,11 @@ static bool parse_number(sbJSON *const item, parse_buffer *const input_buffer) {
     bool decimal_number = false;
 
     const unsigned char *buffer = buffer_at_offset(input_buffer);
-    const size_t length = input_buffer->length - input_buffer->offset;
+    const size_t buffer_length = input_buffer->length - input_buffer->offset;
 
     /* Copy the number into a temporary buffer. This takes care of '\0' not
      * necessarily being available for marking the end of the input */
-    for (i = 0; (i < (sizeof(number_c_string) - 1)) && i < length; i++) {
+    for (i = 0; (i < (sizeof(number_c_string) - 1)) && i < buffer_length; i++) {
         const unsigned char c = buffer[i];
 
         switch (c) {
