@@ -213,7 +213,6 @@ typedef struct {
 static bool parse_number(sbJSON *const item, parse_buffer *const input_buffer) {
     unsigned char *after_end = NULL;
     unsigned char number_c_string[64];
-    unsigned char decimal_point = '.';
     size_t i = 0;
 
     if ((input_buffer == NULL) || (input_buffer->content == NULL)) {
@@ -227,7 +226,9 @@ static bool parse_number(sbJSON *const item, parse_buffer *const input_buffer) {
     for (i = 0; (i < (sizeof(number_c_string) - 1)) &&
                 can_access_at_index(input_buffer, i);
          i++) {
-        switch (buffer_at_offset(input_buffer)[i]) {
+        const unsigned char c = buffer_at_offset(input_buffer)[i];
+
+        switch (c) {
         case '0':
         case '1':
         case '2':
@@ -242,11 +243,11 @@ static bool parse_number(sbJSON *const item, parse_buffer *const input_buffer) {
         case '-':
         case 'e':
         case 'E':
-            number_c_string[i] = buffer_at_offset(input_buffer)[i];
+            number_c_string[i] = c;
             break;
 
         case '.':
-            number_c_string[i] = decimal_point;
+            number_c_string[i] = c;
             decimal_number = true;
             break;
 
