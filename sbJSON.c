@@ -293,31 +293,25 @@ int64_t sbJSON_SetIntegerNumber(sbJSON *object, int64_t number) {
 }
 
 char *sbJSON_SetValuestring(sbJSON *object, const char *valuestring) {
-    char *copy = NULL;
-    /* if object's type is not sbJSON_String or is sbJSON_IsReference, it should
-     * not set valuestring */
-    if ((object == NULL) || (object->type != sbJSON_String) ||
-        (object->is_reference)) {
+    if (object == NULL) {
         return NULL;
     }
-    /* return NULL if the object is corrupted */
-    if (object->u.valuestring == NULL) {
-        return NULL;
-    }
+
+    assert(object->type == sbJSON_String && !object->is_reference && valuestring != NULL);
+
     if (strlen(valuestring) <= strlen(object->u.valuestring)) {
         strcpy(object->u.valuestring, valuestring);
         return object->u.valuestring;
     }
-    copy = (char *)sbJSON_strdup((const unsigned char *)valuestring,
+
+    char *copy = (char *)sbJSON_strdup((const unsigned char *)valuestring,
                                  &global_hooks);
     if (copy == NULL) {
         return NULL;
     }
-    if (object->u.valuestring != NULL) {
-        sbJSON_free(object->u.valuestring);
-    }
-    object->u.valuestring = copy;
 
+    sbJSON_free(object->u.valuestring);
+    object->u.valuestring = copy;
     return copy;
 }
 
@@ -2729,4 +2723,5 @@ bool sbJSON_Compare(const sbJSON *const a, const sbJSON *const b,
 
 void *sbJSON_malloc(size_t size) { return global_hooks.allocate(size); }
 
+// TODO: Is passing NULL valid?
 void sbJSON_free(void *object) { global_hooks.deallocate(object); }
