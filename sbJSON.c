@@ -57,7 +57,10 @@ char *sbJSON_GetStringValue(const sbJSON *const item) {
 // TODO: Is this API smart anymore?
 double sbJSON_GetNumberValue(const sbJSON *const item) {
     if (!sbJSON_IsNumber(item)) {
-        return (double)NAN;
+        if (item == NULL) {
+            return NAN;
+        }
+        assert(false); // precondition violation
     }
 
     if (item->is_number_double) {
@@ -459,6 +462,8 @@ static bool print_number(const sbJSON *const item,
 
         /* This checks for NaN and Infinity */
         if (isnan(d) || isinf(d)) {
+            // TODO: This behavior should be controllable. Crashing is at least as valid.
+            // Also think about rountrip ability.
             length = sprintf((char *)number_buffer, "null");
         } else if (d == (int64_t)d) {
             length = sprintf((char *)number_buffer, "%" PRId64, (int64_t)d);

@@ -61,7 +61,7 @@ typedef struct sbJSON {
     bool string_is_const;
 
     union U {
-        /* The item's string, if type==sbJSON_String  and type == sbJSON_Raw */
+        /* The item's string, if type==sbJSON_String || type == sbJSON_Raw */
         char *valuestring;
         /* The item's number, if type==sbJSON_Number */
         int64_t valueint;

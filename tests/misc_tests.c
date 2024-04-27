@@ -539,7 +539,8 @@ static void sbjson_get_number_value_should_get_a_number(void) {
     sbJSON *number = sbJSON_CreateIntegerNumber(1);
 
     TEST_ASSERT_EQUAL_DOUBLE(sbJSON_GetNumberValue(number), (double) number->u.valueint);
-    TEST_ASSERT_DOUBLE_IS_NAN(sbJSON_GetNumberValue(string));
+    //TODO: Precondition violation. This should crash.
+    //TEST_ASSERT_DOUBLE_IS_NAN(sbJSON_GetNumberValue(string));
     TEST_ASSERT_DOUBLE_IS_NAN(sbJSON_GetNumberValue(NULL));
 
     sbJSON_Delete(number);
