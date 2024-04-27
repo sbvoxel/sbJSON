@@ -155,7 +155,7 @@ static void sort_tests(void) {
     sortme = sbJSON_CreateObject();
     for (i = 0; i < 26; i++) {
         buf[0] = random[i];
-        sbJSON_AddItemToObject(sortme, buf, sbJSON_CreateNumber(1));
+        sbJSON_AddItemToObject(sortme, buf, sbJSON_CreateIntegerNumber(1));
     }
 
     sbJSONUtils_SortObject(sortme);

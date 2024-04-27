@@ -45,7 +45,7 @@ static sbJSON *parse_test_file(const char *const filename) {
     return json;
 }
 
-static sbJSON_bool test_apply_patch(const sbJSON *const test) {
+static bool test_apply_patch(const sbJSON *const test) {
     sbJSON *doc = NULL;
     sbJSON *patch = NULL;
     sbJSON *expected = NULL;
@@ -54,12 +54,12 @@ static sbJSON_bool test_apply_patch(const sbJSON *const test) {
     sbJSON *disabled = NULL;
 
     sbJSON *object = NULL;
-    sbJSON_bool successful = false;
+    bool successful = false;
 
     /* extract all the data out of the test */
     comment = sbJSON_GetObjectItemCaseSensitive(test, "comment");
     if (sbJSON_IsString(comment)) {
-        printf("Testing \"%s\"\n", comment->valuestring);
+        printf("Testing \"%s\"\n", comment->u.valuestring);
     } else {
         printf("Testing unknown\n");
     }
@@ -110,14 +110,14 @@ static sbJSON_bool test_apply_patch(const sbJSON *const test) {
     return successful;
 }
 
-static sbJSON_bool test_generate_test(sbJSON *test) {
+static bool test_generate_test(sbJSON *test) {
     sbJSON *doc = NULL;
     sbJSON *patch = NULL;
     sbJSON *expected = NULL;
     sbJSON *disabled = NULL;
 
     sbJSON *object = NULL;
-    sbJSON_bool successful = false;
+    bool successful = false;
 
     char *printed_patch = NULL;
 
@@ -171,7 +171,7 @@ static void sbjson_utils_should_pass_json_patch_test_tests(void) {
     sbJSON *tests = parse_test_file("json-patch-tests/tests.json");
     sbJSON *test = NULL;
 
-    sbJSON_bool failed = false;
+    bool failed = false;
     sbJSON_ArrayForEach(test, tests) {
         failed |= !test_apply_patch(test);
         failed |= !test_generate_test(test);
@@ -186,7 +186,7 @@ static void sbjson_utils_should_pass_json_patch_test_spec_tests(void) {
     sbJSON *tests = parse_test_file("json-patch-tests/spec_tests.json");
     sbJSON *test = NULL;
 
-    sbJSON_bool failed = false;
+    bool failed = false;
     sbJSON_ArrayForEach(test, tests) {
         failed |= !test_apply_patch(test);
         failed |= !test_generate_test(test);
@@ -201,7 +201,7 @@ static void sbjson_utils_should_pass_json_patch_test_sbjson_utils_tests(void) {
     sbJSON *tests = parse_test_file("json-patch-tests/sbjson-utils-tests.json");
     sbJSON *test = NULL;
 
-    sbJSON_bool failed = false;
+    bool failed = false;
     sbJSON_ArrayForEach(test, tests) {
         failed |= !test_apply_patch(test);
         failed |= !test_generate_test(test);

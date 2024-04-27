@@ -29,7 +29,27 @@ set(unity_tests
 
 foreach(unity_test ${unity_tests})
     add_executable("${unity_test}" "${unity_test}.c")
-    target_link_libraries("${unity_test}" "${CJSON_LIB}" unity)
+    target_link_libraries("${unity_test}" unity)
     add_test(NAME "${unity_test}"
         COMMAND "./${unity_test}")
 endforeach()
+
+if (BUILD_UTILS)
+    #copy test files
+    file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/json-patch-tests")
+    file(GLOB test_files "json-patch-tests/*")
+    file(COPY ${test_files} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/json-patch-tests/")
+
+    set(utils_tests
+        json_patch_tests
+        old_utils_tests
+        misc_utils_tests
+    )
+
+    foreach(utils_test ${utils_tests})
+        add_executable("${utils_test}" "${utils_test}.c")
+        target_link_libraries("${utils_test}" sbjson_utils unity)
+        add_test(NAME "${utils_test}"
+            COMMAND "./${utils_test}")
+    endforeach()
+endif()
