@@ -46,6 +46,8 @@ const char *sbJSON_GetErrorPtr(void) {
     return (const char *)(global_error.json + global_error.position);
 }
 
+// TODO: Actually we need a form of this which can be called
+// on any json item. Use this or name it TryGetStringValue?
 char *sbJSON_GetStringValue(const sbJSON *const item) {
     if (item == NULL) {
         return NULL;
@@ -55,7 +57,9 @@ char *sbJSON_GetStringValue(const sbJSON *const item) {
     return item->u.valuestring;
 }
 
-// TODO: Is this API smart anymore?
+// TODO: Actually we need a form of this which can be called
+// on any json item. Use this or name it TryGetNumberValue?
+// TODO: Is this API smart anymore (int vs double)?
 double sbJSON_GetNumberValue(const sbJSON *const item) {
     if (!sbJSON_IsNumber(item)) {
         if (item == NULL) {
