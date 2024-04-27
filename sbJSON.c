@@ -63,7 +63,7 @@ double sbJSON_GetNumberValue(const sbJSON *const item) {
         return item->u.valuedouble;
     }
 
-    assert(false);
+    return (double) item->u.valueint;
 }
 
 /* Case insensitive string comparison, doesn't consider two NULL pointers equal
