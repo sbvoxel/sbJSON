@@ -109,10 +109,9 @@ static void print_number_should_print_negative_reals(void) {
 
 static void print_number_should_print_non_number(void) {
     TEST_IGNORE();
-    /* FIXME: Cannot test this easily in C89! */
-    /* assert_print_double_number("null", NaN); */
-    /* assert_print_double_number("null", INFTY); */
-    /* assert_print_double_number("null", -INFTY); */
+     assert_print_double_number("null", NAN);
+     assert_print_double_number("null", INFINITY);
+     assert_print_double_number("null", -INFINITY);
 }
 
 int main(void) {
