@@ -230,8 +230,8 @@ static void sbjson_add_number_should_add_number(void) {
                              sbJSON_GetObjectItemCaseSensitive(root, "number"));
 
     TEST_ASSERT_EQUAL_INT(number->type, sbJSON_Number);
-    TEST_ASSERT_EQUAL_DOUBLE(number->valuedouble, 42);
-    TEST_ASSERT_EQUAL_INT(number->valueint, 42);
+    TEST_ASSERT_FALSE(number->is_number_double);
+    TEST_ASSERT_EQUAL_INT(number->u.valueint, 42);
 
     sbJSON_Delete(root);
 }
@@ -266,7 +266,7 @@ static void sbjson_add_string_should_add_string(void) {
     TEST_ASSERT_NOT_NULL(string =
                              sbJSON_GetObjectItemCaseSensitive(root, "string"));
     TEST_ASSERT_EQUAL_INT(string->type, sbJSON_String);
-    TEST_ASSERT_EQUAL_STRING(string->valuestring, "Hello World!");
+    TEST_ASSERT_EQUAL_STRING(string->u.valuestring, "Hello World!");
 
     sbJSON_Delete(root);
 }
@@ -300,7 +300,7 @@ static void sbjson_add_raw_should_add_raw(void) {
 
     TEST_ASSERT_NOT_NULL(raw = sbJSON_GetObjectItemCaseSensitive(root, "raw"));
     TEST_ASSERT_EQUAL_INT(raw->type, sbJSON_Raw);
-    TEST_ASSERT_EQUAL_STRING(raw->valuestring, "{}");
+    TEST_ASSERT_EQUAL_STRING(raw->u.valuestring, "{}");
 
     sbJSON_Delete(root);
 }

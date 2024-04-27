@@ -23,7 +23,7 @@
 #include "common.h"
 #include "unity.h"
 
-static void assert_print_number(const char *expected, double input) {
+static void assert_print_number(const char *expected, bool is_double, double double_input, int integer_input) {
     unsigned char printed[1024];
     unsigned char new_buffer[26];
     unsigned int i = 0;
@@ -38,7 +38,11 @@ static void assert_print_number(const char *expected, double input) {
 
     memset(item, 0, sizeof(item));
     memset(new_buffer, 0, sizeof(new_buffer));
-    sbJSON_SetNumberValue(item, input);
+    if (is_double) {
+        sbJSON_SetDoubleNumberValue(item, double_input);
+    } else {
+        sbJSON_SetIntegerNumberValue(item, integer_input);
+    }
     TEST_ASSERT_TRUE_MESSAGE(print_number(item, &buffer),
                              "Failed to print number.");
 
@@ -61,45 +65,53 @@ static void assert_print_number(const char *expected, double input) {
                                      "Printed number is not as expected.");
 }
 
+static void assert_print_integer_number(const char *expected, int input) {
+    assert_print_number(expected, false, 0, input);
+}
+
+static void assert_print_double_number(const char *expected, double input) {
+    assert_print_number(expected, true, input, 0);
+}
+
 static void print_number_should_print_zero(void) {
-    assert_print_number("0", 0);
+    assert_print_integer_number("0", 0);
 }
 
 static void print_number_should_print_negative_integers(void) {
-    assert_print_number("-1", -1.0);
-    assert_print_number("-32768", -32768.0);
-    assert_print_number("-2147483648", -2147483648.0);
+    assert_print_integer_number("-1", -1.0);
+    assert_print_integer_number("-32768", -32768.0);
+    assert_print_integer_number("-2147483648", -2147483648.0);
 }
 
 static void print_number_should_print_positive_integers(void) {
-    assert_print_number("1", 1.0);
-    assert_print_number("32767", 32767.0);
-    assert_print_number("2147483647", 2147483647.0);
+    assert_print_integer_number("1", 1);
+    assert_print_integer_number("32767", 32767);
+    assert_print_integer_number("2147483647", 2147483647);
 }
 
 static void print_number_should_print_positive_reals(void) {
-    assert_print_number("0.123", 0.123);
-    assert_print_number("1e-09", 10e-10);
-    assert_print_number("1000000000000", 10e11);
-    assert_print_number("1.23e+129", 123e+127);
-    assert_print_number("1.23e-126", 123e-128);
-    assert_print_number("3.1415926535897931", 3.1415926535897931);
+    assert_print_double_number("0.123", 0.123);
+    assert_print_double_number("1e-09", 10e-10);
+    assert_print_double_number("1000000000000", 10e11);
+    assert_print_double_number("1.23e+129", 123e+127);
+    assert_print_double_number("1.23e-126", 123e-128);
+    assert_print_double_number("3.1415926535897931", 3.1415926535897931);
 }
 
 static void print_number_should_print_negative_reals(void) {
-    assert_print_number("-0.0123", -0.0123);
-    assert_print_number("-1e-09", -10e-10);
-    assert_print_number("-1e+21", -10e20);
-    assert_print_number("-1.23e+129", -123e+127);
-    assert_print_number("-1.23e-126", -123e-128);
+    assert_print_double_number("-0.0123", -0.0123);
+    assert_print_double_number("-1e-09", -10e-10);
+    assert_print_double_number("-1e+21", -10e20);
+    assert_print_double_number("-1.23e+129", -123e+127);
+    assert_print_double_number("-1.23e-126", -123e-128);
 }
 
 static void print_number_should_print_non_number(void) {
     TEST_IGNORE();
     /* FIXME: Cannot test this easily in C89! */
-    /* assert_print_number("null", NaN); */
-    /* assert_print_number("null", INFTY); */
-    /* assert_print_number("null", -INFTY); */
+    /* assert_print_double_number("null", NaN); */
+    /* assert_print_double_number("null", INFTY); */
+    /* assert_print_double_number("null", -INFTY); */
 }
 
 int main(void) {
