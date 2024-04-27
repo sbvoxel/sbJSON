@@ -78,7 +78,7 @@ static void parse_array_should_parse_arrays_with_one_element(void) {
     assert_parse_array("[\"hello!\"]");
     assert_has_child(item);
     assert_has_type(item->child, sbJSON_String);
-    TEST_ASSERT_EQUAL_STRING("hello!", item->child->valuestring);
+    TEST_ASSERT_EQUAL_STRING("hello!", item->child->u.valuestring);
     reset(item);
 
     assert_parse_array("[[]]");
