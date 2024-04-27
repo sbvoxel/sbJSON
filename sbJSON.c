@@ -246,11 +246,10 @@ static bool parse_number(sbJSON *const item, parse_buffer *const input_buffer) {
         case '9':
         case '+':
         case '-':
-        case 'e':
-        case 'E':
             number_c_string[i] = c;
             break;
-
+        case 'e':
+        case 'E':
         case '.':
             number_c_string[i] = c;
             decimal_number = true;
