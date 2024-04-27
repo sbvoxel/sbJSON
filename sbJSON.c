@@ -2660,6 +2660,10 @@ bool sbJSON_IsRaw(const sbJSON *const item) {
     return item->type == sbJSON_Raw;
 }
 
+// TODO: https://github.com/DaveGamble/cJSON/issues/748
+// Duplicate keys make comparison impossible. Would need
+// keys to have an order as well. Starting to be ridiculous.
+// Duplicate keys should be opt-in and not parse by default (do they?).
 bool sbJSON_Compare(const sbJSON *const a, const sbJSON *const b,
                     const bool case_sensitive) {
     if (a == b) {
