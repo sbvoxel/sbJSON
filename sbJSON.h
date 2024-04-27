@@ -37,7 +37,7 @@ enum sbJSON_Kind {
     sbJSON_Invalid, // TODO: Document whether parser can return this.
     sbJSON_False,
     sbJSON_True,
-    sbJSON_NULL,
+    sbJSON_Null,
     sbJSON_Number,
     sbJSON_String,
     sbJSON_Array,

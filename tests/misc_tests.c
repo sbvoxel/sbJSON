@@ -177,7 +177,7 @@ static void typecheck_functions_should_check_type(void) {
     TEST_ASSERT_TRUE(sbJSON_IsTrue(item));
     TEST_ASSERT_TRUE(sbJSON_IsBool(item));
 
-    item->type = sbJSON_NULL;
+    item->type = sbJSON_Null;
     item->string_is_const = true;
     TEST_ASSERT_FALSE(sbJSON_IsNull(NULL));
     TEST_ASSERT_FALSE(sbJSON_IsNull(invalid));

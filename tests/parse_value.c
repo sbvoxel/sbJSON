@@ -51,7 +51,7 @@ static void assert_parse_value(const char *string, int type) {
 }
 
 static void parse_value_should_parse_null(void) {
-    assert_parse_value("null", sbJSON_NULL);
+    assert_parse_value("null", sbJSON_Null);
     reset(item);
 }
 

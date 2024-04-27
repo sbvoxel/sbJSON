@@ -1149,7 +1149,7 @@ static bool parse_value(sbJSON *const item, parse_buffer *const input_buffer) {
     if (can_read(input_buffer, 4) &&
         (strncmp((const char *)buffer_at_offset(input_buffer), "null", 4) ==
          0)) {
-        item->type = sbJSON_NULL;
+        item->type = sbJSON_Null;
         input_buffer->offset += 4;
         return true;
     }
@@ -1205,7 +1205,7 @@ static bool print_value(const sbJSON *const item,
     }
 
     switch (item->type) {
-    case sbJSON_NULL:
+    case sbJSON_Null:
         output = ensure(output_buffer, 5);
         if (output == NULL) {
             return false;
@@ -2095,7 +2095,7 @@ bool sbJSON_ReplaceItemInObjectCaseSensitive(sbJSON *object, const char *string,
 sbJSON *sbJSON_CreateNull(void) {
     sbJSON *item = sbJSON_New_Item(&global_hooks);
     if (item) {
-        item->type = sbJSON_NULL;
+        item->type = sbJSON_Null;
     }
 
     return item;
@@ -2566,7 +2566,7 @@ bool sbJSON_IsNull(const sbJSON *const item) {
         return false;
     }
 
-    return item->type == sbJSON_NULL;
+    return item->type == sbJSON_Null;
 }
 
 bool sbJSON_IsNumber(const sbJSON *const item) {
@@ -2627,7 +2627,7 @@ bool sbJSON_Compare(const sbJSON *const a, const sbJSON *const b,
     case sbJSON_Invalid:
     case sbJSON_False:
     case sbJSON_True:
-    case sbJSON_NULL:
+    case sbJSON_Null:
         return true;
     case sbJSON_Number:
         if (a->is_number_double != b->is_number_double) {

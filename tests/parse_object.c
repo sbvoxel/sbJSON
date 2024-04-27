@@ -96,7 +96,7 @@ static void parse_object_should_parse_objects_with_one_element(void) {
     reset(item);
 
     assert_parse_object("{\"null\":null}");
-    assert_is_child(item->child, "null", sbJSON_NULL);
+    assert_is_child(item->child, "null", sbJSON_Null);
     reset(item);
 }
 
@@ -110,7 +110,7 @@ static void parse_object_should_parse_objects_with_multiple_elements(void) {
     {
         size_t i = 0;
         sbJSON *node = NULL;
-        int expected_types[7] = {sbJSON_Number, sbJSON_NULL,  sbJSON_True,
+        int expected_types[7] = {sbJSON_Number, sbJSON_Null,  sbJSON_True,
                                  sbJSON_False,  sbJSON_Array, sbJSON_String,
                                  sbJSON_Object};
         const char *expected_names[7] = {"one",   "NULL",  "TRUE",  "FALSE",

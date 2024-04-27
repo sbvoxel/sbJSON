@@ -46,7 +46,7 @@ static void sbjson_add_null_should_add_null(void) {
     sbJSON_AddNullToObject(root, "null");
 
     TEST_ASSERT_NOT_NULL(null = sbJSON_GetObjectItemCaseSensitive(root, "null"));
-    TEST_ASSERT_EQUAL_INT(null->type, sbJSON_NULL);
+    TEST_ASSERT_EQUAL_INT(null->type, sbJSON_Null);
 
     sbJSON_Delete(root);
 }
