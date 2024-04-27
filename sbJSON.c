@@ -64,7 +64,7 @@ double sbJSON_GetNumberValue(const sbJSON *const item) {
         return item->u.valuedouble;
     }
 
-    return (double) item->u.valueint;
+    return (double)item->u.valueint;
 }
 
 /* Case insensitive string comparison, doesn't consider two NULL pointers equal
@@ -2368,6 +2368,7 @@ sbJSON *sbJSON_CreateStringArray(const char *const *strings, int count) {
 }
 
 /* Duplication */
+// TODO: This is missing regular tests (outside of the utils tests)
 sbJSON *sbJSON_Duplicate(const sbJSON *item, bool recurse) {
     sbJSON *newitem = NULL;
     sbJSON *child = NULL;
@@ -2387,17 +2388,17 @@ sbJSON *sbJSON_Duplicate(const sbJSON *item, bool recurse) {
     newitem->type = item->type;
     newitem->is_reference = false;
     newitem->string_is_const = item->string_is_const;
-
-    newitem->u.valueint = item->u.valueint;
-    newitem->u.valuedouble = item->u.valuedouble;
+    newitem->u = item->u;
     newitem->is_number_double = item->is_number_double;
-    if (item->u.valuestring) {
+
+    if (item->type == sbJSON_String || item->type == sbJSON_Raw) {
         newitem->u.valuestring = (char *)sbJSON_strdup(
             (unsigned char *)item->u.valuestring, &global_hooks);
         if (!newitem->u.valuestring) {
             goto fail;
         }
     }
+
     if (item->string) {
         newitem->string =
             (item->string_is_const)
@@ -2408,10 +2409,12 @@ sbJSON *sbJSON_Duplicate(const sbJSON *item, bool recurse) {
             goto fail;
         }
     }
+
     /* If non-recursive, then we're done! */
     if (!recurse) {
         return newitem;
     }
+
     /* Walk the ->next chain for the child. */
     child = item->child;
     while (child != NULL) {
