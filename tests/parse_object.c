@@ -46,7 +46,7 @@ static void assert_is_child(sbJSON *child_item, const char *name, int type) {
                                  "Child item doesn't have a name.");
     TEST_ASSERT_EQUAL_STRING_MESSAGE(name, child_item->string,
                                      "Child item has the wrong name.");
-    TEST_ASSERT_BITS(0xFF, type, child_item->type);
+    TEST_ASSERT_EQUAL(type, child_item->type);
 }
 
 static void assert_not_object(const char *json) {
