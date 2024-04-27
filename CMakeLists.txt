@@ -13,6 +13,7 @@ if(ENABLE_SBJSON_TEST)
     enable_testing()
 
     # This is not the testing executable; it's just one of the tests.
+    # To run the tests simply run 'ctest' in the build directory.
     add_executable(sbJSON_test test.c)
     target_link_libraries(sbJSON_test sbJSON)
 
