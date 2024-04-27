@@ -1212,7 +1212,6 @@ static bool print_value(const sbJSON *const item,
         }
         strcpy((char *)output, "null");
         return true;
-
     case sbJSON_False:
         output = ensure(output_buffer, 6);
         if (output == NULL) {
@@ -1220,7 +1219,6 @@ static bool print_value(const sbJSON *const item,
         }
         strcpy((char *)output, "false");
         return true;
-
     case sbJSON_True:
         output = ensure(output_buffer, 5);
         if (output == NULL) {
@@ -1228,10 +1226,8 @@ static bool print_value(const sbJSON *const item,
         }
         strcpy((char *)output, "true");
         return true;
-
     case sbJSON_Number:
         return print_number(item, output_buffer);
-
     case sbJSON_Raw: {
         size_t raw_length = 0;
         if (item->u.valuestring == NULL) {
@@ -1246,16 +1242,12 @@ static bool print_value(const sbJSON *const item,
         memcpy(output, item->u.valuestring, raw_length);
         return true;
     }
-
     case sbJSON_String:
         return print_string(item, output_buffer);
-
     case sbJSON_Array:
         return print_array(item, output_buffer);
-
     case sbJSON_Object:
         return print_object(item, output_buffer);
-
     default:
         return false;
     }
@@ -2514,7 +2506,6 @@ void sbJSON_Minify(char *json) {
         case '\n':
             json++;
             break;
-
         case '/':
             if (json[1] == '/') {
                 skip_oneline_comment(&json);
@@ -2524,11 +2515,9 @@ void sbJSON_Minify(char *json) {
                 json++;
             }
             break;
-
         case '\"':
             minify_string(&json, (char **)&into);
             break;
-
         default:
             into[0] = json[0];
             json++;
@@ -2640,7 +2629,6 @@ bool sbJSON_Compare(const sbJSON *const a, const sbJSON *const b,
     case sbJSON_True:
     case sbJSON_NULL:
         return true;
-
     case sbJSON_Number:
         if (a->is_number_double != b->is_number_double) {
             return false;
@@ -2661,7 +2649,6 @@ bool sbJSON_Compare(const sbJSON *const a, const sbJSON *const b,
         }
 
         return false;
-
     case sbJSON_Array: {
         sbJSON *a_element = a->child;
         sbJSON *b_element = b->child;
@@ -2682,7 +2669,6 @@ bool sbJSON_Compare(const sbJSON *const a, const sbJSON *const b,
 
         return true;
     }
-
     case sbJSON_Object: {
         sbJSON *a_element = NULL;
         sbJSON *b_element = NULL;
@@ -2714,7 +2700,6 @@ bool sbJSON_Compare(const sbJSON *const a, const sbJSON *const b,
 
         return true;
     }
-
     default:
         return false;
     }
