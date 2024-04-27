@@ -12,6 +12,8 @@ sbJSON tracks cJSON development with the following changes:
 	- cJSON is unclear about what the preconditions are and what's done about them. It tries to handle some preconditions by detecting them and returning an early NULL, without doing so for others (see parent==item checks, yet no general cycle checks).
 	- sbJSON will respect preconditions by either assuming or asserting them to be met.
 	- This is made slightly difficult because it's not clear to me yet what in cJSON is part of intentional API design, and what's misguided precondition handling.
+- Removes locale handling
+    - Ideally, we don't want to depend on strtod for parsing as its locale dependent, and locales are not thread safe. So while we depend on strtod, we require the locale to be set to 'C', which is the default.
 - Replaces the build system options/files with a simple CMake one (WIP). I recommend copy pasting sbJSON.c and sbJSON.h into your project.
 
 The API is diverging from cJSON.
