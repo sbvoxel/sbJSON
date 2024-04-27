@@ -48,12 +48,12 @@ static void sbjson_compare_should_compare_null_pointer_as_equal(void) {
     TEST_ASSERT_TRUE(sbJSON_Compare(NULL, NULL, false));
 }
 
-static void sbjson_compare_should_compare_invalid_as_not_equal(void) {
+static void sbjson_compare_should_compare_invalid_as_equal(void) {
     sbJSON invalid[1];
     memset(invalid, '\0', sizeof(invalid));
 
-    TEST_ASSERT_FALSE(sbJSON_Compare(invalid, invalid, false));
-    TEST_ASSERT_FALSE(sbJSON_Compare(invalid, invalid, true));
+    TEST_ASSERT_TRUE(sbJSON_Compare(invalid, invalid, false));
+    TEST_ASSERT_TRUE(sbJSON_Compare(invalid, invalid, true));
 }
 
 static void sbjson_compare_should_compare_numbers(void) {
@@ -187,7 +187,7 @@ int main(void) {
     UNITY_BEGIN();
 
     RUN_TEST(sbjson_compare_should_compare_null_pointer_as_equal);
-    RUN_TEST(sbjson_compare_should_compare_invalid_as_not_equal);
+    RUN_TEST(sbjson_compare_should_compare_invalid_as_equal);
     RUN_TEST(sbjson_compare_should_compare_numbers);
     RUN_TEST(sbjson_compare_should_compare_booleans);
     RUN_TEST(sbjson_compare_should_compare_null);
