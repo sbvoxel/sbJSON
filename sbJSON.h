@@ -143,9 +143,12 @@ bool sbJSON_HasObjectItem(const sbJSON *object, const char *string);
  * when sbJSON_Parse() returns 0. 0 when sbJSON_Parse() succeeds. */
 const char *sbJSON_GetErrorPtr(void);
 
-/* Check item type and return its value */
+/* Get values of items of known type */
 char *sbJSON_GetStringValue(const sbJSON *const item);
 double sbJSON_GetNumberValue(const sbJSON *const item);
+/* Get values of items of unknown type */
+char *sbJSON_TryGetStringValue(const sbJSON *const item);
+double sbJSON_TryGetNumberValue(const sbJSON *const item);
 
 /* These functions check the type of an item */
 bool sbJSON_IsInvalid(const sbJSON *const item);

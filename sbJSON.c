@@ -57,22 +57,41 @@ char *sbJSON_GetStringValue(const sbJSON *const item) {
     return item->u.valuestring;
 }
 
+char *sbJSON_TryGetStringValue(const sbJSON *const item) {
+    if (item == NULL || item->type != sbJSON_String) {
+        return NULL;
+    }
+
+    return item->u.valuestring;
+}
+
 // TODO: Actually we need a form of this which can be called
 // on any json item. Use this or name it TryGetNumberValue?
 // TODO: Is this API smart anymore (int vs double)?
 double sbJSON_GetNumberValue(const sbJSON *const item) {
-    if (!sbJSON_IsNumber(item)) {
-        if (item == NULL) {
-            return NAN;
-        }
-        assert(false); // precondition violation
+    if (item == NULL) {
+        return NAN;
+    }
+
+    assert(item->type == sbJSON_Number);
+
+    if (item->is_number_double) {
+        return item->u.valuedouble;
+    } else {
+        return (double)item->u.valueint;
+    }
+}
+
+double sbJSON_TryGetNumberValue(const sbJSON *const item) {
+    if (item == NULL || item->type != sbJSON_Number) {
+        return NAN;
     }
 
     if (item->is_number_double) {
         return item->u.valuedouble;
+    } else {
+        return (double)item->u.valueint;
     }
-
-    return (double)item->u.valueint;
 }
 
 /* Case insensitive string comparison, doesn't consider two NULL pointers equal
