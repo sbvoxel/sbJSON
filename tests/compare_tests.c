@@ -186,10 +186,10 @@ static void sbjson_compare_should_compare_objects(void) {
     /* test objects that are a subset of each other */
     TEST_ASSERT_FALSE(
         compare_from_string("{\"one\": 1, \"two\": 2}",
-                            "{\"one\": 1, \"two\": 2, \"three\": 3}", true))
+                            "{\"one\": 1, \"two\": 2, \"three\": 3}", true));
     TEST_ASSERT_FALSE(
         compare_from_string("{\"one\": 1, \"two\": 2}",
-                            "{\"one\": 1, \"two\": 2, \"three\": 3}", false))
+                            "{\"one\": 1, \"two\": 2, \"three\": 3}", false));
 }
 
 int main(void) {
