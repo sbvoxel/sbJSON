@@ -21,7 +21,7 @@ set(unity_tests
     misc_tests
     parse_with_opts
     compare_tests
-    cjson_add
+    sbjson_add
     readme_examples
     minify_tests
 )
