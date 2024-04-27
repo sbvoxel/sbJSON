@@ -238,9 +238,9 @@ sbJSON *sbJSON_Duplicate(const sbJSON *item, bool recurse);
  * new memory that will need to be released. With recurse!=0, it will duplicate
  * any children connected to the item. The item->next and ->prev pointers are
  * always zero on return from Duplicate. */
-/* Recursively compare two sbJSON items for equality. If either a or b is NULL
- * or invalid, they will be considered unequal. case_sensitive determines if
- * object keys are treated case sensitive (1) or case insensitive (0) */
+
+/* Recursively compare two sbJSON items for equality. case_sensitive determines
+ * if object keys are treated case sensitive (1) or case insensitive (0) */
 bool sbJSON_Compare(const sbJSON *const a, const sbJSON *const b,
                     const bool case_sensitive);
 
