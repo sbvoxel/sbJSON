@@ -2636,8 +2636,6 @@ bool sbJSON_Compare(const sbJSON *const a, const sbJSON *const b,
 
     switch (a->type) {
     case sbJSON_Invalid:
-        return true;
-    /* in these cases and equal type is enough */
     case sbJSON_False:
     case sbJSON_True:
     case sbJSON_NULL:
