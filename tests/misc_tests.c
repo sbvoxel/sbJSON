@@ -148,59 +148,67 @@ static void typecheck_functions_should_check_type(void) {
     sbJSON invalid[1];
     sbJSON item[1];
     invalid->type = sbJSON_Invalid;
-    invalid->type |= sbJSON_StringIsConst;
+    invalid->string_is_const = true;
     item->type = sbJSON_False;
-    item->type |= sbJSON_StringIsConst;
+    item->string_is_const = true;
 
     TEST_ASSERT_FALSE(sbJSON_IsInvalid(NULL));
     TEST_ASSERT_FALSE(sbJSON_IsInvalid(item));
     TEST_ASSERT_TRUE(sbJSON_IsInvalid(invalid));
 
-    item->type = sbJSON_False | sbJSON_StringIsConst;
+    item->type = sbJSON_False;
+    item->string_is_const = true;
     TEST_ASSERT_FALSE(sbJSON_IsFalse(NULL));
     TEST_ASSERT_FALSE(sbJSON_IsFalse(invalid));
     TEST_ASSERT_TRUE(sbJSON_IsFalse(item));
     TEST_ASSERT_TRUE(sbJSON_IsBool(item));
 
-    item->type = sbJSON_True | sbJSON_StringIsConst;
+    item->type = sbJSON_True;
+    item->string_is_const = true;
     TEST_ASSERT_FALSE(sbJSON_IsTrue(NULL));
     TEST_ASSERT_FALSE(sbJSON_IsTrue(invalid));
     TEST_ASSERT_TRUE(sbJSON_IsTrue(item));
     TEST_ASSERT_TRUE(sbJSON_IsBool(item));
 
-    item->type = sbJSON_NULL | sbJSON_StringIsConst;
+    item->type = sbJSON_NULL;
+    item->string_is_const = true;
     TEST_ASSERT_FALSE(sbJSON_IsNull(NULL));
     TEST_ASSERT_FALSE(sbJSON_IsNull(invalid));
     TEST_ASSERT_TRUE(sbJSON_IsNull(item));
 
-    item->type = sbJSON_Number | sbJSON_StringIsConst;
+    item->type = sbJSON_Number;
+    item->string_is_const = true;
     TEST_ASSERT_FALSE(sbJSON_IsNumber(NULL));
     TEST_ASSERT_FALSE(sbJSON_IsNumber(invalid));
     TEST_ASSERT_TRUE(sbJSON_IsNumber(item));
 
-    item->type = sbJSON_String | sbJSON_StringIsConst;
+    item->type = sbJSON_String;
+    item->string_is_const = true;
     TEST_ASSERT_FALSE(sbJSON_IsString(NULL));
     TEST_ASSERT_FALSE(sbJSON_IsString(invalid));
     TEST_ASSERT_TRUE(sbJSON_IsString(item));
 
-    item->type = sbJSON_Array | sbJSON_StringIsConst;
+    item->type = sbJSON_Array;
+    item->string_is_const = true;
     TEST_ASSERT_FALSE(sbJSON_IsArray(NULL));
     TEST_ASSERT_FALSE(sbJSON_IsArray(invalid));
     TEST_ASSERT_TRUE(sbJSON_IsArray(item));
 
-    item->type = sbJSON_Object | sbJSON_StringIsConst;
+    item->type = sbJSON_Object;
+    item->string_is_const = true;
     TEST_ASSERT_FALSE(sbJSON_IsObject(NULL));
     TEST_ASSERT_FALSE(sbJSON_IsObject(invalid));
     TEST_ASSERT_TRUE(sbJSON_IsObject(item));
 
-    item->type = sbJSON_Raw | sbJSON_StringIsConst;
+    item->type = sbJSON_Raw;
+    item->string_is_const = true;
     TEST_ASSERT_FALSE(sbJSON_IsRaw(NULL));
     TEST_ASSERT_FALSE(sbJSON_IsRaw(invalid));
     TEST_ASSERT_TRUE(sbJSON_IsRaw(item));
 }
 
 static void sbjson_should_not_parse_to_deeply_nested_jsons(void) {
-    char deep_json[CJSON_NESTING_LIMIT + 1];
+    char deep_json[SBJSON_NESTING_LIMIT + 1];
     size_t position = 0;
 
     for (position = 0; position < sizeof(deep_json); position++) {
@@ -215,20 +223,18 @@ static void sbjson_should_not_parse_to_deeply_nested_jsons(void) {
 static void sbjson_set_number_value_should_set_numbers(void) {
     sbJSON number[1] = {{NULL, NULL, NULL, sbJSON_Number, NULL, 0, 0, NULL}};
 
-    sbJSON_SetNumberValue(number, 1.5);
-    TEST_ASSERT_EQUAL(1, number->valueint);
+    sbJSON_SetDoubleNumberValue(number, 1.5);
     TEST_ASSERT_EQUAL_DOUBLE(1.5, number->valuedouble);
 
-    sbJSON_SetNumberValue(number, -1.5);
-    TEST_ASSERT_EQUAL(-1, number->valueint);
+    sbJSON_SetDoubleNumberValue(number, -1.5);
     TEST_ASSERT_EQUAL_DOUBLE(-1.5, number->valuedouble);
 
-    sbJSON_SetNumberValue(number, 1 + (double)INT_MAX);
-    TEST_ASSERT_EQUAL(INT_MAX, number->valueint);
+    sbJSON_SetDoubleNumberValue(number, 1 + (double)INT_MAX);
+    //TEST_ASSERT_EQUAL(INT_MAX, number->valueint);
     TEST_ASSERT_EQUAL_DOUBLE(1 + (double)INT_MAX, number->valuedouble);
 
-    sbJSON_SetNumberValue(number, -1 + (double)INT_MIN);
-    TEST_ASSERT_EQUAL(INT_MIN, number->valueint);
+    sbJSON_SetDoubleNumberValue(number, -1 + (double)INT_MIN);
+    //TEST_ASSERT_EQUAL(INT_MIN, number->valueint);
     TEST_ASSERT_EQUAL_DOUBLE(-1 + (double)INT_MIN, number->valuedouble);
 }
 
@@ -341,11 +347,11 @@ static void sbjson_replace_item_in_object_should_preserve_name(void) {
     sbJSON root[1] = {{NULL, NULL, NULL, 0, NULL, 0, 0, NULL}};
     sbJSON *child = NULL;
     sbJSON *replacement = NULL;
-    sbJSON_bool flag = false;
+    bool flag = false;
 
-    child = sbJSON_CreateNumber(1);
+    child = sbJSON_CreateIntegerNumber(1);
     TEST_ASSERT_NOT_NULL(child);
-    replacement = sbJSON_CreateNumber(2);
+    replacement = sbJSON_CreateIntegerNumber(2);
     TEST_ASSERT_NOT_NULL(replacement);
 
     flag = sbJSON_AddItemToObject(root, "child", child);
@@ -372,8 +378,8 @@ static void sbjson_functions_should_not_crash_with_null_pointers(void) {
 
     originalPrev = item2->prev;
     item2->prev = NULL;
-    free(corruptedString->valuestring);
-    corruptedString->valuestring = NULL;
+    free(corruptedString->u.valuestring);
+    corruptedString->u.valuestring = NULL;
 
     sbJSON_InitHooks(NULL);
     TEST_ASSERT_NULL(sbJSON_Parse(NULL));
@@ -507,9 +513,9 @@ static void skip_utf8_bom_should_not_skip_bom_if_not_at_beginning(void) {
 
 static void sbjson_get_string_value_should_get_a_string(void) {
     sbJSON *string = sbJSON_CreateString("test");
-    sbJSON *number = sbJSON_CreateNumber(1);
+    sbJSON *number = sbJSON_CreateIntegerNumber(1);
 
-    TEST_ASSERT_TRUE(sbJSON_GetStringValue(string) == string->valuestring);
+    TEST_ASSERT_TRUE(sbJSON_GetStringValue(string) == string->u.valuestring);
     TEST_ASSERT_NULL(sbJSON_GetStringValue(number));
     TEST_ASSERT_NULL(sbJSON_GetStringValue(NULL));
 
@@ -519,7 +525,7 @@ static void sbjson_get_string_value_should_get_a_string(void) {
 
 static void sbjson_get_number_value_should_get_a_number(void) {
     sbJSON *string = sbJSON_CreateString("test");
-    sbJSON *number = sbJSON_CreateNumber(1);
+    sbJSON *number = sbJSON_CreateIntegerNumber(1);
 
     TEST_ASSERT_EQUAL_DOUBLE(sbJSON_GetNumberValue(number), number->valuedouble);
     TEST_ASSERT_DOUBLE_IS_NAN(sbJSON_GetNumberValue(string));
@@ -534,9 +540,10 @@ sbjson_create_string_reference_should_create_a_string_reference(void) {
     const char *string = "I am a string!";
 
     sbJSON *string_reference = sbJSON_CreateStringReference(string);
-    TEST_ASSERT_TRUE(string_reference->valuestring == string);
-    TEST_ASSERT_EQUAL_INT(sbJSON_IsReference | sbJSON_String,
-                          string_reference->type);
+    TEST_ASSERT_TRUE(string_reference->u.valuestring == string);
+    TEST_ASSERT_TRUE(string_reference->type == sbJSON_String);
+    TEST_ASSERT_TRUE(string_reference->is_reference);
+    TEST_ASSERT_FALSE(string_reference->string_is_const);
 
     sbJSON_Delete(string_reference);
 }
@@ -545,7 +552,7 @@ static void
 sbjson_create_object_reference_should_create_an_object_reference(void) {
     sbJSON *number_reference = NULL;
     sbJSON *number_object = sbJSON_CreateObject();
-    sbJSON *number = sbJSON_CreateNumber(42);
+    sbJSON *number = sbJSON_CreateIntegerNumber(42);
     const char key[] = "number";
 
     TEST_ASSERT_TRUE(sbJSON_IsNumber(number));
@@ -554,8 +561,9 @@ sbjson_create_object_reference_should_create_an_object_reference(void) {
 
     number_reference = sbJSON_CreateObjectReference(number);
     TEST_ASSERT_TRUE(number_reference->child == number);
-    TEST_ASSERT_EQUAL_INT(sbJSON_Object | sbJSON_IsReference,
-                          number_reference->type);
+    TEST_ASSERT_TRUE(number_reference->type == sbJSON_Object);
+    TEST_ASSERT_TRUE(number_reference->is_reference);
+    TEST_ASSERT_FALSE(number_reference->string_is_const);
 
     sbJSON_Delete(number_object);
     sbJSON_Delete(number_reference);
@@ -565,7 +573,7 @@ static void
 sbjson_create_array_reference_should_create_an_array_reference(void) {
     sbJSON *number_reference = NULL;
     sbJSON *number_array = sbJSON_CreateArray();
-    sbJSON *number = sbJSON_CreateNumber(42);
+    sbJSON *number = sbJSON_CreateIntegerNumber(42);
 
     TEST_ASSERT_TRUE(sbJSON_IsNumber(number));
     TEST_ASSERT_TRUE(sbJSON_IsArray(number_array));
@@ -573,8 +581,9 @@ sbjson_create_array_reference_should_create_an_array_reference(void) {
 
     number_reference = sbJSON_CreateArrayReference(number);
     TEST_ASSERT_TRUE(number_reference->child == number);
-    TEST_ASSERT_EQUAL_INT(sbJSON_Array | sbJSON_IsReference,
-                          number_reference->type);
+    TEST_ASSERT_TRUE(number_reference->type == sbJSON_Array);
+    TEST_ASSERT_TRUE(number_reference->is_reference);
+    TEST_ASSERT_FALSE(number_reference->string_is_const);
 
     sbJSON_Delete(number_array);
     sbJSON_Delete(number_reference);
@@ -583,7 +592,7 @@ sbjson_create_array_reference_should_create_an_array_reference(void) {
 static void sbjson_add_item_to_object_or_array_should_not_add_itself(void) {
     sbJSON *object = sbJSON_CreateObject();
     sbJSON *array = sbJSON_CreateArray();
-    sbJSON_bool flag = false;
+    bool flag = false;
 
     flag = sbJSON_AddItemToObject(object, "key", object);
     TEST_ASSERT_FALSE_MESSAGE(flag, "add an object to itself should fail");
@@ -599,7 +608,7 @@ static void
 sbjson_add_item_to_object_should_not_use_after_free_when_string_is_aliased(
     void) {
     sbJSON *object = sbJSON_CreateObject();
-    sbJSON *number = sbJSON_CreateNumber(42);
+    sbJSON *number = sbJSON_CreateIntegerNumber(42);
     char *name =
         (char *)sbJSON_strdup((const unsigned char *)"number", &global_hooks);
 
@@ -666,7 +675,7 @@ static void sbjson_set_valuestring_to_object_should_not_leak_memory(void) {
     sbJSON_AddItemToObject(root, "one", item1);
     sbJSON_AddItemToObject(root, "two", item2);
 
-    ptr1 = item1->valuestring;
+    ptr1 = item1->u.valuestring;
     return_value = sbJSON_SetValuestring(sbJSON_GetObjectItem(root, "one"),
                                         short_valuestring);
     TEST_ASSERT_NOT_NULL(return_value);
@@ -674,25 +683,25 @@ static void sbjson_set_valuestring_to_object_should_not_leak_memory(void) {
         ptr1, return_value,
         "new valuestring shorter than old should not reallocate memory");
     TEST_ASSERT_EQUAL_STRING(short_valuestring,
-                             sbJSON_GetObjectItem(root, "one")->valuestring);
+                             sbJSON_GetObjectItem(root, "one")->u.valuestring);
 
     /* we needn't to free the original valuestring manually */
-    ptr1 = item1->valuestring;
+    ptr1 = item1->u.valuestring;
     return_value = sbJSON_SetValuestring(sbJSON_GetObjectItem(root, "one"),
                                         long_valuestring);
     TEST_ASSERT_NOT_NULL(return_value);
     TEST_ASSERT_NOT_EQUAL_MESSAGE(
         ptr1, return_value,
-        "new valuestring longer than old should reallocate memory")
+        "new valuestring longer than old should reallocate memory");
     TEST_ASSERT_EQUAL_STRING(long_valuestring,
-                             sbJSON_GetObjectItem(root, "one")->valuestring);
+                             sbJSON_GetObjectItem(root, "one")->u.valuestring);
 
     return_value = sbJSON_SetValuestring(sbJSON_GetObjectItem(root, "two"),
                                         long_valuestring);
     TEST_ASSERT_NULL_MESSAGE(
         return_value, "valuestring of reference object should not be changed");
     TEST_ASSERT_EQUAL_STRING(reference_valuestring,
-                             sbJSON_GetObjectItem(root, "two")->valuestring);
+                             sbJSON_GetObjectItem(root, "two")->u.valuestring);
 
     sbJSON_Delete(root);
 }
@@ -729,24 +738,24 @@ static void sbjson_set_bool_value_must_not_break_objects(void) {
 
     refobj = sbJSON_CreateStringReference("conststring");
     TEST_ASSERT_TRUE(sbJSON_IsString(refobj));
-    TEST_ASSERT_TRUE(refobj->type & sbJSON_IsReference);
+    TEST_ASSERT_TRUE(refobj->is_reference);
     sbJSON_SetBoolValue(refobj, 1);
     TEST_ASSERT_TRUE(sbJSON_IsString(refobj));
-    TEST_ASSERT_TRUE(refobj->type & sbJSON_IsReference);
+    TEST_ASSERT_TRUE(refobj->is_reference);
     sbJSON_SetBoolValue(refobj, 0);
     TEST_ASSERT_TRUE(sbJSON_IsString(refobj));
-    TEST_ASSERT_TRUE(refobj->type & sbJSON_IsReference);
+    TEST_ASSERT_TRUE(refobj->is_reference);
     sbJSON_Delete(refobj);
 
     refobj = sbJSON_CreateObjectReference(oobj);
     TEST_ASSERT_TRUE(sbJSON_IsObject(refobj));
-    TEST_ASSERT_TRUE(refobj->type & sbJSON_IsReference);
+    TEST_ASSERT_TRUE(refobj->is_reference);
     sbJSON_SetBoolValue(refobj, 1);
     TEST_ASSERT_TRUE(sbJSON_IsObject(refobj));
-    TEST_ASSERT_TRUE(refobj->type & sbJSON_IsReference);
+    TEST_ASSERT_TRUE(refobj->is_reference);
     sbJSON_SetBoolValue(refobj, 0);
     TEST_ASSERT_TRUE(sbJSON_IsObject(refobj));
-    TEST_ASSERT_TRUE(refobj->type & sbJSON_IsReference);
+    TEST_ASSERT_TRUE(refobj->is_reference);
     sbJSON_Delete(refobj);
 
     sbJSON_Delete(oobj);
