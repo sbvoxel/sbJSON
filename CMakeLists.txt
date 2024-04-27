@@ -10,8 +10,13 @@ endif()
 
 option(ENABLE_SBJSON_TEST "Enable building sbJSON test" ON)
 if(ENABLE_SBJSON_TEST)
+    enable_testing()
+
+    # This is not the testing executable; it's just one of the tests.
     add_executable(sbJSON_test test.c)
     target_link_libraries(sbJSON_test sbJSON)
+
+    add_subdirectory(tests)
 endif()
 
 install(TARGETS sbJSON DESTINATION lib)
