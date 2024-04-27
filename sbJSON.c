@@ -266,11 +266,11 @@ loop_end:
     if (decimal_number) {
         double number =
             strtod((const char *)number_c_string, (char **)&after_end);
-        sbJSON_SetDoubleNumber(item, number);
+        sbJSON_SetDoubleNumberValue(item, number);
     } else {
         int64_t number =
             strtoll((const char *)number_c_string, (char **)&after_end, 10);
-        sbJSON_SetIntegerNumber(item, number);
+        sbJSON_SetIntegerNumberValue(item, number);
     }
 
     if (number_c_string == after_end) {
@@ -283,13 +283,13 @@ loop_end:
     return true;
 }
 
-double sbJSON_SetDoubleNumber(sbJSON *object, double number) {
+double sbJSON_SetDoubleNumberValue(sbJSON *object, double number) {
     object->u.valuedouble = number;
     object->is_number_double = true;
     return number;
 }
 
-int64_t sbJSON_SetIntegerNumber(sbJSON *object, int64_t number) {
+int64_t sbJSON_SetIntegerNumberValue(sbJSON *object, int64_t number) {
     object->u.valueint = number;
     object->is_number_double = false;
     return number;

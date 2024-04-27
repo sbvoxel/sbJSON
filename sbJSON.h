@@ -262,8 +262,8 @@ sbJSON *sbJSON_AddRawToObject(sbJSON *const object, const char *const name,
 sbJSON *sbJSON_AddObjectToObject(sbJSON *const object, const char *const name);
 sbJSON *sbJSON_AddArrayToObject(sbJSON *const object, const char *const name);
 
-double sbJSON_SetDoubleNumber(sbJSON *object, double number);
-int64_t sbJSON_SetIntegerNumber(sbJSON *object, int64_t number);
+double sbJSON_SetDoubleNumberValue(sbJSON *object, double number);
+int64_t sbJSON_SetIntegerNumberValue(sbJSON *object, int64_t number);
 
 /* Change the valuestring of a sbJSON_String object, only takes effect when type
  * of object is sbJSON_String */
