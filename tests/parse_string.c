@@ -50,10 +50,10 @@ static void assert_parse_string(const char *string, const char *expected) {
     TEST_ASSERT_TRUE_MESSAGE(parse_string(item, &buffer),
                              "Couldn't parse string.");
     assert_is_string(item);
-    TEST_ASSERT_EQUAL_STRING_MESSAGE(expected, item->valuestring,
+    TEST_ASSERT_EQUAL_STRING_MESSAGE(expected, item->u.valuestring,
                                      "The parsed result isn't as expected.");
-    global_hooks.deallocate(item->valuestring);
-    item->valuestring = NULL;
+    global_hooks.deallocate(item->u.valuestring);
+    item->u.valuestring = NULL;
 }
 
 static void assert_not_parse_string(const char *const string) {

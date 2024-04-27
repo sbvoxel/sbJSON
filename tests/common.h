@@ -93,7 +93,7 @@ cleanup:
 /* assertion helper macros */
 #define assert_has_type(item, item_type)                                       \
     TEST_ASSERT_EQUAL_MESSAGE(item_type, item->type,                           \
-                             "Item isn't the expected type.")
+                             "Item doesn't have expected type.")
 #define assert_has_no_reference(item)                                          \
     TEST_ASSERT_FALSE_MESSAGE(item->is_reference,                              \
                              "Item should not have a string as reference.")
