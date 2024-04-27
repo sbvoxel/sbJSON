@@ -221,8 +221,7 @@ static void create_objects(void) {
 }
 
 int main(void) {
-    /* Now some samplecode for building objects concisely: */
+    // some sample code
     create_objects();
-
     return 0;
 }

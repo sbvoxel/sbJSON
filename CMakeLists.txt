@@ -3,19 +3,19 @@ project(SbJSON)
 
 add_library(sbJSON sbJSON.c)
 
-option(ENABLE_SBJSON_UTILS "Enable building the sbJSON_Utils library." OFF)
-if(ENABLE_SBJSON_UTILS)
+option(BUILD_UTILS "Enable building the sbJSON_Utils library." OFF)
+if(BUILD_UTILS)
     add_library(sbjson_utils sbJSON_Utils.c)
 endif()
 
-option(ENABLE_SBJSON_TEST "Enable building sbJSON test" ON)
-if(ENABLE_SBJSON_TEST)
+option(BUILD_TESTS "Enable building the tests" ON)
+if(BUILD_TESTS)
     enable_testing()
 
-    # This is not the testing executable; it's just one of the tests.
+    # This is not the testing executable; it's just an example program.
     # To run the tests simply run 'ctest' in the build directory.
-    add_executable(sbJSON_test test.c)
-    target_link_libraries(sbJSON_test sbJSON)
+    add_executable(example example.c)
+    target_link_libraries(example sbJSON)
 
     add_subdirectory(tests)
 endif()
