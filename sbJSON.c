@@ -46,8 +46,6 @@ const char *sbJSON_GetErrorPtr(void) {
     return (const char *)(global_error.json + global_error.position);
 }
 
-// TODO: Actually we need a form of this which can be called
-// on any json item. Use this or name it TryGetStringValue?
 char *sbJSON_GetStringValue(const sbJSON *const item) {
     if (item == NULL) {
         return NULL;
@@ -65,8 +63,6 @@ char *sbJSON_TryGetStringValue(const sbJSON *const item) {
     return item->u.valuestring;
 }
 
-// TODO: Actually we need a form of this which can be called
-// on any json item. Use this or name it TryGetNumberValue?
 // TODO: Is this API smart anymore (int vs double)?
 double sbJSON_GetNumberValue(const sbJSON *const item) {
     if (item == NULL) {
@@ -91,6 +87,34 @@ double sbJSON_TryGetNumberValue(const sbJSON *const item) {
         return item->u.valuedouble;
     } else {
         return (double)item->u.valueint;
+    }
+}
+
+bool sbJSON_GetBoolValue(const sbJSON *const item) {
+    if (item == NULL) {
+        return false; // ...
+    }
+
+    if (item->type == sbJSON_True) {
+        return true;
+    } else if (item->type == sbJSON_False) {
+        return false;
+    } else {
+        assert(false); // precondition violation
+    }
+}
+
+bool sbJSON_TryGetBoolValue(const sbJSON *const item, bool default_bool) {
+    if (item == NULL) {
+        return default_bool;
+    }
+
+    if (item->type == sbJSON_True) {
+        return true;
+    } else if (item->type == sbJSON_False) {
+        return false;
+    } else {
+        return default_bool;
     }
 }
 

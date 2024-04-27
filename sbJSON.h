@@ -146,9 +146,12 @@ const char *sbJSON_GetErrorPtr(void);
 /* Get values of items of known type */
 char *sbJSON_GetStringValue(const sbJSON *const item);
 double sbJSON_GetNumberValue(const sbJSON *const item);
+bool sbJSON_GetBoolValue(const sbJSON *const item);
+
 /* Get values of items of unknown type */
 char *sbJSON_TryGetStringValue(const sbJSON *const item);
 double sbJSON_TryGetNumberValue(const sbJSON *const item);
+bool sbJSON_TryGetBoolValue(const sbJSON *const item, bool default_bool);
 
 /* These functions check the type of an item */
 bool sbJSON_IsInvalid(const sbJSON *const item);
