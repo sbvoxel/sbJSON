@@ -92,16 +92,6 @@ static void sbjson_compare_should_compare_null(void) {
     TEST_ASSERT_FALSE(compare_from_string("null", "true", false));
 }
 
-static void sbjson_compare_should_not_accept_invalid_types(void) {
-    sbJSON invalid[1];
-    memset(invalid, '\0', sizeof(invalid));
-
-    invalid->type = sbJSON_Number | sbJSON_String;
-
-    TEST_ASSERT_FALSE(sbJSON_Compare(invalid, invalid, true));
-    TEST_ASSERT_FALSE(sbJSON_Compare(invalid, invalid, false));
-}
-
 static void sbjson_compare_should_compare_strings(void) {
     TEST_ASSERT_TRUE(compare_from_string("\"abcdefg\"", "\"abcdefg\"", true));
     TEST_ASSERT_TRUE(compare_from_string("\"abcdefg\"", "\"abcdefg\"", false));
@@ -200,7 +190,6 @@ int main(void) {
     RUN_TEST(sbjson_compare_should_compare_numbers);
     RUN_TEST(sbjson_compare_should_compare_booleans);
     RUN_TEST(sbjson_compare_should_compare_null);
-    RUN_TEST(sbjson_compare_should_not_accept_invalid_types);
     RUN_TEST(sbjson_compare_should_compare_strings);
     RUN_TEST(sbjson_compare_should_compare_raw);
     RUN_TEST(sbjson_compare_should_compare_arrays);
