@@ -86,7 +86,7 @@ static void parse_value_should_parse_object(void) {
     reset(item);
 }
 
-int CJSON_CDECL main(void) {
+int main(void) {
     /* initialize sbJSON item */
     memset(item, 0, sizeof(sbJSON));
     UNITY_BEGIN();

@@ -154,7 +154,7 @@ static void sbjson_minify_should_not_loop_infinitely(void) {
     sbJSON_Minify(string);
 }
 
-int CJSON_CDECL main(void) {
+int main(void) {
     UNITY_BEGIN();
 
     RUN_TEST(sbjson_minify_should_not_overflow_buffer);

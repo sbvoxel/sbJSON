@@ -31,11 +31,11 @@ void reset(sbJSON *item) {
         sbJSON_Delete(item->child);
     }
 
-    // TODO: no longer valid
-    if ((item->valuestring != NULL) && !(item->type & sbJSON_IsReference)) {
-        global_hooks.deallocate(item->valuestring);
+    if (!item->is_reference && (item->type == sbJSON_String || item->type == sbJSON_Raw)) {
+        global_hooks.deallocate(item->u.valuestring);
     }
-    if ((item->string != NULL) && !(item->type & sbJSON_StringIsConst)) {
+
+    if ((!item->string_is_const) && (item->string != NULL)) {
         global_hooks.deallocate(item->string);
     }
 

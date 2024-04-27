@@ -23,11 +23,11 @@
 #include "common.h"
 #include "unity.h"
 
-static sbJSON_bool compare_from_string(const char *const a, const char *const b,
-                                      const sbJSON_bool case_sensitive) {
+static bool compare_from_string(const char *const a, const char *const b,
+                                      const bool case_sensitive) {
     sbJSON *a_json = NULL;
     sbJSON *b_json = NULL;
-    sbJSON_bool result = false;
+    bool result = false;
 
     a_json = sbJSON_Parse(a);
     TEST_ASSERT_NOT_NULL_MESSAGE(a_json, "Failed to parse a.");
@@ -192,7 +192,7 @@ static void sbjson_compare_should_compare_objects(void) {
                             "{\"one\": 1, \"two\": 2, \"three\": 3}", false))
 }
 
-int CJSON_CDECL main(void) {
+int main(void) {
     UNITY_BEGIN();
 
     RUN_TEST(sbjson_compare_should_compare_null_pointer_as_not_equal);

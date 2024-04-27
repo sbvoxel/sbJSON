@@ -467,7 +467,7 @@ static void sbjson_functions_should_not_crash_with_null_pointers(void) {
     sbJSON_Delete(item);
 }
 
-static void *CJSON_CDECL failing_realloc(void *pointer, size_t size) {
+static void *failing_realloc(void *pointer, size_t size) {
     (void)size;
     (void)pointer;
     return NULL;
@@ -754,7 +754,7 @@ static void sbjson_set_bool_value_must_not_break_objects(void) {
     sbJSON_Delete(sobj);
 }
 
-int CJSON_CDECL main(void) {
+int main(void) {
     UNITY_BEGIN();
 
     RUN_TEST(sbjson_array_foreach_should_loop_over_arrays);
