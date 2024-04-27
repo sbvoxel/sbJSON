@@ -76,7 +76,6 @@ static void print_array_should_print_empty_arrays(void) {
 }
 
 static void print_array_should_print_arrays_with_one_element(void) {
-
     assert_print_array("[1]", "[1]");
     assert_print_array("[\"hello!\"]", "[\"hello!\"]");
     assert_print_array("[[]]", "[[]]");
