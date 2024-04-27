@@ -43,9 +43,9 @@ static bool compare_from_string(const char *const a, const char *const b,
     return result;
 }
 
-static void sbjson_compare_should_compare_null_pointer_as_not_equal(void) {
-    TEST_ASSERT_FALSE(sbJSON_Compare(NULL, NULL, true));
-    TEST_ASSERT_FALSE(sbJSON_Compare(NULL, NULL, false));
+static void sbjson_compare_should_compare_null_pointer_as_equal(void) {
+    TEST_ASSERT_TRUE(sbJSON_Compare(NULL, NULL, true));
+    TEST_ASSERT_TRUE(sbJSON_Compare(NULL, NULL, false));
 }
 
 static void sbjson_compare_should_compare_invalid_as_not_equal(void) {
@@ -186,7 +186,7 @@ static void sbjson_compare_should_compare_objects(void) {
 int main(void) {
     UNITY_BEGIN();
 
-    RUN_TEST(sbjson_compare_should_compare_null_pointer_as_not_equal);
+    RUN_TEST(sbjson_compare_should_compare_null_pointer_as_equal);
     RUN_TEST(sbjson_compare_should_compare_invalid_as_not_equal);
     RUN_TEST(sbjson_compare_should_compare_numbers);
     RUN_TEST(sbjson_compare_should_compare_booleans);

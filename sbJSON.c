@@ -2623,7 +2623,11 @@ bool sbJSON_IsRaw(const sbJSON *const item) {
 
 bool sbJSON_Compare(const sbJSON *const a, const sbJSON *const b,
                     const bool case_sensitive) {
-    if ((a == NULL) || (b == NULL) || (a->type != b->type)) {
+    if (a == NULL || b == NULL) {
+        return a == b;
+    }
+
+    if (a->type != b->type) {
         return false;
     }
 
