@@ -2540,6 +2540,7 @@ void sbJSON_Minify(char *json) {
     *into = '\0';
 }
 
+// TODO: LOL
 bool sbJSON_IsInvalid(const sbJSON *const item) {
     if (item == NULL) {
         return false;
@@ -2626,23 +2627,11 @@ bool sbJSON_Compare(const sbJSON *const a, const sbJSON *const b,
         return false;
     }
 
-    /* check if type is valid */
-    switch (a->type) {
-    case sbJSON_False:
-    case sbJSON_True:
-    case sbJSON_NULL:
-    case sbJSON_Number:
-    case sbJSON_String:
-    case sbJSON_Raw:
-    case sbJSON_Array:
-    case sbJSON_Object:
-        break;
-
-    default:
+    // Current tests dictate invalids compare as unequal. So fancy and chaotic.
+    if (a->type == sbJSON_Invalid) {
         return false;
     }
 
-    /* identical objects are equal */
     if (a == b) {
         return true;
     }
