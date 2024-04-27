@@ -177,7 +177,8 @@ void sbJSON_Delete(sbJSON *item) {
             sbJSON_Delete(item->child);
         }
 
-        if (!item->is_reference && (item->type == sbJSON_String || item->type == sbJSON_Raw)) {
+        if (!item->is_reference &&
+            (item->type == sbJSON_String || item->type == sbJSON_Raw)) {
             global_hooks.deallocate(item->u.valuestring);
         }
 
@@ -300,7 +301,8 @@ char *sbJSON_SetValuestring(sbJSON *object, const char *valuestring) {
         return NULL;
     }
 
-    assert(object->type == sbJSON_String && !object->is_reference && valuestring != NULL);
+    assert(object->type == sbJSON_String && !object->is_reference &&
+           valuestring != NULL);
 
     if (strlen(valuestring) <= strlen(object->u.valuestring)) {
         strcpy(object->u.valuestring, valuestring);
@@ -308,7 +310,7 @@ char *sbJSON_SetValuestring(sbJSON *object, const char *valuestring) {
     }
 
     char *copy = (char *)sbJSON_strdup((const unsigned char *)valuestring,
-                                 &global_hooks);
+                                       &global_hooks);
     if (copy == NULL) {
         return NULL;
     }
@@ -439,36 +441,41 @@ static bool compare_double(double a, double b) {
 /* Render the number nicely from the given item into a string. */
 static bool print_number(const sbJSON *const item,
                          printbuffer *const output_buffer) {
+
     unsigned char *output_pointer = NULL;
-    double d = item->u.valuedouble;
     int length = 0;
     size_t i = 0;
     unsigned char number_buffer[26] = {
         0}; /* temporary buffer to print the number into */
-    unsigned char decimal_point = '.';
     double test = 0.0;
 
     if (output_buffer == NULL) {
         return false;
     }
 
-    /* This checks for NaN and Infinity */
-    if (isnan(d) || isinf(d)) {
-        length = sprintf((char *)number_buffer, "null");
-    } else if (d == (double)item->u.valueint) {
-        length =
-            sprintf((char *)number_buffer, "%" PRId64, (long)item->u.valueint);
-    } else {
-        /* Try 15 decimal places of precision to avoid nonsignificant nonzero
-         * digits */
-        length = sprintf((char *)number_buffer, "%1.15g", d);
+    if (item->is_number_double) {
+        double d = item->u.valuedouble;
 
-        /* Check whether the original double can be recovered */
-        if ((sscanf((char *)number_buffer, "%lg", &test) != 1) ||
-            !compare_double((double)test, d)) {
-            /* If not, print with 17 decimal places of precision */
-            length = sprintf((char *)number_buffer, "%1.17g", d);
+        /* This checks for NaN and Infinity */
+        if (isnan(d) || isinf(d)) {
+            length = sprintf((char *)number_buffer, "null");
+        } else if (d == (int64_t)d) {
+            length = sprintf((char *)number_buffer, "%" PRId64, (int64_t)d);
+        } else {
+            /* Try 15 decimal places of precision to avoid nonsignificant
+             * nonzero digits */
+            length = sprintf((char *)number_buffer, "%1.15g", d);
+
+            /* Check whether the original double can be recovered */
+            if ((sscanf((char *)number_buffer, "%lg", &test) != 1) ||
+                !compare_double((double)test, d)) {
+                /* If not, print with 17 decimal places of precision */
+                length = sprintf((char *)number_buffer, "%1.17g", d);
+            }
         }
+    } else {
+        int64_t i = item->u.valueint;
+        length = sprintf((char *)number_buffer, "%" PRId64, i);
     }
 
     /* sprintf failed or buffer overrun occurred */
@@ -482,14 +489,7 @@ static bool print_number(const sbJSON *const item,
         return false;
     }
 
-    /* copy the printed number to the output and replace locale
-     * dependent decimal point with '.' */
     for (i = 0; i < ((size_t)length); i++) {
-        if (number_buffer[i] == decimal_point) {
-            output_pointer[i] = '.';
-            continue;
-        }
-
         output_pointer[i] = number_buffer[i];
     }
     output_pointer[i] = '\0';
