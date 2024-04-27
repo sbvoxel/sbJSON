@@ -79,13 +79,13 @@ static char *create_monitor(void) {
         }
         sbJSON_AddItemToArray(resolutions, resolution);
 
-        width = sbJSON_CreateNumber(resolution_numbers[index][0]);
+        width = sbJSON_CreateIntegerNumber(resolution_numbers[index][0]);
         if (width == NULL) {
             goto end;
         }
         sbJSON_AddItemToObject(resolution, "width", width);
 
-        height = sbJSON_CreateNumber(resolution_numbers[index][1]);
+        height = sbJSON_CreateIntegerNumber(resolution_numbers[index][1]);
         if (height == NULL) {
             goto end;
         }
@@ -124,12 +124,12 @@ static char *create_monitor_with_helpers(void) {
          ++index) {
         sbJSON *resolution = sbJSON_CreateObject();
 
-        if (sbJSON_AddNumberToObject(resolution, "width",
+        if (sbJSON_AddIntegerNumberToObject(resolution, "width",
                                     resolution_numbers[index][0]) == NULL) {
             goto end;
         }
 
-        if (sbJSON_AddNumberToObject(resolution, "height",
+        if (sbJSON_AddIntegerNumberToObject(resolution, "height",
                                     resolution_numbers[index][1]) == NULL) {
             goto end;
         }
@@ -164,8 +164,8 @@ static int supports_full_hd(const char *const monitor) {
     }
 
     name = sbJSON_GetObjectItemCaseSensitive(monitor_json, "name");
-    if (sbJSON_IsString(name) && (name->valuestring != NULL)) {
-        printf("Checking monitor \"%s\"\n", name->valuestring);
+    if (sbJSON_IsString(name) && (name->u.valuestring != NULL)) {
+        printf("Checking monitor \"%s\"\n", name->u.valuestring);
     }
 
     resolutions = sbJSON_GetObjectItemCaseSensitive(monitor_json, "resolutions");
@@ -178,8 +178,10 @@ static int supports_full_hd(const char *const monitor) {
             goto end;
         }
 
-        if (compare_double(width->valuedouble, 1920) &&
-            compare_double(height->valuedouble, 1080)) {
+        TEST_ASSERT_FALSE(width->is_number_double);
+        TEST_ASSERT_FALSE(height->is_number_double);
+
+        if (width->u.valueint == 1920 && height->u.valueint == 1080) {
             status = 1;
             goto end;
         }
