@@ -156,21 +156,24 @@ static void typecheck_functions_should_check_type(void) {
     sbJSON item[1];
     invalid->type = sbJSON_Invalid;
     invalid->string_is_const = true;
-    item->type = sbJSON_False;
+    item->type = sbJSON_Bool;
+    item->u.valuebool = false;
     item->string_is_const = true;
 
     TEST_ASSERT_FALSE(sbJSON_IsInvalid(NULL));
     TEST_ASSERT_FALSE(sbJSON_IsInvalid(item));
     TEST_ASSERT_TRUE(sbJSON_IsInvalid(invalid));
 
-    item->type = sbJSON_False;
+    item->type = sbJSON_Bool;
+    item->u.valuebool = false;
     item->string_is_const = true;
     TEST_ASSERT_FALSE(sbJSON_IsFalse(NULL));
     TEST_ASSERT_FALSE(sbJSON_IsFalse(invalid));
     TEST_ASSERT_TRUE(sbJSON_IsFalse(item));
     TEST_ASSERT_TRUE(sbJSON_IsBool(item));
 
-    item->type = sbJSON_True;
+    item->type = sbJSON_Bool;
+    item->u.valuebool = true;
     item->string_is_const = true;
     TEST_ASSERT_FALSE(sbJSON_IsTrue(NULL));
     TEST_ASSERT_FALSE(sbJSON_IsTrue(invalid));
@@ -730,11 +733,11 @@ static void sbjson_set_bool_value_must_not_break_objects(void) {
 
     bobj = sbJSON_CreateFalse();
     TEST_ASSERT_TRUE(sbJSON_IsFalse(bobj));
-    TEST_ASSERT_TRUE((sbJSON_SetBoolValue(bobj, 1) == sbJSON_True));
+    TEST_ASSERT_TRUE((sbJSON_SetBoolValue(bobj, 1)));
     TEST_ASSERT_TRUE(sbJSON_IsTrue(bobj));
     sbJSON_SetBoolValue(bobj, 1);
     TEST_ASSERT_TRUE(sbJSON_IsTrue(bobj));
-    TEST_ASSERT_TRUE((sbJSON_SetBoolValue(bobj, 0) == sbJSON_False));
+    TEST_ASSERT_TRUE((sbJSON_SetBoolValue(bobj, 0)));
     TEST_ASSERT_TRUE(sbJSON_IsFalse(bobj));
     sbJSON_SetBoolValue(bobj, 0);
     TEST_ASSERT_TRUE(sbJSON_IsFalse(bobj));

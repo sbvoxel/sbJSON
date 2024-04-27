@@ -95,13 +95,8 @@ bool sbJSON_GetBoolValue(const sbJSON *const item) {
         return false; // ...
     }
 
-    if (item->type == sbJSON_True) {
-        return true;
-    } else if (item->type == sbJSON_False) {
-        return false;
-    } else {
-        assert(false); // precondition violation
-    }
+    assert(item->type == sbJSON_Bool);
+    return item->u.valuebool;
 }
 
 bool sbJSON_TryGetBoolValue(const sbJSON *const item, bool default_bool) {
@@ -109,13 +104,11 @@ bool sbJSON_TryGetBoolValue(const sbJSON *const item, bool default_bool) {
         return default_bool;
     }
 
-    if (item->type == sbJSON_True) {
-        return true;
-    } else if (item->type == sbJSON_False) {
-        return false;
-    } else {
-        return default_bool;
+    if (item->type == sbJSON_Bool) {
+        return item->u.valuebool;
     }
+
+    return default_bool;
 }
 
 /* Case insensitive string comparison, doesn't consider two NULL pointers equal
@@ -372,24 +365,19 @@ char *sbJSON_SetValuestring(sbJSON *object, const char *valuestring) {
     return copy;
 }
 
-enum sbJSON_Kind sbJSON_SetBoolValue(sbJSON *object, bool boolValue) {
+bool sbJSON_SetBoolValue(sbJSON *object, bool boolValue) {
     if (object == NULL) {
-        return sbJSON_Invalid;
+        return false;
     }
 
-    if (object->type != sbJSON_False && object->type != sbJSON_True) {
-        return sbJSON_Invalid;
+    if (object->type != sbJSON_Bool) {
+        return false;
     }
 
     assert(!object->is_reference && !object->string_is_const);
-
-    if (boolValue) {
-        object->type = sbJSON_True;
-        return sbJSON_True;
-    } else {
-        object->type = sbJSON_False;
-        return sbJSON_False;
-    }
+    object->type = sbJSON_Bool;
+    object->u.valuebool = boolValue;
+    return true;
 }
 
 typedef struct {
@@ -510,8 +498,8 @@ static bool print_number(const sbJSON *const item,
 
         /* This checks for NaN and Infinity */
         if (isnan(d) || isinf(d)) {
-            // TODO: This behavior should be controllable. Crashing is at least as valid.
-            // Also think about rountrip ability.
+            // TODO: This behavior should be controllable. Crashing is at least
+            // as valid. Also think about rountrip ability.
             length = sprintf((char *)number_buffer, "null");
         } else if (d == (int64_t)d) {
             length = sprintf((char *)number_buffer, "%" PRId64, (int64_t)d);
@@ -1205,7 +1193,8 @@ static bool parse_value(sbJSON *const item, parse_buffer *const input_buffer) {
     if (can_read(input_buffer, 5) &&
         (strncmp((const char *)buffer_at_offset(input_buffer), "false", 5) ==
          0)) {
-        item->type = sbJSON_False;
+        item->type = sbJSON_Bool;
+        item->u.valuebool = false;
         input_buffer->offset += 5;
         return true;
     }
@@ -1213,7 +1202,8 @@ static bool parse_value(sbJSON *const item, parse_buffer *const input_buffer) {
     if (can_read(input_buffer, 4) &&
         (strncmp((const char *)buffer_at_offset(input_buffer), "true", 4) ==
          0)) {
-        item->type = sbJSON_True;
+        item->type = sbJSON_Bool;
+        item->u.valuebool = true;
         input_buffer->offset += 4;
         return true;
     }
@@ -1260,20 +1250,22 @@ static bool print_value(const sbJSON *const item,
         }
         strcpy((char *)output, "null");
         return true;
-    case sbJSON_False:
-        output = ensure(output_buffer, 6);
-        if (output == NULL) {
-            return false;
+    case sbJSON_Bool:
+        if (item->u.valuebool) {
+            output = ensure(output_buffer, 5);
+            if (output == NULL) {
+                return false;
+            }
+            strcpy((char *)output, "true");
+            return true;
+        } else {
+            output = ensure(output_buffer, 6);
+            if (output == NULL) {
+                return false;
+            }
+            strcpy((char *)output, "false");
+            return true;
         }
-        strcpy((char *)output, "false");
-        return true;
-    case sbJSON_True:
-        output = ensure(output_buffer, 5);
-        if (output == NULL) {
-            return false;
-        }
-        strcpy((char *)output, "true");
-        return true;
     case sbJSON_Number:
         return print_number(item, output_buffer);
     case sbJSON_Raw: {
@@ -2152,7 +2144,8 @@ sbJSON *sbJSON_CreateNull(void) {
 sbJSON *sbJSON_CreateTrue(void) {
     sbJSON *item = sbJSON_New_Item(&global_hooks);
     if (item) {
-        item->type = sbJSON_True;
+        item->type = sbJSON_Bool;
+        item->u.valuebool = true;
     }
 
     return item;
@@ -2161,7 +2154,8 @@ sbJSON *sbJSON_CreateTrue(void) {
 sbJSON *sbJSON_CreateFalse(void) {
     sbJSON *item = sbJSON_New_Item(&global_hooks);
     if (item) {
-        item->type = sbJSON_False;
+        item->type = sbJSON_Bool;
+        item->u.valuebool = false;
     }
 
     return item;
@@ -2170,7 +2164,8 @@ sbJSON *sbJSON_CreateFalse(void) {
 sbJSON *sbJSON_CreateBool(bool boolean) {
     sbJSON *item = sbJSON_New_Item(&global_hooks);
     if (item) {
-        item->type = boolean ? sbJSON_True : sbJSON_False;
+        item->type = sbJSON_Bool;
+        item->u.valuebool = boolean;
     }
 
     return item;
@@ -2590,7 +2585,11 @@ bool sbJSON_IsFalse(const sbJSON *const item) {
         return false;
     }
 
-    return item->type == sbJSON_False;
+    if (item->type != sbJSON_Bool) {
+        return false;
+    }
+
+    return !item->u.valuebool;
 }
 
 bool sbJSON_IsTrue(const sbJSON *const item) {
@@ -2598,7 +2597,11 @@ bool sbJSON_IsTrue(const sbJSON *const item) {
         return false;
     }
 
-    return item->type == sbJSON_True;
+    if (item->type != sbJSON_Bool) {
+        return false;
+    }
+
+    return item->u.valuebool;
 }
 
 bool sbJSON_IsBool(const sbJSON *const item) {
@@ -2606,7 +2609,7 @@ bool sbJSON_IsBool(const sbJSON *const item) {
         return false;
     }
 
-    return item->type == sbJSON_True || item->type == sbJSON_False;
+    return item->type == sbJSON_Bool;
 }
 
 bool sbJSON_IsNull(const sbJSON *const item) {
@@ -2673,8 +2676,9 @@ bool sbJSON_Compare(const sbJSON *const a, const sbJSON *const b,
 
     switch (a->type) {
     case sbJSON_Invalid:
-    case sbJSON_False:
-    case sbJSON_True:
+        return true;
+    case sbJSON_Bool:
+        return a->u.valuebool == b->u.valuebool;
     case sbJSON_Null:
         return true;
     case sbJSON_Number:

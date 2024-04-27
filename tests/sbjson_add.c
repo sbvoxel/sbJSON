@@ -80,7 +80,8 @@ static void sbjson_add_true_should_add_true(void) {
 
     TEST_ASSERT_NOT_NULL(true_item =
                              sbJSON_GetObjectItemCaseSensitive(root, "true"));
-    TEST_ASSERT_EQUAL_INT(true_item->type, sbJSON_True);
+    TEST_ASSERT_EQUAL_INT(true_item->type, sbJSON_Bool);
+    TEST_ASSERT_EQUAL(true_item->u.valuebool, true);
 
     sbJSON_Delete(root);
 }
@@ -154,7 +155,8 @@ static void sbjson_add_false_should_add_false(void) {
 
     TEST_ASSERT_NOT_NULL(false_item =
                              sbJSON_GetObjectItemCaseSensitive(root, "false"));
-    TEST_ASSERT_EQUAL_INT(false_item->type, sbJSON_False);
+    TEST_ASSERT_EQUAL_INT(false_item->type, sbJSON_Bool);
+    TEST_ASSERT_EQUAL(false_item->u.valuebool, false);
 
     sbJSON_Delete(root);
 }
@@ -189,13 +191,15 @@ static void sbjson_add_bool_should_add_bool(void) {
     sbJSON_AddBoolToObject(root, "true", true);
     TEST_ASSERT_NOT_NULL(true_item =
                              sbJSON_GetObjectItemCaseSensitive(root, "true"));
-    TEST_ASSERT_EQUAL_INT(true_item->type, sbJSON_True);
+    TEST_ASSERT_EQUAL_INT(true_item->type, sbJSON_Bool);
+    TEST_ASSERT_EQUAL(true_item->u.valuebool, true);
 
     /* false */
     sbJSON_AddBoolToObject(root, "false", false);
     TEST_ASSERT_NOT_NULL(false_item =
                              sbJSON_GetObjectItemCaseSensitive(root, "false"));
-    TEST_ASSERT_EQUAL_INT(false_item->type, sbJSON_False);
+    TEST_ASSERT_EQUAL_INT(false_item->type, sbJSON_Bool);
+    TEST_ASSERT_EQUAL(false_item->u.valuebool, false);
 
     sbJSON_Delete(root);
 }

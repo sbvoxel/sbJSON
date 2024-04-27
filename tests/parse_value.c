@@ -56,12 +56,12 @@ static void parse_value_should_parse_null(void) {
 }
 
 static void parse_value_should_parse_true(void) {
-    assert_parse_value("true", sbJSON_True);
+    assert_parse_value("true", sbJSON_Bool);
     reset(item);
 }
 
 static void parse_value_should_parse_false(void) {
-    assert_parse_value("false", sbJSON_False);
+    assert_parse_value("true", sbJSON_Bool);
     reset(item);
 }
 

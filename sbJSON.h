@@ -35,8 +35,7 @@ extern "C" {
 /* sbJSON Types: */
 enum sbJSON_Kind {
     sbJSON_Invalid, // TODO: Document whether parser can return this.
-    sbJSON_False,
-    sbJSON_True,
+    sbJSON_Bool,
     sbJSON_Null,
     sbJSON_Number,
     sbJSON_String,
@@ -66,6 +65,7 @@ typedef struct sbJSON {
         /* The item's number, if type==sbJSON_Number */
         int64_t valueint;
         double valuedouble;
+        bool valuebool;
     } u;
 
     bool is_number_double;
@@ -276,9 +276,8 @@ int64_t sbJSON_SetIntegerNumberValue(sbJSON *object, int64_t number);
  * of object is sbJSON_String */
 char *sbJSON_SetValuestring(sbJSON *object, const char *valuestring);
 
-/* If the object is not a boolean type this does nothing and returns
- * sbJSON_Invalid else it returns the new type*/
-enum sbJSON_Kind sbJSON_SetBoolValue(sbJSON *object, bool boolValue);
+/* Returns success status. False if object is not a boolean type */
+bool sbJSON_SetBoolValue(sbJSON *object, bool boolValue);
 
 /* Macro for iterating over an array or object */
 #define sbJSON_ArrayForEach(element, array)                                    \

@@ -110,8 +110,8 @@ static void parse_object_should_parse_objects_with_multiple_elements(void) {
     {
         size_t i = 0;
         sbJSON *node = NULL;
-        int expected_types[7] = {sbJSON_Number, sbJSON_Null,  sbJSON_True,
-                                 sbJSON_False,  sbJSON_Array, sbJSON_String,
+        int expected_types[7] = {sbJSON_Number, sbJSON_Null,  sbJSON_Bool,
+                                 sbJSON_Bool,  sbJSON_Array, sbJSON_String,
                                  sbJSON_Object};
         const char *expected_names[7] = {"one",   "NULL",  "TRUE",  "FALSE",
                                          "array", "world", "object"};
