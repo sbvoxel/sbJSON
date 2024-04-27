@@ -1713,7 +1713,7 @@ static sbJSON *create_reference(const sbJSON *item,
 static bool add_item_to_array(sbJSON *array, sbJSON *item) {
     sbJSON *child = NULL;
 
-    if (item == NULL) {
+    if (array == NULL || item == NULL) {
         return false;
     }
 
