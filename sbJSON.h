@@ -34,7 +34,7 @@ extern "C" {
 
 /* sbJSON Types: */
 enum sbJSON_Kind {
-    sbJSON_Invalid,
+    sbJSON_Invalid, // TODO: Document whether parser can return this.
     sbJSON_False,
     sbJSON_True,
     sbJSON_NULL,

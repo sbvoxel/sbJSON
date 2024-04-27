@@ -49,11 +49,16 @@ static void sbjson_compare_should_compare_null_pointer_as_equal(void) {
 }
 
 static void sbjson_compare_should_compare_invalid_as_equal(void) {
-    sbJSON invalid[1];
-    memset(invalid, '\0', sizeof(invalid));
+    sbJSON invalid1;
+    sbJSON invalid2;
+    memset(&invalid1, '\0', sizeof(invalid1));
+    memset(&invalid2, '\0', sizeof(invalid2));
 
-    TEST_ASSERT_TRUE(sbJSON_Compare(invalid, invalid, false));
-    TEST_ASSERT_TRUE(sbJSON_Compare(invalid, invalid, true));
+    TEST_ASSERT_TRUE(sbJSON_Compare(&invalid1, &invalid1, false));
+    TEST_ASSERT_TRUE(sbJSON_Compare(&invalid1, &invalid1, true));
+
+    TEST_ASSERT_TRUE(sbJSON_Compare(&invalid1, &invalid2, false));
+    TEST_ASSERT_TRUE(sbJSON_Compare(&invalid1, &invalid2, true));
 }
 
 static void sbjson_compare_should_compare_numbers(void) {
