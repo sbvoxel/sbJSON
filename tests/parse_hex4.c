@@ -25,8 +25,7 @@
 #include <string.h>
 
 #include "common.h"
-#include "unity/examples/unity_config.h"
-#include "unity/src/unity.h"
+#include "unity.h"
 
 static void parse_hex4_should_parse_all_combinations(void) {
     unsigned int number = 0;

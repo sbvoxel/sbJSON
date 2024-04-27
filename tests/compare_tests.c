@@ -21,8 +21,7 @@
 */
 
 #include "common.h"
-#include "unity/examples/unity_config.h"
-#include "unity/src/unity.h"
+#include "unity.h"
 
 static sbJSON_bool compare_from_string(const char *const a, const char *const b,
                                       const sbJSON_bool case_sensitive) {

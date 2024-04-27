@@ -21,8 +21,7 @@
 */
 
 #include "common.h"
-#include "unity/examples/unity_config.h"
-#include "unity/src/unity.h"
+#include "unity.h"
 
 static void assert_print_object(const char *const expected,
                                 const char *const input) {

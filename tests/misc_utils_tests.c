@@ -26,8 +26,7 @@
 
 #include "../sbJSON_Utils.h"
 #include "common.h"
-#include "unity/examples/unity_config.h"
-#include "unity/src/unity.h"
+#include "unity.h"
 
 static void sbjson_utils_functions_shouldnt_crash_with_null_pointers(void) {
     sbJSON *item = sbJSON_CreateString("item");

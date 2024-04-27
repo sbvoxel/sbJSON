@@ -25,8 +25,7 @@
 #include <string.h>
 
 #include "common.h"
-#include "unity/examples/unity_config.h"
-#include "unity/src/unity.h"
+#include "unity.h"
 
 static void sbjson_array_foreach_should_loop_over_arrays(void) {
     sbJSON array[1];

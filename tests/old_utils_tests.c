@@ -26,8 +26,7 @@
 
 #include "../sbJSON_Utils.h"
 #include "common.h"
-#include "unity/examples/unity_config.h"
-#include "unity/src/unity.h"
+#include "unity.h"
 
 /* JSON Apply Merge tests: */
 static const char *merges[15][3] = {

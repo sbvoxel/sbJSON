@@ -21,8 +21,7 @@
 */
 
 #include "common.h"
-#include "unity/examples/unity_config.h"
-#include "unity/src/unity.h"
+#include "unity.h"
 
 static void assert_print_string(const char *expected, const char *input) {
     unsigned char printed[1024];

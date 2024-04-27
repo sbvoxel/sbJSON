@@ -21,8 +21,7 @@
 */
 
 #include "common.h"
-#include "unity/examples/unity_config.h"
-#include "unity/src/unity.h"
+#include "unity.h"
 
 static void parse_with_opts_should_handle_null(void) {
     const char *error_pointer = NULL;
