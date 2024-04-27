@@ -47,10 +47,11 @@ const char *sbJSON_GetErrorPtr(void) {
 }
 
 char *sbJSON_GetStringValue(const sbJSON *const item) {
-    if (!sbJSON_IsString(item)) {
+    if (item == NULL) {
         return NULL;
     }
 
+    assert(sbJSON_IsString(item));
     return item->u.valuestring;
 }
 

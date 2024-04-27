@@ -527,8 +527,9 @@ static void sbjson_get_string_value_should_get_a_string(void) {
     sbJSON *number = sbJSON_CreateIntegerNumber(1);
 
     TEST_ASSERT_TRUE(sbJSON_GetStringValue(string) == string->u.valuestring);
-    TEST_ASSERT_NULL(sbJSON_GetStringValue(number));
-    TEST_ASSERT_NULL(sbJSON_GetStringValue(NULL));
+    //TODO: Precondition violations. Should crash.
+    //TEST_ASSERT_NULL(sbJSON_GetStringValue(number));
+    //TEST_ASSERT_NULL(sbJSON_GetStringValue(NULL));
 
     sbJSON_Delete(number);
     sbJSON_Delete(string);
