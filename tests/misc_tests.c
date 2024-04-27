@@ -73,15 +73,18 @@ static void sbjson_get_object_item_should_get_object_items(void) {
 
     found = sbJSON_GetObjectItem(item, "one");
     TEST_ASSERT_NOT_NULL_MESSAGE(found, "Failed to find first item.");
-    TEST_ASSERT_EQUAL_DOUBLE(found->valuedouble, 1);
+    TEST_ASSERT_FALSE(item->is_number_double);
+    TEST_ASSERT_EQUAL_INT(found->u.valueint, 1);
 
     found = sbJSON_GetObjectItem(item, "tWo");
     TEST_ASSERT_NOT_NULL_MESSAGE(found, "Failed to find first item.");
-    TEST_ASSERT_EQUAL_DOUBLE(found->valuedouble, 2);
+    TEST_ASSERT_FALSE(item->is_number_double);
+    TEST_ASSERT_EQUAL_INT(found->u.valueint, 2);
 
     found = sbJSON_GetObjectItem(item, "three");
     TEST_ASSERT_NOT_NULL_MESSAGE(found, "Failed to find item.");
-    TEST_ASSERT_EQUAL_DOUBLE(found->valuedouble, 3);
+    TEST_ASSERT_FALSE(item->is_number_double);
+    TEST_ASSERT_EQUAL_INT(found->u.valueint, 3);
 
     found = sbJSON_GetObjectItem(item, "four");
     TEST_ASSERT_NULL_MESSAGE(found,
@@ -104,15 +107,18 @@ static void sbjson_get_object_item_case_sensitive_should_get_object_items(void) 
 
     found = sbJSON_GetObjectItemCaseSensitive(item, "one");
     TEST_ASSERT_NOT_NULL_MESSAGE(found, "Failed to find first item.");
-    TEST_ASSERT_EQUAL_DOUBLE(found->valuedouble, 1);
+    TEST_ASSERT_FALSE(item->is_number_double);
+    TEST_ASSERT_EQUAL_INT(found->u.valueint, 1);
 
     found = sbJSON_GetObjectItemCaseSensitive(item, "Two");
     TEST_ASSERT_NOT_NULL_MESSAGE(found, "Failed to find first item.");
-    TEST_ASSERT_EQUAL_DOUBLE(found->valuedouble, 2);
+    TEST_ASSERT_FALSE(item->is_number_double);
+    TEST_ASSERT_EQUAL_INT(found->u.valueint, 2);
 
     found = sbJSON_GetObjectItemCaseSensitive(item, "tHree");
     TEST_ASSERT_NOT_NULL_MESSAGE(found, "Failed to find item.");
-    TEST_ASSERT_EQUAL_DOUBLE(found->valuedouble, 3);
+    TEST_ASSERT_FALSE(item->is_number_double);
+    TEST_ASSERT_EQUAL_INT(found->u.valueint, 3);
 
     found = sbJSON_GetObjectItemCaseSensitive(item, "One");
     TEST_ASSERT_NULL_MESSAGE(found,
@@ -224,18 +230,22 @@ static void sbjson_set_number_value_should_set_numbers(void) {
     sbJSON number[1] = {{NULL, NULL, NULL, sbJSON_Number, NULL, 0, 0, NULL}};
 
     sbJSON_SetDoubleNumberValue(number, 1.5);
-    TEST_ASSERT_EQUAL_DOUBLE(1.5, number->valuedouble);
+    TEST_ASSERT_TRUE(number->is_number_double);
+    TEST_ASSERT_EQUAL_DOUBLE(1.5, number->u.valuedouble);
 
     sbJSON_SetDoubleNumberValue(number, -1.5);
-    TEST_ASSERT_EQUAL_DOUBLE(-1.5, number->valuedouble);
+    TEST_ASSERT_TRUE(number->is_number_double);
+    TEST_ASSERT_EQUAL_DOUBLE(-1.5, number->u.valuedouble);
 
     sbJSON_SetDoubleNumberValue(number, 1 + (double)INT_MAX);
     //TEST_ASSERT_EQUAL(INT_MAX, number->valueint);
-    TEST_ASSERT_EQUAL_DOUBLE(1 + (double)INT_MAX, number->valuedouble);
+    TEST_ASSERT_TRUE(number->is_number_double);
+    TEST_ASSERT_EQUAL_DOUBLE(1 + (double)INT_MAX, number->u.valuedouble);
 
     sbJSON_SetDoubleNumberValue(number, -1 + (double)INT_MIN);
     //TEST_ASSERT_EQUAL(INT_MIN, number->valueint);
-    TEST_ASSERT_EQUAL_DOUBLE(-1 + (double)INT_MIN, number->valuedouble);
+    TEST_ASSERT_TRUE(number->is_number_double);
+    TEST_ASSERT_EQUAL_DOUBLE(-1 + (double)INT_MIN, number->u.valuedouble);
 }
 
 static void sbjson_detach_item_via_pointer_should_detach_items(void) {
@@ -527,7 +537,7 @@ static void sbjson_get_number_value_should_get_a_number(void) {
     sbJSON *string = sbJSON_CreateString("test");
     sbJSON *number = sbJSON_CreateIntegerNumber(1);
 
-    TEST_ASSERT_EQUAL_DOUBLE(sbJSON_GetNumberValue(number), number->valuedouble);
+    TEST_ASSERT_EQUAL_DOUBLE(sbJSON_GetNumberValue(number), (double) number->u.valueint);
     TEST_ASSERT_DOUBLE_IS_NAN(sbJSON_GetNumberValue(string));
     TEST_ASSERT_DOUBLE_IS_NAN(sbJSON_GetNumberValue(NULL));
 

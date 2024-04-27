@@ -1,4 +1,5 @@
 add_library(unity STATIC 3rdparty/unity.c)
+target_compile_definitions(unity PUBLIC -DUNITY_INCLUDE_DOUBLE)
 
 #copy test files
 file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/inputs")

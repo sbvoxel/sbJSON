@@ -53,6 +53,7 @@ char *sbJSON_GetStringValue(const sbJSON *const item) {
     return item->u.valuestring;
 }
 
+// TODO: Is this API smart anymore?
 double sbJSON_GetNumberValue(const sbJSON *const item) {
     if (!sbJSON_IsNumber(item)) {
         return (double)NAN;

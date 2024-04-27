@@ -49,7 +49,7 @@ static void assert_parse_double_number(const char *string, double real) {
     TEST_ASSERT_TRUE(parse_number(item, &buffer));
     assert_is_number(item);
     TEST_ASSERT_TRUE(item->is_number_double);
-    TEST_ASSERT_EQUAL_DOUBLE(real, item->valuedouble);
+    TEST_ASSERT_EQUAL_DOUBLE(real, item->u.valuedouble);
 }
 
 static void assert_parse_integer_number(const char *string, int integer) {
