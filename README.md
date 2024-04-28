@@ -5,16 +5,16 @@ Ultralightweight JSON parser in C99. Fork of [cJSON](https://github.com/DaveGamb
 sbJSON tracks cJSON development with the following changes:
 
 - Adds 64-bit integer support
+- Always case sensitive
 - Uses C99 over cJSON's C89
 - Formats code with Clang Format
-- Gets rid of archaic preprocessor platform/compiler handling
-- Alters/respects preconditions (WIP)
-	- cJSON is unclear about what the preconditions are and what's done about them. It tries to handle some preconditions by detecting them and returning an early NULL, without doing so for others (see parent==item checks, yet no general cycle checks).
+- Removes special casing platform/compiler preprocessor code. One simple codebase with one setting, so to speak.
+- Alters preconditions
+	- cJSON in general will check for multiple kinds of issues and return early if it detects any of them. This can hide issues.
 	- sbJSON will respect preconditions by either assuming or asserting them to be met.
-	- This is made slightly difficult because it's not clear to me yet what in cJSON is part of intentional API design, and what's misguided precondition handling.
 - Removes locale handling
-    - Ideally, we don't want to depend on strtod for parsing as its locale dependent, and locales are not thread safe. So while we depend on strtod, we require the locale to be set to 'C', which is the default.
-- Replaces the build system options/files with a simple CMake one (WIP). I recommend copy pasting sbJSON.c and sbJSON.h into your project.
+    - Ideally, we don't want to depend on strtod for parsing as its locale dependent, and locales are not thread safe. But while we depend on strtod, we require the locale to be set to 'C', which is the default.
+- Replaces the build system files with a simple CMake one. You can also copy paste sbJSON.c and sbJSON.h directly into your project.
 
 The API is diverging from cJSON.
 
