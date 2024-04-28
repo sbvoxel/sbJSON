@@ -51,24 +51,10 @@ static void assert_print_number(const char *expected, bool is_double, double dou
     } else {
         sbJSON_SetIntegerNumberValue(item, integer_input);
     }
+
     TEST_ASSERT_TRUE_MESSAGE(print_number(item, &buffer),
                              "Failed to print number.");
 
-    /* In MinGW or visual studio(before 2015),the exponten is represented using
-     * three digits,like:"1e-009","1e+017" remove extra "0" to output "1e-09" or
-     * "1e+17",which makes testcase PASS */
-    for (i = 0; i < sizeof(new_buffer); i++) {
-        if (i > 3 && new_buffer[i] == '0') {
-            if ((new_buffer[i - 3] == 'e' && new_buffer[i - 2] == '-' &&
-                 new_buffer[i] == '0') ||
-                (new_buffer[i - 2] == 'e' && new_buffer[i - 1] == '+')) {
-                while (new_buffer[i] != '\0') {
-                    new_buffer[i] = new_buffer[i + 1];
-                    i++;
-                }
-            }
-        }
-    }
     TEST_ASSERT_EQUAL_STRING_MESSAGE(expected, buffer.buffer,
                                      "Printed number is not as expected.");
 }
