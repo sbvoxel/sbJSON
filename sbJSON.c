@@ -312,33 +312,43 @@ loop_end:
     if (decimal_number) {
         double number =
             strtod((const char *)number_c_string, (char **)&after_end);
+        if (number_c_string == after_end) {
+            return false; /* parse_error */
+        }
+        item->type = sbJSON_Number;
         sbJSON_SetDoubleNumberValue(item, number);
     } else {
         int64_t number =
             strtoll((const char *)number_c_string, (char **)&after_end, 10);
+        if (number_c_string == after_end) {
+            return false; /* parse_error */
+        }
+        item->type = sbJSON_Number;
         sbJSON_SetIntegerNumberValue(item, number);
     }
-
-    if (number_c_string == after_end) {
-        return false; /* parse_error */
-    }
-
-    item->type = sbJSON_Number;
 
     input_buffer->offset += (size_t)(after_end - number_c_string);
     return true;
 }
 
-double sbJSON_SetDoubleNumberValue(sbJSON *object, double number) {
+void sbJSON_SetDoubleNumberValue(sbJSON *object, double number) {
+    if (object == NULL) {
+        return;
+    }
+
+    assert(object->type == sbJSON_Number);
     object->u.valuedouble = number;
     object->is_number_double = true;
-    return number;
 }
 
-int64_t sbJSON_SetIntegerNumberValue(sbJSON *object, int64_t number) {
+void sbJSON_SetIntegerNumberValue(sbJSON *object, int64_t number) {
+    if (object == NULL) {
+        return;
+    }
+
+    assert(object->type == sbJSON_Number);
     object->u.valueint = number;
     object->is_number_double = false;
-    return number;
 }
 
 char *sbJSON_SetValuestring(sbJSON *object, const char *valuestring) {

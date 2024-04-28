@@ -39,6 +39,13 @@ static void assert_print_number(const char *expected, bool is_double, double dou
 
     memset(item, 0, sizeof(item));
     memset(new_buffer, 0, sizeof(new_buffer));
+
+    // TODO: What on earth.
+    // This test just looks odd. For some reason no checks
+    // for type were in cJSON when setting numbers.
+    // There are asserts in sbJSON so we must first set the type.
+    item->type = sbJSON_Number;
+
     if (is_double) {
         sbJSON_SetDoubleNumberValue(item, double_input);
     } else {
