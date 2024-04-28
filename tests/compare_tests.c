@@ -127,30 +127,16 @@ static void sbjson_compare_should_compare_objects(void) {
     TEST_ASSERT_TRUE(compare_from_string("{}", "{}"));
 
     //TODO:
-    /*TEST_ASSERT_TRUE(compare_from_string(*/
-        /*"{\"false\": false, \"true\": true, \"null\": null, \"number\": 42, "*/
-        /*"\"string\": \"string\", \"array\": [], \"object\": {}}",*/
-        /*"{\"true\": true, \"false\": false, \"null\": null, \"number\": 42, "*/
-        /*"\"string\": \"string\", \"array\": [], \"object\": {}}",*/
-        /*true));*/
-    /*TEST_ASSERT_FALSE(compare_from_string(*/
-        /*"{\"False\": false, \"true\": true, \"null\": null, \"number\": 42, "*/
-        /*"\"string\": \"string\", \"array\": [], \"object\": {}}",*/
-        /*"{\"true\": true, \"false\": false, \"null\": null, \"number\": 42, "*/
-        /*"\"string\": \"string\", \"array\": [], \"object\": {}}",*/
-        /*true));*/
-    /*TEST_ASSERT_TRUE(compare_from_string(*/
-        /*"{\"False\": false, \"true\": true, \"null\": null, \"number\": 42, "*/
-        /*"\"string\": \"string\", \"array\": [], \"object\": {}}",*/
-        /*"{\"true\": true, \"false\": false, \"null\": null, \"number\": 42, "*/
-        /*"\"string\": \"string\", \"array\": [], \"object\": {}}",*/
-        /*false));*/
-    /*TEST_ASSERT_FALSE(compare_from_string(*/
-        /*"{\"Flse\": false, \"true\": true, \"null\": null, \"number\": 42, "*/
-        /*"\"string\": \"string\", \"array\": [], \"object\": {}}",*/
-        /*"{\"true\": true, \"false\": false, \"null\": null, \"number\": 42, "*/
-        /*"\"string\": \"string\", \"array\": [], \"object\": {}}",*/
-        /*false));*/
+    TEST_ASSERT_TRUE(compare_from_string(
+        "{\"false\": false, \"true\": true, \"null\": null, \"number\": 42, "
+        "\"string\": \"string\", \"array\": [], \"object\": {}}",
+        "{\"true\": true, \"false\": false, \"null\": null, \"number\": 42, "
+        "\"string\": \"string\", \"array\": [], \"object\": {}}"));
+    TEST_ASSERT_FALSE(compare_from_string(
+        "{\"False\": false, \"true\": true, \"null\": null, \"number\": 42, "
+        "\"string\": \"string\", \"array\": [], \"object\": {}}",
+        "{\"true\": true, \"false\": false, \"null\": null, \"number\": 42, "
+        "\"string\": \"string\", \"array\": [], \"object\": {}}"));
     /* test objects that are a subset of each other */
     TEST_ASSERT_FALSE(
         compare_from_string("{\"one\": 1, \"two\": 2}",

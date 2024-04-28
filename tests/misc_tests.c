@@ -64,7 +64,7 @@ static void sbjson_get_object_item_should_get_object_items(void) {
     sbJSON *item = NULL;
     sbJSON *found = NULL;
 
-    item = sbJSON_Parse("{\"one\":1, \"Two\":2, \"tHree\":3}");
+    item = sbJSON_Parse("{\"one\":1, \"two\":2, \"three\":3}");
 
     found = sbJSON_GetObjectItem(NULL, "test");
     TEST_ASSERT_NULL_MESSAGE(found, "Failed to fail on NULL pointer.");
@@ -77,7 +77,7 @@ static void sbjson_get_object_item_should_get_object_items(void) {
     TEST_ASSERT_FALSE(item->is_number_double);
     TEST_ASSERT_EQUAL_INT(found->u.valueint, 1);
 
-    found = sbJSON_GetObjectItem(item, "tWo");
+    found = sbJSON_GetObjectItem(item, "two");
     TEST_ASSERT_NOT_NULL_MESSAGE(found, "Failed to find first item.");
     TEST_ASSERT_FALSE(item->is_number_double);
     TEST_ASSERT_EQUAL_INT(found->u.valueint, 2);
