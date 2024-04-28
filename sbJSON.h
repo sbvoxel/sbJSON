@@ -58,6 +58,7 @@ typedef struct sbJSON {
     uint8_t type;
     bool is_reference;
     bool string_is_const;
+    bool is_number_double;
 
     union U {
         /* The item's string, if type==sbJSON_String || type == sbJSON_Raw */
@@ -65,10 +66,9 @@ typedef struct sbJSON {
         /* The item's number, if type==sbJSON_Number */
         int64_t valueint;
         double valuedouble;
+        /* The item's boolean, if type==sbJSON_Bool */
         bool valuebool;
     } u;
-
-    bool is_number_double;
 
     /* The item's name string, if this item is the child of, or is in the list
      * of subitems of an object. */

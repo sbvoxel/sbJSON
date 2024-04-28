@@ -682,7 +682,7 @@ static int apply_patch(sbJSON *object, const sbJSON *patch) {
     if (path->u.valuestring[0] == '\0') {
         if (opcode == REMOVE) {
             static const sbJSON invalid = {
-                NULL, NULL, NULL, sbJSON_Invalid, 0, 0, {0}, false, NULL};
+                NULL, NULL, NULL, sbJSON_Invalid, 0, 0, false, {0}, NULL};
 
             overwrite_item(object, invalid);
 
