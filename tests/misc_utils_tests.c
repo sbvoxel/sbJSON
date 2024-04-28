@@ -49,11 +49,8 @@ static void sbjson_utils_functions_shouldnt_crash_with_null_pointers(void) {
     item = sbJSON_CreateString("item");
     /* these calls are actually valid */
     /* sbJSONUtils_MergePatch(NULL, item); */
-    /* sbJSONUtils_MergePatchCaseSensitive(NULL, item);*/
     /* sbJSONUtils_GenerateMergePatch(item, NULL); */
     /* sbJSONUtils_GenerateMergePatch(NULL, item); */
-    /* sbJSONUtils_GenerateMergePatchCaseSensitive(item, NULL); */
-    /* sbJSONUtils_GenerateMergePatchCaseSensitive(NULL, item); */
 
     TEST_ASSERT_NULL(sbJSONUtils_FindPointerFromObjectTo(item, NULL));
     TEST_ASSERT_NULL(sbJSONUtils_FindPointerFromObjectTo(NULL, item));
