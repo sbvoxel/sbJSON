@@ -111,27 +111,6 @@ bool sbJSON_TryGetBoolValue(const sbJSON *const item, bool default_bool) {
     return default_bool;
 }
 
-/* Case insensitive string comparison, doesn't consider two NULL pointers equal
- * though */
-static int case_insensitive_strcmp(const unsigned char *string1,
-                                   const unsigned char *string2) {
-    if ((string1 == NULL) || (string2 == NULL)) {
-        return 1;
-    }
-
-    if (string1 == string2) {
-        return 0;
-    }
-
-    for (; tolower(*string1) == tolower(*string2); (void)string1++, string2++) {
-        if (*string1 == '\0') {
-            return 0;
-        }
-    }
-
-    return tolower(*string1) - tolower(*string2);
-}
-
 typedef struct internal_hooks {
     void *(*allocate)(size_t size);
     void (*deallocate)(void *pointer);
@@ -1688,8 +1667,7 @@ sbJSON *sbJSON_GetArrayItem(const sbJSON *array, int index) {
 }
 
 static sbJSON *get_object_item(const sbJSON *const object,
-                               const char *const name,
-                               const bool case_sensitive) {
+                               const char *const name) {
     sbJSON *current_element = NULL;
 
     if ((object == NULL) || (name == NULL)) {
@@ -1697,18 +1675,9 @@ static sbJSON *get_object_item(const sbJSON *const object,
     }
 
     current_element = object->child;
-    if (case_sensitive) {
-        while ((current_element != NULL) && (current_element->string != NULL) &&
-               (strcmp(name, current_element->string) != 0)) {
-            current_element = current_element->next;
-        }
-    } else {
-        while ((current_element != NULL) &&
-               (case_insensitive_strcmp(
-                    (const unsigned char *)name,
-                    (const unsigned char *)(current_element->string)) != 0)) {
-            current_element = current_element->next;
-        }
+    while ((current_element != NULL) && (current_element->string != NULL) &&
+           (strcmp(name, current_element->string) != 0)) {
+        current_element = current_element->next;
     }
 
     if ((current_element == NULL) || (current_element->string == NULL)) {
@@ -1720,12 +1689,7 @@ static sbJSON *get_object_item(const sbJSON *const object,
 
 sbJSON *sbJSON_GetObjectItem(const sbJSON *const object,
                              const char *const string) {
-    return get_object_item(object, string, false);
-}
-
-sbJSON *sbJSON_GetObjectItemCaseSensitive(const sbJSON *const object,
-                                          const char *const string) {
-    return get_object_item(object, string, true);
+    return get_object_item(object, string);
 }
 
 bool sbJSON_HasObjectItem(const sbJSON *object, const char *string) {
@@ -2013,20 +1977,8 @@ sbJSON *sbJSON_DetachItemFromObject(sbJSON *object, const char *string) {
     return sbJSON_DetachItemViaPointer(object, to_detach);
 }
 
-sbJSON *sbJSON_DetachItemFromObjectCaseSensitive(sbJSON *object,
-                                                 const char *string) {
-    sbJSON *to_detach = sbJSON_GetObjectItemCaseSensitive(object, string);
-
-    return sbJSON_DetachItemViaPointer(object, to_detach);
-}
-
 void sbJSON_DeleteItemFromObject(sbJSON *object, const char *string) {
     sbJSON_Delete(sbJSON_DetachItemFromObject(object, string));
-}
-
-void sbJSON_DeleteItemFromObjectCaseSensitive(sbJSON *object,
-                                              const char *string) {
-    sbJSON_Delete(sbJSON_DetachItemFromObjectCaseSensitive(object, string));
 }
 
 /* Replace array/object items with new ones. */
@@ -2110,7 +2062,7 @@ bool sbJSON_ReplaceItemInArray(sbJSON *array, int which, sbJSON *newitem) {
 }
 
 static bool replace_item_in_object(sbJSON *object, const char *string,
-                                   sbJSON *replacement, bool case_sensitive) {
+                                   sbJSON *replacement) {
     if ((replacement == NULL) || (string == NULL)) {
         return false;
     }
@@ -2127,18 +2079,13 @@ static bool replace_item_in_object(sbJSON *object, const char *string,
 
     replacement->string_is_const = false;
 
-    return sbJSON_ReplaceItemViaPointer(
-        object, get_object_item(object, string, case_sensitive), replacement);
+    return sbJSON_ReplaceItemViaPointer(object, get_object_item(object, string),
+                                        replacement);
 }
 
 bool sbJSON_ReplaceItemInObject(sbJSON *object, const char *string,
                                 sbJSON *newitem) {
-    return replace_item_in_object(object, string, newitem, false);
-}
-
-bool sbJSON_ReplaceItemInObjectCaseSensitive(sbJSON *object, const char *string,
-                                             sbJSON *newitem) {
-    return replace_item_in_object(object, string, newitem, true);
+    return replace_item_in_object(object, string, newitem);
 }
 
 /* Create basic types: */
@@ -2674,8 +2621,7 @@ bool sbJSON_IsRaw(const sbJSON *const item) {
 // Duplicate keys make comparison impossible. Would need
 // keys to have an order as well. Starting to be ridiculous.
 // Duplicate keys should be opt-in and not parse by default (do they?).
-bool sbJSON_Compare(const sbJSON *const a, const sbJSON *const b,
-                    const bool case_sensitive) {
+bool sbJSON_Compare(const sbJSON *const a, const sbJSON *const b) {
     if (a == b) {
         return true;
     }
@@ -2720,7 +2666,7 @@ bool sbJSON_Compare(const sbJSON *const a, const sbJSON *const b,
         sbJSON *b_element = b->child;
 
         for (; (a_element != NULL) && (b_element != NULL);) {
-            if (!sbJSON_Compare(a_element, b_element, case_sensitive)) {
+            if (!sbJSON_Compare(a_element, b_element)) {
                 return false;
             }
 
@@ -2740,12 +2686,12 @@ bool sbJSON_Compare(const sbJSON *const a, const sbJSON *const b,
         sbJSON *b_element = NULL;
         sbJSON_ArrayForEach(a_element, a) {
             /* TODO This has O(n^2) runtime, which is horrible! */
-            b_element = get_object_item(b, a_element->string, case_sensitive);
+            b_element = get_object_item(b, a_element->string);
             if (b_element == NULL) {
                 return false;
             }
 
-            if (!sbJSON_Compare(a_element, b_element, case_sensitive)) {
+            if (!sbJSON_Compare(a_element, b_element)) {
                 return false;
             }
         }
@@ -2754,12 +2700,12 @@ bool sbJSON_Compare(const sbJSON *const a, const sbJSON *const b,
          * subset of b
          * TODO: Do this the proper way, this is just a fix for now */
         sbJSON_ArrayForEach(b_element, b) {
-            a_element = get_object_item(a, b_element->string, case_sensitive);
+            a_element = get_object_item(a, b_element->string);
             if (a_element == NULL) {
                 return false;
             }
 
-            if (!sbJSON_Compare(b_element, a_element, case_sensitive)) {
+            if (!sbJSON_Compare(b_element, a_element)) {
                 return false;
             }
         }

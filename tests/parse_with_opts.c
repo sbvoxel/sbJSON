@@ -89,7 +89,7 @@ static void parse_with_opts_should_parse_utf8_bom(void) {
     without_bom = sbJSON_ParseWithOpts("{}", NULL, true);
     TEST_ASSERT_NOT_NULL(with_bom);
 
-    TEST_ASSERT_TRUE(sbJSON_Compare(with_bom, without_bom, true));
+    TEST_ASSERT_TRUE(sbJSON_Compare(with_bom, without_bom));
 
     sbJSON_Delete(with_bom);
     sbJSON_Delete(without_bom);

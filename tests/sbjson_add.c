@@ -45,7 +45,7 @@ static void sbjson_add_null_should_add_null(void) {
 
     sbJSON_AddNullToObject(root, "null");
 
-    TEST_ASSERT_NOT_NULL(null = sbJSON_GetObjectItemCaseSensitive(root, "null"));
+    TEST_ASSERT_NOT_NULL(null = sbJSON_GetObjectItem(root, "null"));
     TEST_ASSERT_EQUAL_INT(null->type, sbJSON_Null);
 
     sbJSON_Delete(root);
@@ -78,8 +78,7 @@ static void sbjson_add_true_should_add_true(void) {
 
     sbJSON_AddTrueToObject(root, "true");
 
-    TEST_ASSERT_NOT_NULL(true_item =
-                             sbJSON_GetObjectItemCaseSensitive(root, "true"));
+    TEST_ASSERT_NOT_NULL(true_item = sbJSON_GetObjectItem(root, "true"));
     TEST_ASSERT_EQUAL_INT(true_item->type, sbJSON_Bool);
     TEST_ASSERT_EQUAL(true_item->u.valuebool, true);
 
@@ -153,8 +152,7 @@ static void sbjson_add_false_should_add_false(void) {
 
     sbJSON_AddFalseToObject(root, "false");
 
-    TEST_ASSERT_NOT_NULL(false_item =
-                             sbJSON_GetObjectItemCaseSensitive(root, "false"));
+    TEST_ASSERT_NOT_NULL(false_item = sbJSON_GetObjectItem(root, "false"));
     TEST_ASSERT_EQUAL_INT(false_item->type, sbJSON_Bool);
     TEST_ASSERT_EQUAL(false_item->u.valuebool, false);
 
@@ -189,15 +187,13 @@ static void sbjson_add_bool_should_add_bool(void) {
 
     /* true */
     sbJSON_AddBoolToObject(root, "true", true);
-    TEST_ASSERT_NOT_NULL(true_item =
-                             sbJSON_GetObjectItemCaseSensitive(root, "true"));
+    TEST_ASSERT_NOT_NULL(true_item = sbJSON_GetObjectItem(root, "true"));
     TEST_ASSERT_EQUAL_INT(true_item->type, sbJSON_Bool);
     TEST_ASSERT_EQUAL(true_item->u.valuebool, true);
 
     /* false */
     sbJSON_AddBoolToObject(root, "false", false);
-    TEST_ASSERT_NOT_NULL(false_item =
-                             sbJSON_GetObjectItemCaseSensitive(root, "false"));
+    TEST_ASSERT_NOT_NULL(false_item = sbJSON_GetObjectItem(root, "false"));
     TEST_ASSERT_EQUAL_INT(false_item->type, sbJSON_Bool);
     TEST_ASSERT_EQUAL(false_item->u.valuebool, false);
 
@@ -231,8 +227,7 @@ static void sbjson_add_number_should_add_number(void) {
 
     sbJSON_AddIntegerNumberToObject(root, "number", 42);
 
-    TEST_ASSERT_NOT_NULL(number =
-                             sbJSON_GetObjectItemCaseSensitive(root, "number"));
+    TEST_ASSERT_NOT_NULL(number = sbJSON_GetObjectItem(root, "number"));
 
     TEST_ASSERT_EQUAL_INT(number->type, sbJSON_Number);
     TEST_ASSERT_FALSE(number->is_number_double);
@@ -268,8 +263,7 @@ static void sbjson_add_string_should_add_string(void) {
 
     sbJSON_AddStringToObject(root, "string", "Hello World!");
 
-    TEST_ASSERT_NOT_NULL(string =
-                             sbJSON_GetObjectItemCaseSensitive(root, "string"));
+    TEST_ASSERT_NOT_NULL(string = sbJSON_GetObjectItem(root, "string"));
     TEST_ASSERT_EQUAL_INT(string->type, sbJSON_String);
     TEST_ASSERT_EQUAL_STRING(string->u.valuestring, "Hello World!");
 
@@ -303,7 +297,7 @@ static void sbjson_add_raw_should_add_raw(void) {
 
     sbJSON_AddRawToObject(root, "raw", "{}");
 
-    TEST_ASSERT_NOT_NULL(raw = sbJSON_GetObjectItemCaseSensitive(root, "raw"));
+    TEST_ASSERT_NOT_NULL(raw = sbJSON_GetObjectItem(root, "raw"));
     TEST_ASSERT_EQUAL_INT(raw->type, sbJSON_Raw);
     TEST_ASSERT_EQUAL_STRING(raw->u.valuestring, "{}");
 
@@ -336,8 +330,7 @@ static void sbJSON_add_object_should_add_object(void) {
     sbJSON *object = NULL;
 
     sbJSON_AddObjectToObject(root, "object");
-    TEST_ASSERT_NOT_NULL(object =
-                             sbJSON_GetObjectItemCaseSensitive(root, "object"));
+    TEST_ASSERT_NOT_NULL(object = sbJSON_GetObjectItem(root, "object"));
     TEST_ASSERT_EQUAL_INT(object->type, sbJSON_Object);
 
     sbJSON_Delete(root);
@@ -369,8 +362,7 @@ static void sbJSON_add_array_should_add_array(void) {
     sbJSON *array = NULL;
 
     sbJSON_AddArrayToObject(root, "array");
-    TEST_ASSERT_NOT_NULL(array =
-                             sbJSON_GetObjectItemCaseSensitive(root, "array"));
+    TEST_ASSERT_NOT_NULL(array = sbJSON_GetObjectItem(root, "array"));
     TEST_ASSERT_EQUAL_INT(array->type, sbJSON_Array);
 
     sbJSON_Delete(root);

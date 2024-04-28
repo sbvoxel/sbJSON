@@ -164,15 +164,15 @@ static int supports_full_hd(const char *const monitor) {
         goto end;
     }
 
-    name = sbJSON_GetObjectItemCaseSensitive(monitor_json, "name");
+    name = sbJSON_GetObjectItem(monitor_json, "name");
     if (sbJSON_IsString(name) && (name->u.valuestring != NULL)) {
         printf("Checking monitor \"%s\"\n", name->u.valuestring);
     }
 
-    resolutions = sbJSON_GetObjectItemCaseSensitive(monitor_json, "resolutions");
+    resolutions = sbJSON_GetObjectItem(monitor_json, "resolutions");
     sbJSON_ArrayForEach(resolution, resolutions) {
-        sbJSON *width = sbJSON_GetObjectItemCaseSensitive(resolution, "width");
-        sbJSON *height = sbJSON_GetObjectItemCaseSensitive(resolution, "height");
+        sbJSON *width = sbJSON_GetObjectItem(resolution, "width");
+        sbJSON *height = sbJSON_GetObjectItem(resolution, "height");
 
         if (!sbJSON_IsNumber(width) || !sbJSON_IsNumber(height)) {
             status = 0;

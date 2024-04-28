@@ -35,23 +35,17 @@ static void sbjson_utils_functions_shouldnt_crash_with_null_pointers(void) {
 
     TEST_ASSERT_NULL(sbJSONUtils_GetPointer(item, NULL));
     TEST_ASSERT_NULL(sbJSONUtils_GetPointer(NULL, "pointer"));
-    TEST_ASSERT_NULL(sbJSONUtils_GetPointerCaseSensitive(NULL, "pointer"));
-    TEST_ASSERT_NULL(sbJSONUtils_GetPointerCaseSensitive(item, NULL));
     TEST_ASSERT_NULL(sbJSONUtils_GeneratePatches(item, NULL));
     TEST_ASSERT_NULL(sbJSONUtils_GeneratePatches(NULL, item));
-    TEST_ASSERT_NULL(sbJSONUtils_GeneratePatchesCaseSensitive(item, NULL));
-    TEST_ASSERT_NULL(sbJSONUtils_GeneratePatchesCaseSensitive(NULL, item));
     sbJSONUtils_AddPatchToArray(item, "path", "add", NULL);
     sbJSONUtils_AddPatchToArray(item, "path", NULL, item);
     sbJSONUtils_AddPatchToArray(item, NULL, "add", item);
     sbJSONUtils_AddPatchToArray(NULL, "path", "add", item);
     sbJSONUtils_ApplyPatches(item, NULL);
     sbJSONUtils_ApplyPatches(NULL, item);
-    sbJSONUtils_ApplyPatchesCaseSensitive(item, NULL);
-    sbJSONUtils_ApplyPatchesCaseSensitive(NULL, item);
     TEST_ASSERT_NULL(sbJSONUtils_MergePatch(item, NULL));
     item = sbJSON_CreateString("item");
-    TEST_ASSERT_NULL(sbJSONUtils_MergePatchCaseSensitive(item, NULL));
+    TEST_ASSERT_NULL(sbJSONUtils_MergePatch(item, NULL));
     item = sbJSON_CreateString("item");
     /* these calls are actually valid */
     /* sbJSONUtils_MergePatch(NULL, item); */
@@ -64,7 +58,6 @@ static void sbjson_utils_functions_shouldnt_crash_with_null_pointers(void) {
     TEST_ASSERT_NULL(sbJSONUtils_FindPointerFromObjectTo(item, NULL));
     TEST_ASSERT_NULL(sbJSONUtils_FindPointerFromObjectTo(NULL, item));
     sbJSONUtils_SortObject(NULL);
-    sbJSONUtils_SortObjectCaseSensitive(NULL);
 
     sbJSON_Delete(item);
 }

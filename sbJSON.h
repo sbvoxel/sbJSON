@@ -132,11 +132,8 @@ int sbJSON_GetArraySize(const sbJSON *array);
 /* Retrieve item number "index" from array "array". Returns NULL if
  * unsuccessful. */
 sbJSON *sbJSON_GetArrayItem(const sbJSON *array, int index);
-/* Get item "string" from object. Case insensitive. */
 sbJSON *sbJSON_GetObjectItem(const sbJSON *const object,
                              const char *const string);
-sbJSON *sbJSON_GetObjectItemCaseSensitive(const sbJSON *const object,
-                                          const char *const string);
 bool sbJSON_HasObjectItem(const sbJSON *object, const char *string);
 /* For analysing failed parses. This returns a pointer to the parse error.
  * You'll probably need to look a few chars back to make sense of it. Defined
@@ -214,11 +211,7 @@ sbJSON *sbJSON_DetachItemViaPointer(sbJSON *parent, sbJSON *const item);
 sbJSON *sbJSON_DetachItemFromArray(sbJSON *array, int which);
 void sbJSON_DeleteItemFromArray(sbJSON *array, int which);
 sbJSON *sbJSON_DetachItemFromObject(sbJSON *object, const char *string);
-sbJSON *sbJSON_DetachItemFromObjectCaseSensitive(sbJSON *object,
-                                                 const char *string);
 void sbJSON_DeleteItemFromObject(sbJSON *object, const char *string);
-void sbJSON_DeleteItemFromObjectCaseSensitive(sbJSON *object,
-                                              const char *string);
 
 /* Update array items. */
 bool sbJSON_InsertItemInArray(
@@ -229,8 +222,6 @@ bool sbJSON_ReplaceItemViaPointer(sbJSON *const parent, sbJSON *const item,
 bool sbJSON_ReplaceItemInArray(sbJSON *array, int which, sbJSON *newitem);
 bool sbJSON_ReplaceItemInObject(sbJSON *object, const char *string,
                                 sbJSON *newitem);
-bool sbJSON_ReplaceItemInObjectCaseSensitive(sbJSON *object, const char *string,
-                                             sbJSON *newitem);
 
 /* Duplicate a sbJSON item */
 sbJSON *sbJSON_Duplicate(const sbJSON *item, bool recurse);
@@ -239,10 +230,7 @@ sbJSON *sbJSON_Duplicate(const sbJSON *item, bool recurse);
  * any children connected to the item. The item->next and ->prev pointers are
  * always zero on return from Duplicate. */
 
-/* Recursively compare two sbJSON items for equality. case_sensitive determines
- * if object keys are treated case sensitive (1) or case insensitive (0) */
-bool sbJSON_Compare(const sbJSON *const a, const sbJSON *const b,
-                    const bool case_sensitive);
+bool sbJSON_Compare(const sbJSON *const a, const sbJSON *const b);
 
 /* Minify a strings, remove blank characters(such as ' ', '\t', '\r', '\n') from
  * strings. The input pointer json cannot point to a read-only address area,

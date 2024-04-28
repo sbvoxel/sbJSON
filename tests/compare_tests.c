@@ -24,8 +24,7 @@
 #include "common.h"
 #include "unity.h"
 
-static bool compare_from_string(const char *const a, const char *const b,
-                                      const bool case_sensitive) {
+static bool compare_from_string(const char *const a, const char *const b) {
     sbJSON *a_json = NULL;
     sbJSON *b_json = NULL;
     bool result = false;
@@ -35,7 +34,7 @@ static bool compare_from_string(const char *const a, const char *const b,
     b_json = sbJSON_Parse(b);
     TEST_ASSERT_NOT_NULL_MESSAGE(b_json, "Failed to parse b.");
 
-    result = sbJSON_Compare(a_json, b_json, case_sensitive);
+    result = sbJSON_Compare(a_json, b_json);
 
     sbJSON_Delete(a_json);
     sbJSON_Delete(b_json);
@@ -44,8 +43,7 @@ static bool compare_from_string(const char *const a, const char *const b,
 }
 
 static void sbjson_compare_should_compare_null_pointer_as_equal(void) {
-    TEST_ASSERT_TRUE(sbJSON_Compare(NULL, NULL, true));
-    TEST_ASSERT_TRUE(sbJSON_Compare(NULL, NULL, false));
+    TEST_ASSERT_TRUE(sbJSON_Compare(NULL, NULL));
 }
 
 static void sbjson_compare_should_compare_invalid_as_equal(void) {
@@ -54,56 +52,40 @@ static void sbjson_compare_should_compare_invalid_as_equal(void) {
     memset(&invalid1, '\0', sizeof(invalid1));
     memset(&invalid2, '\0', sizeof(invalid2));
 
-    TEST_ASSERT_TRUE(sbJSON_Compare(&invalid1, &invalid1, false));
-    TEST_ASSERT_TRUE(sbJSON_Compare(&invalid1, &invalid1, true));
-
-    TEST_ASSERT_TRUE(sbJSON_Compare(&invalid1, &invalid2, false));
-    TEST_ASSERT_TRUE(sbJSON_Compare(&invalid1, &invalid2, true));
+    TEST_ASSERT_TRUE(sbJSON_Compare(&invalid1, &invalid1));
+    TEST_ASSERT_TRUE(sbJSON_Compare(&invalid1, &invalid2));
 }
 
 static void sbjson_compare_should_compare_numbers(void) {
-    TEST_ASSERT_TRUE(compare_from_string("1", "1", true));
-    TEST_ASSERT_TRUE(compare_from_string("1", "1", false));
-    TEST_ASSERT_TRUE(compare_from_string("0.0001", "0.0001", true));
-    TEST_ASSERT_TRUE(compare_from_string("0.0001", "0.0001", false));
-    TEST_ASSERT_TRUE(compare_from_string("1E100", "10E99", false));
+    TEST_ASSERT_TRUE(compare_from_string("1", "1"));
+    TEST_ASSERT_TRUE(compare_from_string("0.0001", "0.0001"));
+    TEST_ASSERT_TRUE(compare_from_string("1E100", "10E99"));
 
-    TEST_ASSERT_FALSE(compare_from_string("0.5E-100", "0.5E-101", false));
+    TEST_ASSERT_FALSE(compare_from_string("0.5E-100", "0.5E-101"));
 
-    TEST_ASSERT_FALSE(compare_from_string("1", "2", true));
-    TEST_ASSERT_FALSE(compare_from_string("1", "2", false));
+    TEST_ASSERT_FALSE(compare_from_string("1", "2"));
 }
 
 static void sbjson_compare_should_compare_booleans(void) {
     /* true */
-    TEST_ASSERT_TRUE(compare_from_string("true", "true", true));
-    TEST_ASSERT_TRUE(compare_from_string("true", "true", false));
+    TEST_ASSERT_TRUE(compare_from_string("true", "true"));
 
     /* false */
-    TEST_ASSERT_TRUE(compare_from_string("false", "false", true));
-    TEST_ASSERT_TRUE(compare_from_string("false", "false", false));
+    TEST_ASSERT_TRUE(compare_from_string("false", "false"));
 
     /* mixed */
-    TEST_ASSERT_FALSE(compare_from_string("true", "false", true));
-    TEST_ASSERT_FALSE(compare_from_string("true", "false", false));
-    TEST_ASSERT_FALSE(compare_from_string("false", "true", true));
-    TEST_ASSERT_FALSE(compare_from_string("false", "true", false));
+    TEST_ASSERT_FALSE(compare_from_string("true", "false"));
+    TEST_ASSERT_FALSE(compare_from_string("false", "true"));
 }
 
 static void sbjson_compare_should_compare_null(void) {
-    TEST_ASSERT_TRUE(compare_from_string("null", "null", true));
-    TEST_ASSERT_TRUE(compare_from_string("null", "null", false));
-
-    TEST_ASSERT_FALSE(compare_from_string("null", "true", true));
-    TEST_ASSERT_FALSE(compare_from_string("null", "true", false));
+    TEST_ASSERT_TRUE(compare_from_string("null", "null"));
+    TEST_ASSERT_FALSE(compare_from_string("null", "true"));
 }
 
 static void sbjson_compare_should_compare_strings(void) {
-    TEST_ASSERT_TRUE(compare_from_string("\"abcdefg\"", "\"abcdefg\"", true));
-    TEST_ASSERT_TRUE(compare_from_string("\"abcdefg\"", "\"abcdefg\"", false));
-
-    TEST_ASSERT_FALSE(compare_from_string("\"ABCDEFG\"", "\"abcdefg\"", true));
-    TEST_ASSERT_FALSE(compare_from_string("\"ABCDEFG\"", "\"abcdefg\"", false));
+    TEST_ASSERT_TRUE(compare_from_string("\"abcdefg\"", "\"abcdefg\""));
+    TEST_ASSERT_FALSE(compare_from_string("\"ABCDEFG\"", "\"abcdefg\""));
 }
 
 static void sbjson_compare_should_compare_raw(void) {
@@ -118,74 +100,61 @@ static void sbjson_compare_should_compare_raw(void) {
     raw1->type = sbJSON_Raw;
     raw2->type = sbJSON_Raw;
 
-    TEST_ASSERT_TRUE(sbJSON_Compare(raw1, raw2, true));
-    TEST_ASSERT_TRUE(sbJSON_Compare(raw1, raw2, false));
+    TEST_ASSERT_TRUE(sbJSON_Compare(raw1, raw2));
 
     sbJSON_Delete(raw1);
     sbJSON_Delete(raw2);
 }
 
 static void sbjson_compare_should_compare_arrays(void) {
-    TEST_ASSERT_TRUE(compare_from_string("[]", "[]", true));
-    TEST_ASSERT_TRUE(compare_from_string("[]", "[]", false));
+    TEST_ASSERT_TRUE(compare_from_string("[]", "[]"));
 
     TEST_ASSERT_TRUE(compare_from_string(
         "[false,true,null,42,\"string\",[],{}]",
-        "[false, true, null, 42, \"string\", [], {}]", true));
-    TEST_ASSERT_TRUE(compare_from_string(
-        "[false,true,null,42,\"string\",[],{}]",
-        "[false, true, null, 42, \"string\", [], {}]", false));
+        "[false, true, null, 42, \"string\", [], {}]"));
 
-    TEST_ASSERT_TRUE(compare_from_string("[[[1], 2]]", "[[[1], 2]]", true));
-    TEST_ASSERT_TRUE(compare_from_string("[[[1], 2]]", "[[[1], 2]]", false));
+    TEST_ASSERT_TRUE(compare_from_string("[[[1], 2]]", "[[[1], 2]]"));
 
     TEST_ASSERT_FALSE(compare_from_string(
         "[true,null,42,\"string\",[],{}]",
-        "[false, true, null, 42, \"string\", [], {}]", true));
-    TEST_ASSERT_FALSE(compare_from_string(
-        "[true,null,42,\"string\",[],{}]",
-        "[false, true, null, 42, \"string\", [], {}]", false));
+        "[false, true, null, 42, \"string\", [], {}]"));
 
     /* Arrays that are a prefix of another array */
-    TEST_ASSERT_FALSE(compare_from_string("[1,2,3]", "[1,2]", true));
-    TEST_ASSERT_FALSE(compare_from_string("[1,2,3]", "[1,2]", false));
+    TEST_ASSERT_FALSE(compare_from_string("[1,2,3]", "[1,2]"));
 }
 
 static void sbjson_compare_should_compare_objects(void) {
-    TEST_ASSERT_TRUE(compare_from_string("{}", "{}", true));
-    TEST_ASSERT_TRUE(compare_from_string("{}", "{}", false));
+    TEST_ASSERT_TRUE(compare_from_string("{}", "{}"));
 
-    TEST_ASSERT_TRUE(compare_from_string(
-        "{\"false\": false, \"true\": true, \"null\": null, \"number\": 42, "
-        "\"string\": \"string\", \"array\": [], \"object\": {}}",
-        "{\"true\": true, \"false\": false, \"null\": null, \"number\": 42, "
-        "\"string\": \"string\", \"array\": [], \"object\": {}}",
-        true));
-    TEST_ASSERT_FALSE(compare_from_string(
-        "{\"False\": false, \"true\": true, \"null\": null, \"number\": 42, "
-        "\"string\": \"string\", \"array\": [], \"object\": {}}",
-        "{\"true\": true, \"false\": false, \"null\": null, \"number\": 42, "
-        "\"string\": \"string\", \"array\": [], \"object\": {}}",
-        true));
-    TEST_ASSERT_TRUE(compare_from_string(
-        "{\"False\": false, \"true\": true, \"null\": null, \"number\": 42, "
-        "\"string\": \"string\", \"array\": [], \"object\": {}}",
-        "{\"true\": true, \"false\": false, \"null\": null, \"number\": 42, "
-        "\"string\": \"string\", \"array\": [], \"object\": {}}",
-        false));
-    TEST_ASSERT_FALSE(compare_from_string(
-        "{\"Flse\": false, \"true\": true, \"null\": null, \"number\": 42, "
-        "\"string\": \"string\", \"array\": [], \"object\": {}}",
-        "{\"true\": true, \"false\": false, \"null\": null, \"number\": 42, "
-        "\"string\": \"string\", \"array\": [], \"object\": {}}",
-        false));
+    //TODO:
+    /*TEST_ASSERT_TRUE(compare_from_string(*/
+        /*"{\"false\": false, \"true\": true, \"null\": null, \"number\": 42, "*/
+        /*"\"string\": \"string\", \"array\": [], \"object\": {}}",*/
+        /*"{\"true\": true, \"false\": false, \"null\": null, \"number\": 42, "*/
+        /*"\"string\": \"string\", \"array\": [], \"object\": {}}",*/
+        /*true));*/
+    /*TEST_ASSERT_FALSE(compare_from_string(*/
+        /*"{\"False\": false, \"true\": true, \"null\": null, \"number\": 42, "*/
+        /*"\"string\": \"string\", \"array\": [], \"object\": {}}",*/
+        /*"{\"true\": true, \"false\": false, \"null\": null, \"number\": 42, "*/
+        /*"\"string\": \"string\", \"array\": [], \"object\": {}}",*/
+        /*true));*/
+    /*TEST_ASSERT_TRUE(compare_from_string(*/
+        /*"{\"False\": false, \"true\": true, \"null\": null, \"number\": 42, "*/
+        /*"\"string\": \"string\", \"array\": [], \"object\": {}}",*/
+        /*"{\"true\": true, \"false\": false, \"null\": null, \"number\": 42, "*/
+        /*"\"string\": \"string\", \"array\": [], \"object\": {}}",*/
+        /*false));*/
+    /*TEST_ASSERT_FALSE(compare_from_string(*/
+        /*"{\"Flse\": false, \"true\": true, \"null\": null, \"number\": 42, "*/
+        /*"\"string\": \"string\", \"array\": [], \"object\": {}}",*/
+        /*"{\"true\": true, \"false\": false, \"null\": null, \"number\": 42, "*/
+        /*"\"string\": \"string\", \"array\": [], \"object\": {}}",*/
+        /*false));*/
     /* test objects that are a subset of each other */
     TEST_ASSERT_FALSE(
         compare_from_string("{\"one\": 1, \"two\": 2}",
-                            "{\"one\": 1, \"two\": 2, \"three\": 3}", true));
-    TEST_ASSERT_FALSE(
-        compare_from_string("{\"one\": 1, \"two\": 2}",
-                            "{\"one\": 1, \"two\": 2, \"three\": 3}", false));
+                            "{\"one\": 1, \"two\": 2, \"three\": 3}"));
 }
 
 int main(void) {

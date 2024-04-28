@@ -32,23 +32,17 @@ extern "C" {
 
 /* Implement RFC6901 (https://tools.ietf.org/html/rfc6901) JSON Pointer spec. */
 sbJSON *sbJSONUtils_GetPointer(sbJSON *const object, const char *pointer);
-sbJSON *sbJSONUtils_GetPointerCaseSensitive(sbJSON *const object,
-                                          const char *pointer);
 
 /* Implement RFC6902 (https://tools.ietf.org/html/rfc6902) JSON Patch spec. */
 /* NOTE: This modifies objects in 'from' and 'to' by sorting the elements by
  * their key */
 sbJSON *sbJSONUtils_GeneratePatches(sbJSON *const from, sbJSON *const to);
-sbJSON *sbJSONUtils_GeneratePatchesCaseSensitive(sbJSON *const from,
-                                               sbJSON *const to);
 /* Utility for generating patch array entries. */
 void sbJSONUtils_AddPatchToArray(sbJSON *const array, const char *const operation,
                                 const char *const path,
                                 const sbJSON *const value);
 /* Returns 0 for success. */
 int sbJSONUtils_ApplyPatches(sbJSON *const object, const sbJSON *const patches);
-int sbJSONUtils_ApplyPatchesCaseSensitive(sbJSON *const object,
-                                         const sbJSON *const patches);
 
 /*
 // Note that ApplyPatches is NOT atomic on failure. To implement an atomic
@@ -76,14 +70,10 @@ ApplyPatches, use:
  * spec. */
 /* target will be modified by patch. return value is new ptr for target. */
 sbJSON *sbJSONUtils_MergePatch(sbJSON *target, const sbJSON *const patch);
-sbJSON *sbJSONUtils_MergePatchCaseSensitive(sbJSON *target,
-                                          const sbJSON *const patch);
 /* generates a patch to move from -> to */
 /* NOTE: This modifies objects in 'from' and 'to' by sorting the elements by
  * their key */
 sbJSON *sbJSONUtils_GenerateMergePatch(sbJSON *const from, sbJSON *const to);
-sbJSON *sbJSONUtils_GenerateMergePatchCaseSensitive(sbJSON *const from,
-                                                  sbJSON *const to);
 
 /* Given a root object and a target object, construct a pointer from one to the
  * other. */
@@ -92,7 +82,6 @@ char *sbJSONUtils_FindPointerFromObjectTo(const sbJSON *const object,
 
 /* Sorts the members of the object into alphabetical order. */
 void sbJSONUtils_SortObject(sbJSON *const object);
-void sbJSONUtils_SortObjectCaseSensitive(sbJSON *const object);
 
 #ifdef __cplusplus
 }

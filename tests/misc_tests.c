@@ -100,28 +100,28 @@ static void sbjson_get_object_item_case_sensitive_should_get_object_items(void) 
 
     item = sbJSON_Parse("{\"one\":1, \"Two\":2, \"tHree\":3}");
 
-    found = sbJSON_GetObjectItemCaseSensitive(NULL, "test");
+    found = sbJSON_GetObjectItem(NULL, "test");
     TEST_ASSERT_NULL_MESSAGE(found, "Failed to fail on NULL pointer.");
 
-    found = sbJSON_GetObjectItemCaseSensitive(item, NULL);
+    found = sbJSON_GetObjectItem(item, NULL);
     TEST_ASSERT_NULL_MESSAGE(found, "Failed to fail on NULL string.");
 
-    found = sbJSON_GetObjectItemCaseSensitive(item, "one");
+    found = sbJSON_GetObjectItem(item, "one");
     TEST_ASSERT_NOT_NULL_MESSAGE(found, "Failed to find first item.");
     TEST_ASSERT_FALSE(item->is_number_double);
     TEST_ASSERT_EQUAL_INT(found->u.valueint, 1);
 
-    found = sbJSON_GetObjectItemCaseSensitive(item, "Two");
+    found = sbJSON_GetObjectItem(item, "Two");
     TEST_ASSERT_NOT_NULL_MESSAGE(found, "Failed to find first item.");
     TEST_ASSERT_FALSE(item->is_number_double);
     TEST_ASSERT_EQUAL_INT(found->u.valueint, 2);
 
-    found = sbJSON_GetObjectItemCaseSensitive(item, "tHree");
+    found = sbJSON_GetObjectItem(item, "tHree");
     TEST_ASSERT_NOT_NULL_MESSAGE(found, "Failed to find item.");
     TEST_ASSERT_FALSE(item->is_number_double);
     TEST_ASSERT_EQUAL_INT(found->u.valueint, 3);
 
-    found = sbJSON_GetObjectItemCaseSensitive(item, "One");
+    found = sbJSON_GetObjectItem(item, "One");
     TEST_ASSERT_NULL_MESSAGE(found,
                              "Should not find something that isn't there.");
 
@@ -145,7 +145,7 @@ sbjson_get_object_item_case_sensitive_should_not_crash_with_array(void) {
     sbJSON *found = NULL;
     array = sbJSON_Parse("[1]");
 
-    found = sbJSON_GetObjectItemCaseSensitive(array, "name");
+    found = sbJSON_GetObjectItem(array, "name");
     TEST_ASSERT_NULL(found);
 
     sbJSON_Delete(array);
@@ -409,8 +409,8 @@ static void sbjson_functions_should_not_crash_with_null_pointers(void) {
     TEST_ASSERT_NULL(sbJSON_GetArrayItem(NULL, 0));
     TEST_ASSERT_NULL(sbJSON_GetObjectItem(NULL, "item"));
     TEST_ASSERT_NULL(sbJSON_GetObjectItem(item, NULL));
-    TEST_ASSERT_NULL(sbJSON_GetObjectItemCaseSensitive(NULL, "item"));
-    TEST_ASSERT_NULL(sbJSON_GetObjectItemCaseSensitive(item, NULL));
+    TEST_ASSERT_NULL(sbJSON_GetObjectItem(NULL, "item"));
+    TEST_ASSERT_NULL(sbJSON_GetObjectItem(item, NULL));
     TEST_ASSERT_FALSE(sbJSON_HasObjectItem(NULL, "item"));
     TEST_ASSERT_FALSE(sbJSON_HasObjectItem(item, NULL));
     TEST_ASSERT_FALSE(sbJSON_IsInvalid(NULL));
@@ -448,12 +448,12 @@ static void sbjson_functions_should_not_crash_with_null_pointers(void) {
     sbJSON_DeleteItemFromArray(NULL, 0);
     TEST_ASSERT_NULL(sbJSON_DetachItemFromObject(NULL, "item"));
     TEST_ASSERT_NULL(sbJSON_DetachItemFromObject(item, NULL));
-    TEST_ASSERT_NULL(sbJSON_DetachItemFromObjectCaseSensitive(NULL, "item"));
-    TEST_ASSERT_NULL(sbJSON_DetachItemFromObjectCaseSensitive(item, NULL));
+    TEST_ASSERT_NULL(sbJSON_DetachItemFromObject(NULL, "item"));
+    TEST_ASSERT_NULL(sbJSON_DetachItemFromObject(item, NULL));
     sbJSON_DeleteItemFromObject(NULL, "item");
     sbJSON_DeleteItemFromObject(item, NULL);
-    sbJSON_DeleteItemFromObjectCaseSensitive(NULL, "item");
-    sbJSON_DeleteItemFromObjectCaseSensitive(item, NULL);
+    sbJSON_DeleteItemFromObject(NULL, "item");
+    sbJSON_DeleteItemFromObject(item, NULL);
     TEST_ASSERT_FALSE(sbJSON_InsertItemInArray(array, 0, NULL));
     TEST_ASSERT_FALSE(sbJSON_InsertItemInArray(array, 1, item));
     TEST_ASSERT_FALSE(sbJSON_InsertItemInArray(NULL, 0, item));
@@ -467,13 +467,13 @@ static void sbjson_functions_should_not_crash_with_null_pointers(void) {
     TEST_ASSERT_FALSE(sbJSON_ReplaceItemInObject(item, NULL, item));
     TEST_ASSERT_FALSE(sbJSON_ReplaceItemInObject(item, "item", NULL));
     TEST_ASSERT_FALSE(
-        sbJSON_ReplaceItemInObjectCaseSensitive(NULL, "item", item));
-    TEST_ASSERT_FALSE(sbJSON_ReplaceItemInObjectCaseSensitive(item, NULL, item));
+        sbJSON_ReplaceItemInObject(NULL, "item", item));
+    TEST_ASSERT_FALSE(sbJSON_ReplaceItemInObject(item, NULL, item));
     TEST_ASSERT_FALSE(
-        sbJSON_ReplaceItemInObjectCaseSensitive(item, "item", NULL));
+        sbJSON_ReplaceItemInObject(item, "item", NULL));
     TEST_ASSERT_NULL(sbJSON_Duplicate(NULL, true));
-    TEST_ASSERT_FALSE(sbJSON_Compare(item, NULL, false));
-    TEST_ASSERT_FALSE(sbJSON_Compare(NULL, item, false));
+    TEST_ASSERT_FALSE(sbJSON_Compare(item, NULL));
+    TEST_ASSERT_FALSE(sbJSON_Compare(NULL, item));
     TEST_ASSERT_NULL(sbJSON_SetValuestring(NULL, "test"));
     TEST_ASSERT_NULL(sbJSON_SetValuestring(corruptedString, "test"));
     sbJSON_Minify(NULL);

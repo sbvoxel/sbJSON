@@ -57,45 +57,45 @@ static bool test_apply_patch(const sbJSON *const test) {
     bool successful = false;
 
     /* extract all the data out of the test */
-    comment = sbJSON_GetObjectItemCaseSensitive(test, "comment");
+    comment = sbJSON_GetObjectItem(test, "comment");
     if (sbJSON_IsString(comment)) {
         printf("Testing \"%s\"\n", comment->u.valuestring);
     } else {
         printf("Testing unknown\n");
     }
 
-    disabled = sbJSON_GetObjectItemCaseSensitive(test, "disabled");
+    disabled = sbJSON_GetObjectItem(test, "disabled");
     if (sbJSON_IsTrue(disabled)) {
         printf("SKIPPED\n");
         return true;
     }
 
-    doc = sbJSON_GetObjectItemCaseSensitive(test, "doc");
+    doc = sbJSON_GetObjectItem(test, "doc");
     TEST_ASSERT_NOT_NULL_MESSAGE(doc, "No \"doc\" in the test.");
-    patch = sbJSON_GetObjectItemCaseSensitive(test, "patch");
+    patch = sbJSON_GetObjectItem(test, "patch");
     TEST_ASSERT_NOT_NULL_MESSAGE(patch, "No \"patch\"in the test.");
     /* Make a working copy of 'doc' */
     object = sbJSON_Duplicate(doc, true);
     TEST_ASSERT_NOT_NULL(object);
 
-    expected = sbJSON_GetObjectItemCaseSensitive(test, "expected");
-    error_element = sbJSON_GetObjectItemCaseSensitive(test, "error");
+    expected = sbJSON_GetObjectItem(test, "expected");
+    error_element = sbJSON_GetObjectItem(test, "error");
     if (error_element != NULL) {
         /* excepting an error */
         TEST_ASSERT_TRUE_MESSAGE(
-            0 != sbJSONUtils_ApplyPatchesCaseSensitive(object, patch),
+            0 != sbJSONUtils_ApplyPatches(object, patch),
             "Test didn't fail as it's supposed to.");
 
         successful = true;
     } else {
         /* apply the patch */
         TEST_ASSERT_EQUAL_INT_MESSAGE(
-            0, sbJSONUtils_ApplyPatchesCaseSensitive(object, patch),
+            0, sbJSONUtils_ApplyPatches(object, patch),
             "Failed to apply patches.");
         successful = true;
 
         if (expected != NULL) {
-            successful = sbJSON_Compare(object, expected, true);
+            successful = sbJSON_Compare(object, expected);
         }
     }
 
@@ -121,27 +121,27 @@ static bool test_generate_test(sbJSON *test) {
 
     char *printed_patch = NULL;
 
-    disabled = sbJSON_GetObjectItemCaseSensitive(test, "disabled");
+    disabled = sbJSON_GetObjectItem(test, "disabled");
     if (sbJSON_IsTrue(disabled)) {
         printf("SKIPPED\n");
         return true;
     }
 
-    doc = sbJSON_GetObjectItemCaseSensitive(test, "doc");
+    doc = sbJSON_GetObjectItem(test, "doc");
     TEST_ASSERT_NOT_NULL_MESSAGE(doc, "No \"doc\" in the test.");
 
     /* Make a working copy of 'doc' */
     object = sbJSON_Duplicate(doc, true);
     TEST_ASSERT_NOT_NULL(object);
 
-    expected = sbJSON_GetObjectItemCaseSensitive(test, "expected");
+    expected = sbJSON_GetObjectItem(test, "expected");
     if (expected == NULL) {
         sbJSON_Delete(object);
         /* if there is no expected output, this test doesn't make sense */
         return true;
     }
 
-    patch = sbJSONUtils_GeneratePatchesCaseSensitive(doc, expected);
+    patch = sbJSONUtils_GeneratePatches(doc, expected);
     TEST_ASSERT_NOT_NULL_MESSAGE(patch, "Failed to generate patches.");
 
     printed_patch = sbJSON_Print(patch);
@@ -150,10 +150,10 @@ static bool test_generate_test(sbJSON *test) {
 
     /* apply the generated patch */
     TEST_ASSERT_EQUAL_INT_MESSAGE(
-        0, sbJSONUtils_ApplyPatchesCaseSensitive(object, patch),
+        0, sbJSONUtils_ApplyPatches(object, patch),
         "Failed to apply generated patch.");
 
-    successful = sbJSON_Compare(object, expected, true);
+    successful = sbJSON_Compare(object, expected);
 
     sbJSON_Delete(patch);
     sbJSON_Delete(object);
