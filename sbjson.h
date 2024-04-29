@@ -67,7 +67,7 @@ SbJSON *sbj_create_raw(char const* name, char const* string);
 SbJSON *sbj_create_object(char const* name);
 SbJSON *sbj_create_array(char const* name);
 
-void sbj_attach_item(SbJSON *object, SbJSON *item);
+void sbj_attach_item(SbJSON *object, char const* name, SbJSON *item);
 
 // returns the new item, attached to the object
 SbJSON *sbj_add_null(SbJSON *object, char const* name);
@@ -100,16 +100,17 @@ bool sbj_is_raw(SbJSON const* item);
 
 // for objects and arrays
 int32_t sbj_item_count(SbJSON const* item);
-void sbj_get_items(SbJSON const* item, SbJSON const** out_items);
-void sbj_get_booleans(SbJSON const* array, bool** out_booleans);
-void sbj_get_integers(SbJSON const* array, bool** out_booleans);
-void sbj_get_doubles(SbJSON const* array, bool** out_booleans);
+void sbj_get_items(SbJSON const* array, SbJSON const** out_items);
+
+bool sbj_get_booleans(SbJSON const* array, bool** out_booleans);
+bool sbj_get_integers(SbJSON const* array, int64_t** out_integers);
+bool sbj_get_doubles(SbJSON const* array, double** out_doubles);
 
 SbJSON *sbj_slow_get_array_item(SbJSON const *array, int index);
 
 // null on failure
 SbJSON *sbj_lookup(SbJSON const *object, char const* name);
-SbJSON *obj_lookup_kind(SbJSON const *object, SbJSONKind kind, char const* name);
+SbJSON *obj_lookup_kind(SbJSON const *object, char const* name, SbJSONKind kind);
 
 bool sbj_get_boolean(SbJSON *item);
 int64_t sbj_get_integer(SbJSON *item);
@@ -124,3 +125,7 @@ bool sbj_try_get_string(SbJSON *item, char* string);
 bool sbj_get_boolean_or_default(SbJSON *item, bool default_bool);
 double sbj_get_double_or_default(SbJSON *item, double default_number);
 int64_t sbj_get_integer_or_default(SbJSON *item, int64_t default_number);
+
+bool sbj_lookup_boolean_or_default(SbJSON *object, char const* name, bool default_bool);
+double sbj_lookup_double_or_default(SbJSON *object, char const* name, double default_number);
+int64_t sbj_lookup_integer_or_default(SbJSON *object, char const* name, int64_t default_number);
