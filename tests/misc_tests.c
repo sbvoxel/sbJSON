@@ -167,17 +167,13 @@ static void typecheck_functions_should_check_type(void) {
     item->type = sbJSON_Bool;
     item->u.valuebool = false;
     item->string_is_const = true;
-    TEST_ASSERT_FALSE(sbj_is_false(NULL));
-    TEST_ASSERT_FALSE(sbj_is_false(invalid));
-    TEST_ASSERT_TRUE(sbj_is_false(item));
+    TEST_ASSERT_FALSE(sbj_get_bool_value(item));
     TEST_ASSERT_TRUE(sbj_is_bool(item));
 
     item->type = sbJSON_Bool;
     item->u.valuebool = true;
     item->string_is_const = true;
-    TEST_ASSERT_FALSE(sbj_is_true(NULL));
-    TEST_ASSERT_FALSE(sbj_is_true(invalid));
-    TEST_ASSERT_TRUE(sbj_is_true(item));
+    TEST_ASSERT_TRUE(sbj_get_bool_value(item));
     TEST_ASSERT_TRUE(sbj_is_bool(item));
 
     item->type = sbJSON_Null;
@@ -414,8 +410,6 @@ static void sbjson_functions_should_not_crash_with_null_pointers(void) {
     TEST_ASSERT_FALSE(sbj_has_object_item(NULL, "item"));
     TEST_ASSERT_FALSE(sbj_has_object_item(item, NULL));
     TEST_ASSERT_FALSE(sbj_is_invalid(NULL));
-    TEST_ASSERT_FALSE(sbj_is_false(NULL));
-    TEST_ASSERT_FALSE(sbj_is_true(NULL));
     TEST_ASSERT_FALSE(sbj_is_bool(NULL));
     TEST_ASSERT_FALSE(sbj_is_null(NULL));
     TEST_ASSERT_FALSE(sbj_is_number(NULL));
@@ -732,15 +726,15 @@ static void sbjson_set_bool_value_must_not_break_objects(void) {
     TEST_ASSERT_TRUE((sbj_set_bool_value(refobj, 1) == sbJSON_Invalid));
 
     bobj = sbj_create_false();
-    TEST_ASSERT_TRUE(sbj_is_false(bobj));
+    TEST_ASSERT_TRUE(!sbj_get_bool_value(bobj));
     TEST_ASSERT_TRUE((sbj_set_bool_value(bobj, 1)));
-    TEST_ASSERT_TRUE(sbj_is_true(bobj));
+    TEST_ASSERT_TRUE(sbj_get_bool_value(bobj));
     sbj_set_bool_value(bobj, 1);
-    TEST_ASSERT_TRUE(sbj_is_true(bobj));
+    TEST_ASSERT_TRUE(sbj_get_bool_value(bobj));
     TEST_ASSERT_TRUE((sbj_set_bool_value(bobj, 0)));
-    TEST_ASSERT_TRUE(sbj_is_false(bobj));
+    TEST_ASSERT_TRUE(!sbj_get_bool_value(bobj));
     sbj_set_bool_value(bobj, 0);
-    TEST_ASSERT_TRUE(sbj_is_false(bobj));
+    TEST_ASSERT_TRUE(!sbj_get_bool_value(bobj));
 
     sobj = sbJSON_CreateString("test");
     TEST_ASSERT_TRUE(sbj_is_string(sobj));

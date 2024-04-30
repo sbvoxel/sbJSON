@@ -2555,30 +2555,6 @@ bool sbj_is_invalid(sbJSON const *const item) {
     return item->type == sbJSON_Invalid;
 }
 
-bool sbj_is_false(sbJSON const *const item) {
-    if (item == NULL) {
-        return false;
-    }
-
-    if (item->type != sbJSON_Bool) {
-        return false;
-    }
-
-    return !item->u.valuebool;
-}
-
-bool sbj_is_true(sbJSON const *const item) {
-    if (item == NULL) {
-        return false;
-    }
-
-    if (item->type != sbJSON_Bool) {
-        return false;
-    }
-
-    return item->u.valuebool;
-}
-
 bool sbj_is_bool(sbJSON const *const item) {
     if (item == NULL) {
         return false;

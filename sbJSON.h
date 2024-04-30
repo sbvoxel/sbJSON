@@ -152,8 +152,6 @@ bool sbj_try_get_bool_value(sbJSON const *const item, bool default_bool);
 
 /* These functions check the type of an item */
 bool sbj_is_invalid(sbJSON const *const item);
-bool sbj_is_false(sbJSON const *const item);
-bool sbj_is_true(sbJSON const *const item);
 bool sbj_is_bool(sbJSON const *const item);
 bool sbj_is_null(sbJSON const *const item);
 bool sbj_is_number(sbJSON const *const item);

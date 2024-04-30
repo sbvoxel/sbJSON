@@ -65,7 +65,7 @@ static bool test_apply_patch(const sbJSON *const test) {
     }
 
     disabled = sbj_get_object_item(test, "disabled");
-    if (sbj_is_true(disabled)) {
+    if (sbj_is_bool(disabled) && sbj_get_bool_value(disabled)) {
         printf("SKIPPED\n");
         return true;
     }
@@ -122,7 +122,7 @@ static bool test_generate_test(sbJSON *test) {
     char *printed_patch = NULL;
 
     disabled = sbj_get_object_item(test, "disabled");
-    if (sbj_is_true(disabled)) {
+    if (sbj_is_bool(disabled) && sbj_get_bool_value(disabled)) {
         printf("SKIPPED\n");
         return true;
     }
