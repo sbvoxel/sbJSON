@@ -295,10 +295,13 @@ loop_end:
             return false; /* parse_error */
         }
 
-        // TODO: When a number is exactly LLONG_MAX, it will be classified
-        // as a double which is a bug!
+        // TODO: When a number is exactly LLONG_MAX or LLONG_MIN,
+        // it will be classified as a double which is a bug!
         if (number == LLONG_MAX) {
             // Number too large to be stored as an integer.
+            after_end = NULL;
+            decimal_number = true;
+        } else if (number == LLONG_MIN) {
             after_end = NULL;
             decimal_number = true;
         } else {
