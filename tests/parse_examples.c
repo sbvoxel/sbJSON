@@ -194,12 +194,9 @@ static void test15_should_not_heap_buffer_overflow(void) {
         "{\"1\":1, ",
     };
 
-    size_t i;
-
-    for (i = 0; i < sizeof(strings) / sizeof(strings[0]); i+=1) {
+    for (size_t i = 0; i < sizeof(strings) / sizeof(strings[0]); i+=1) {
         char const* json_string = strings[i];
         size_t len = strlen(json_string);
-        sbJSON *json = NULL;
 
         char *exact_size_heap = malloc(len);
         if (exact_size_heap == NULL) {
@@ -207,7 +204,7 @@ static void test15_should_not_heap_buffer_overflow(void) {
         }
 
         memcpy(exact_size_heap, json_string, len);
-        json = sbJSON_ParseWithLength(exact_size_heap, len);
+        sbJSON *json = sbJSON_ParseWithLength(exact_size_heap, len);
 
         if (json) {
             sbJSON_Delete(json);
