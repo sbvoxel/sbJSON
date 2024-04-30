@@ -12,6 +12,7 @@ set(unity_tests
     parse_hex4
     parse_string
     parse_array
+    parse_double
     parse_object
     parse_value
     print_string
