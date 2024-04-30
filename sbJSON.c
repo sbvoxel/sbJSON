@@ -37,16 +37,16 @@
 #include "sbJSON.h"
 
 typedef struct {
-    const unsigned char *json;
+    unsigned char const *json;
     size_t position;
 } error;
 static error global_error = {NULL, 0};
 
-const char *sbJSON_GetErrorPtr(void) {
-    return (const char *)(global_error.json + global_error.position);
+char const *sbJSON_GetErrorPtr(void) {
+    return (char const *)(global_error.json + global_error.position);
 }
 
-char *sbJSON_GetStringValue(const sbJSON *const item) {
+char *sbJSON_GetStringValue(sbJSON const *const item) {
     if (item == NULL) {
         return NULL;
     }
@@ -55,7 +55,7 @@ char *sbJSON_GetStringValue(const sbJSON *const item) {
     return item->u.valuestring;
 }
 
-char *sbJSON_TryGetStringValue(const sbJSON *const item) {
+char *sbJSON_TryGetStringValue(sbJSON const *const item) {
     if (item == NULL || item->type != sbJSON_String) {
         return NULL;
     }
@@ -64,7 +64,7 @@ char *sbJSON_TryGetStringValue(const sbJSON *const item) {
 }
 
 // TODO: Is this API smart anymore (int vs double)?
-double sbJSON_GetNumberValue(const sbJSON *const item) {
+double sbJSON_GetNumberValue(sbJSON const *const item) {
     if (item == NULL) {
         return NAN;
     }
@@ -78,7 +78,7 @@ double sbJSON_GetNumberValue(const sbJSON *const item) {
     }
 }
 
-double sbJSON_TryGetNumberValue(const sbJSON *const item) {
+double sbJSON_TryGetNumberValue(sbJSON const *const item) {
     if (item == NULL || item->type != sbJSON_Number) {
         return NAN;
     }
@@ -90,7 +90,7 @@ double sbJSON_TryGetNumberValue(const sbJSON *const item) {
     }
 }
 
-bool sbJSON_GetBoolValue(const sbJSON *const item) {
+bool sbJSON_GetBoolValue(sbJSON const *const item) {
     if (item == NULL) {
         return false; // ...
     }
@@ -99,7 +99,7 @@ bool sbJSON_GetBoolValue(const sbJSON *const item) {
     return item->u.valuebool;
 }
 
-bool sbJSON_TryGetBoolValue(const sbJSON *const item, bool default_bool) {
+bool sbJSON_TryGetBoolValue(sbJSON const *const item, bool default_bool) {
     if (item == NULL) {
         return default_bool;
     }
@@ -137,8 +137,8 @@ static void *internal_realloc(void *pointer, size_t size) {
 static internal_hooks global_hooks = {internal_malloc, internal_free,
                                       internal_realloc};
 
-static unsigned char *sbJSON_strdup(const unsigned char *string,
-                                    const internal_hooks *const hooks) {
+static unsigned char *sbJSON_strdup(unsigned char const *string,
+                                    internal_hooks const *const hooks) {
     size_t length = 0;
     unsigned char *copy = NULL;
 
@@ -146,7 +146,7 @@ static unsigned char *sbJSON_strdup(const unsigned char *string,
         return NULL;
     }
 
-    length = strlen((const char *)string) + sizeof("");
+    length = strlen((char const *)string) + sizeof("");
     copy = (unsigned char *)hooks->allocate(length);
     if (copy == NULL) {
         return NULL;
@@ -184,7 +184,7 @@ void sbJSON_InitHooks(sbJSON_Hooks *hooks) {
 }
 
 /* Internal constructor. */
-static sbJSON *sbJSON_New_Item(const internal_hooks *const hooks) {
+static sbJSON *sbJSON_New_Item(internal_hooks const *const hooks) {
     sbJSON *node = (sbJSON *)hooks->allocate(sizeof(sbJSON));
     if (node) {
         memset(node, '\0', sizeof(sbJSON));
@@ -217,7 +217,7 @@ void sbJSON_Delete(sbJSON *item) {
 }
 
 typedef struct {
-    const unsigned char *content;
+    unsigned char const *content;
     size_t length;
     size_t offset;
     size_t depth; /* How deeply nested (in arrays/objects) is the input at the
@@ -249,13 +249,13 @@ static bool parse_number(sbJSON *const item, parse_buffer *const input_buffer) {
 
     bool decimal_number = false;
 
-    const unsigned char *buffer = buffer_at_offset(input_buffer);
+    unsigned char const *buffer = buffer_at_offset(input_buffer);
     const size_t buffer_length = input_buffer->length - input_buffer->offset;
 
     /* Copy the number into a temporary buffer. This takes care of '\0' not
      * necessarily being available for marking the end of the input */
     for (i = 0; (i < (sizeof(number_c_string) - 1)) && i < buffer_length; i++) {
-        const unsigned char c = buffer[i];
+        unsigned char const c = buffer[i];
 
         switch (c) {
         case '0':
@@ -290,7 +290,7 @@ loop_end:
 
     if (!decimal_number) {
         int64_t number =
-            strtoll((const char *)number_c_string, (char **)&after_end, 10);
+            strtoll((char const *)number_c_string, (char **)&after_end, 10);
         if (number_c_string == after_end) {
             return false; /* parse_error */
         }
@@ -312,7 +312,7 @@ loop_end:
 
     if (decimal_number) {
         double number =
-            strtod((const char *)number_c_string, (char **)&after_end);
+            strtod((char const *)number_c_string, (char **)&after_end);
         if (number_c_string == after_end) {
             return false; /* parse_error */
         }
@@ -344,7 +344,7 @@ void sbJSON_SetIntegerNumberValue(sbJSON *object, int64_t number) {
     object->is_number_double = false;
 }
 
-char *sbJSON_SetValuestring(sbJSON *object, const char *valuestring) {
+char *sbJSON_SetValuestring(sbJSON *object, char const *valuestring) {
     if (object == NULL) {
         return NULL;
     }
@@ -357,7 +357,7 @@ char *sbJSON_SetValuestring(sbJSON *object, const char *valuestring) {
         return object->u.valuestring;
     }
 
-    char *copy = (char *)sbJSON_strdup((const unsigned char *)valuestring,
+    char *copy = (char *)sbJSON_strdup((unsigned char const *)valuestring,
                                        &global_hooks);
     if (copy == NULL) {
         return NULL;
@@ -466,13 +466,13 @@ static unsigned char *ensure(printbuffer *const p, size_t needed) {
 /* calculate the new length of the string in a printbuffer and update the offset
  */
 static void update_offset(printbuffer *const buffer) {
-    const unsigned char *buffer_pointer = NULL;
+    unsigned char const *buffer_pointer = NULL;
     if (buffer->buffer == NULL) {
         return;
     }
     buffer_pointer = buffer->buffer + buffer->offset;
 
-    buffer->offset += strlen((const char *)buffer_pointer);
+    buffer->offset += strlen((char const *)buffer_pointer);
 }
 
 /* securely comparison of floating-point variables */
@@ -482,7 +482,7 @@ static bool compare_double(double a, double b) {
 }
 
 /* Render the number nicely from the given item into a string. */
-static bool print_number(const sbJSON *const item,
+static bool print_number(sbJSON const *const item,
                          printbuffer *const output_buffer) {
 
     unsigned char *output_pointer = NULL;
@@ -545,7 +545,7 @@ static bool print_number(const sbJSON *const item,
 }
 
 /* parse 4 digit hexadecimal number */
-static unsigned parse_hex4(const unsigned char *const input) {
+static unsigned parse_hex4(unsigned char const *const input) {
     unsigned int h = 0;
     size_t i = 0;
 
@@ -574,12 +574,12 @@ static unsigned parse_hex4(const unsigned char *const input) {
 /* converts a UTF-16 literal to UTF-8
  * A literal can be one or two sequences of the form \uXXXX */
 static unsigned char
-utf16_literal_to_utf8(const unsigned char *const input_pointer,
-                      const unsigned char *const input_end,
+utf16_literal_to_utf8(unsigned char const *const input_pointer,
+                      unsigned char const *const input_end,
                       unsigned char **output_pointer) {
     long unsigned int codepoint = 0;
     unsigned int first_code = 0;
-    const unsigned char *first_sequence = input_pointer;
+    unsigned char const *first_sequence = input_pointer;
     unsigned char utf8_length = 0;
     unsigned char utf8_position = 0;
     unsigned char sequence_length = 0;
@@ -600,7 +600,7 @@ utf16_literal_to_utf8(const unsigned char *const input_pointer,
 
     /* UTF16 surrogate pair */
     if ((first_code >= 0xD800) && (first_code <= 0xDBFF)) {
-        const unsigned char *second_sequence = first_sequence + 6;
+        unsigned char const *second_sequence = first_sequence + 6;
         unsigned int second_code = 0;
         sequence_length = 12; /* \uXXXX\uXXXX */
 
@@ -679,8 +679,8 @@ fail:
 
 /* Parse the input text into an unescaped cinput, and populate item. */
 static bool parse_string(sbJSON *const item, parse_buffer *const input_buffer) {
-    const unsigned char *input_pointer = buffer_at_offset(input_buffer) + 1;
-    const unsigned char *input_end = buffer_at_offset(input_buffer) + 1;
+    unsigned char const *input_pointer = buffer_at_offset(input_buffer) + 1;
+    unsigned char const *input_end = buffer_at_offset(input_buffer) + 1;
     unsigned char *output_pointer = NULL;
     unsigned char *output = NULL;
 
@@ -802,9 +802,9 @@ fail:
 }
 
 /* Render the cstring provided to an escaped version that can be printed. */
-static bool print_string_ptr(const unsigned char *const input,
+static bool print_string_ptr(unsigned char const *const input,
                              printbuffer *const output_buffer) {
-    const unsigned char *input_pointer = NULL;
+    unsigned char const *input_pointer = NULL;
     unsigned char *output = NULL;
     unsigned char *output_pointer = NULL;
     size_t output_length = 0;
@@ -913,19 +913,19 @@ static bool print_string_ptr(const unsigned char *const input,
 }
 
 /* Invoke print_string_ptr (which is useful) on an item. */
-static bool print_string(const sbJSON *const item, printbuffer *const p) {
+static bool print_string(sbJSON const *const item, printbuffer *const p) {
     return print_string_ptr((unsigned char *)item->u.valuestring, p);
 }
 
 /* Predeclare these prototypes. */
 static bool parse_value(sbJSON *const item, parse_buffer *const input_buffer);
-static bool print_value(const sbJSON *const item,
+static bool print_value(sbJSON const *const item,
                         printbuffer *const output_buffer);
 static bool parse_array(sbJSON *const item, parse_buffer *const input_buffer);
-static bool print_array(const sbJSON *const item,
+static bool print_array(sbJSON const *const item,
                         printbuffer *const output_buffer);
 static bool parse_object(sbJSON *const item, parse_buffer *const input_buffer);
-static bool print_object(const sbJSON *const item,
+static bool print_object(sbJSON const *const item,
                          printbuffer *const output_buffer);
 
 /* Utility to jump whitespace and cr/lf */
@@ -958,7 +958,7 @@ static parse_buffer *skip_utf8_bom(parse_buffer *const buffer) {
     }
 
     if (can_access_at_index(buffer, 4) &&
-        (strncmp((const char *)buffer_at_offset(buffer), "\xEF\xBB\xBF", 3) ==
+        (strncmp((char const *)buffer_at_offset(buffer), "\xEF\xBB\xBF", 3) ==
          0)) {
         buffer->offset += 3;
     }
@@ -966,7 +966,7 @@ static parse_buffer *skip_utf8_bom(parse_buffer *const buffer) {
     return buffer;
 }
 
-sbJSON *sbJSON_ParseWithOpts(const char *value, const char **return_parse_end,
+sbJSON *sbJSON_ParseWithOpts(char const *value, char const **return_parse_end,
                              bool require_null_terminated) {
     size_t buffer_length;
 
@@ -982,8 +982,8 @@ sbJSON *sbJSON_ParseWithOpts(const char *value, const char **return_parse_end,
 }
 
 /* Parse an object - create a new root, and populate. */
-sbJSON *sbJSON_ParseWithLengthOpts(const char *value, size_t buffer_length,
-                                   const char **return_parse_end,
+sbJSON *sbJSON_ParseWithLengthOpts(char const *value, size_t buffer_length,
+                                   char const **return_parse_end,
                                    bool require_null_terminated) {
     parse_buffer buffer = {0, 0, 0, 0, {0, 0, 0}};
     sbJSON *item = NULL;
@@ -996,7 +996,7 @@ sbJSON *sbJSON_ParseWithLengthOpts(const char *value, size_t buffer_length,
         goto fail;
     }
 
-    buffer.content = (const unsigned char *)value;
+    buffer.content = (unsigned char const *)value;
     buffer.length = buffer_length;
     buffer.offset = 0;
     buffer.hooks = global_hooks;
@@ -1022,7 +1022,7 @@ sbJSON *sbJSON_ParseWithLengthOpts(const char *value, size_t buffer_length,
         }
     }
     if (return_parse_end) {
-        *return_parse_end = (const char *)buffer_at_offset(&buffer);
+        *return_parse_end = (char const *)buffer_at_offset(&buffer);
     }
 
     return item;
@@ -1034,7 +1034,7 @@ fail:
 
     if (value != NULL) {
         error local_error;
-        local_error.json = (const unsigned char *)value;
+        local_error.json = (unsigned char const *)value;
         local_error.position = 0;
 
         if (buffer.offset < buffer.length) {
@@ -1045,7 +1045,7 @@ fail:
 
         if (return_parse_end != NULL) {
             *return_parse_end =
-                (const char *)local_error.json + local_error.position;
+                (char const *)local_error.json + local_error.position;
         }
 
         global_error = local_error;
@@ -1055,18 +1055,18 @@ fail:
 }
 
 /* Default options for sbJSON_Parse */
-sbJSON *sbJSON_Parse(const char *value) {
+sbJSON *sbJSON_Parse(char const *value) {
     return sbJSON_ParseWithOpts(value, 0, 0);
 }
 
-sbJSON *sbJSON_ParseWithLength(const char *value, size_t buffer_length) {
+sbJSON *sbJSON_ParseWithLength(char const *value, size_t buffer_length) {
     return sbJSON_ParseWithLengthOpts(value, buffer_length, 0, 0);
 }
 
 #define sbjson_min(a, b) (((a) < (b)) ? (a) : (b))
 
-static unsigned char *print(const sbJSON *const item, bool format,
-                            const internal_hooks *const hooks) {
+static unsigned char *print(sbJSON const *const item, bool format,
+                            internal_hooks const *const hooks) {
     static const size_t default_buffer_size = 256;
     printbuffer buffer[1];
     unsigned char *printed = NULL;
@@ -1125,15 +1125,15 @@ fail:
 }
 
 /* Render a sbJSON item/entity/structure to text. */
-char *sbJSON_Print(const sbJSON *item) {
+char *sbJSON_Print(sbJSON const *item) {
     return (char *)print(item, true, &global_hooks);
 }
 
-char *sbJSON_PrintUnformatted(const sbJSON *item) {
+char *sbJSON_PrintUnformatted(sbJSON const *item) {
     return (char *)print(item, false, &global_hooks);
 }
 
-char *sbJSON_PrintBuffered(const sbJSON *item, int prebuffer, bool fmt) {
+char *sbJSON_PrintBuffered(sbJSON const *item, int prebuffer, bool fmt) {
     printbuffer p = {0, 0, 0, 0, 0, 0, {0, 0, 0}};
 
     if (prebuffer < 0) {
@@ -1159,8 +1159,8 @@ char *sbJSON_PrintBuffered(const sbJSON *item, int prebuffer, bool fmt) {
     return (char *)p.buffer;
 }
 
-bool sbJSON_PrintPreallocated(sbJSON *item, char *buffer, const int length,
-                              const bool format) {
+bool sbJSON_PrintPreallocated(sbJSON *item, char *buffer, int const length,
+                              bool const format) {
     printbuffer p = {0, 0, 0, 0, 0, 0, {0, 0, 0}};
 
     if ((length < 0) || (buffer == NULL)) {
@@ -1186,7 +1186,7 @@ static bool parse_value(sbJSON *const item, parse_buffer *const input_buffer) {
     /* parse the different types of values */
     /* null */
     if (can_read(input_buffer, 4) &&
-        (strncmp((const char *)buffer_at_offset(input_buffer), "null", 4) ==
+        (strncmp((char const *)buffer_at_offset(input_buffer), "null", 4) ==
          0)) {
         item->type = sbJSON_Null;
         input_buffer->offset += 4;
@@ -1194,7 +1194,7 @@ static bool parse_value(sbJSON *const item, parse_buffer *const input_buffer) {
     }
     /* false */
     if (can_read(input_buffer, 5) &&
-        (strncmp((const char *)buffer_at_offset(input_buffer), "false", 5) ==
+        (strncmp((char const *)buffer_at_offset(input_buffer), "false", 5) ==
          0)) {
         item->type = sbJSON_Bool;
         item->u.valuebool = false;
@@ -1203,7 +1203,7 @@ static bool parse_value(sbJSON *const item, parse_buffer *const input_buffer) {
     }
     /* true */
     if (can_read(input_buffer, 4) &&
-        (strncmp((const char *)buffer_at_offset(input_buffer), "true", 4) ==
+        (strncmp((char const *)buffer_at_offset(input_buffer), "true", 4) ==
          0)) {
         item->type = sbJSON_Bool;
         item->u.valuebool = true;
@@ -1237,7 +1237,7 @@ static bool parse_value(sbJSON *const item, parse_buffer *const input_buffer) {
 }
 
 /* Render a value to text. */
-static bool print_value(const sbJSON *const item,
+static bool print_value(sbJSON const *const item,
                         printbuffer *const output_buffer) {
     unsigned char *output = NULL;
 
@@ -1384,7 +1384,7 @@ fail:
 }
 
 /* Render an array to text */
-static bool print_array(const sbJSON *const item,
+static bool print_array(sbJSON const *const item,
                         printbuffer *const output_buffer) {
     unsigned char *output_pointer = NULL;
     size_t length = 0;
@@ -1482,7 +1482,7 @@ static bool parse_object(sbJSON *const item, parse_buffer *const input_buffer) {
             current_item = new_item;
         }
 
-        if (input_buffer->offset+1 >= input_buffer->length) {
+        if (input_buffer->offset + 1 >= input_buffer->length) {
             goto fail; /* nothing comes after the comma */
         }
 
@@ -1540,7 +1540,7 @@ fail:
 }
 
 /* Render an object to text. */
-static bool print_object(const sbJSON *const item,
+static bool print_object(sbJSON const *const item,
                          printbuffer *const output_buffer) {
     unsigned char *output_pointer = NULL;
     size_t length = 0;
@@ -1640,7 +1640,7 @@ static bool print_object(const sbJSON *const item,
 }
 
 /* Get Array size/item / object item. */
-int sbJSON_GetArraySize(const sbJSON *array) {
+int sbJSON_GetArraySize(sbJSON const *array) {
     sbJSON *child = NULL;
     size_t size = 0;
 
@@ -1660,7 +1660,7 @@ int sbJSON_GetArraySize(const sbJSON *array) {
     return (int)size;
 }
 
-static sbJSON *get_array_item(const sbJSON *array, size_t index) {
+static sbJSON *get_array_item(sbJSON const *array, size_t index) {
     sbJSON *current_child = NULL;
 
     if (array == NULL) {
@@ -1676,7 +1676,7 @@ static sbJSON *get_array_item(const sbJSON *array, size_t index) {
     return current_child;
 }
 
-sbJSON *sbJSON_GetArrayItem(const sbJSON *array, int index) {
+sbJSON *sbJSON_GetArrayItem(sbJSON const *array, int index) {
     if (index < 0) {
         return NULL;
     }
@@ -1684,8 +1684,8 @@ sbJSON *sbJSON_GetArrayItem(const sbJSON *array, int index) {
     return get_array_item(array, (size_t)index);
 }
 
-static sbJSON *get_object_item(const sbJSON *const object,
-                               const char *const name) {
+static sbJSON *get_object_item(sbJSON const *const object,
+                               char const *const name) {
     sbJSON *current_element = NULL;
 
     if ((object == NULL) || (name == NULL)) {
@@ -1705,12 +1705,12 @@ static sbJSON *get_object_item(const sbJSON *const object,
     return current_element;
 }
 
-sbJSON *sbJSON_GetObjectItem(const sbJSON *const object,
-                             const char *const string) {
+sbJSON *sbJSON_GetObjectItem(sbJSON const *const object,
+                             char const *const string) {
     return get_object_item(object, string);
 }
 
-bool sbJSON_HasObjectItem(const sbJSON *object, const char *string) {
+bool sbJSON_HasObjectItem(sbJSON const *object, char const *string) {
     return sbJSON_GetObjectItem(object, string) ? 1 : 0;
 }
 
@@ -1721,8 +1721,8 @@ static void suffix_object(sbJSON *prev, sbJSON *item) {
 }
 
 /* Utility for handling references. */
-static sbJSON *create_reference(const sbJSON *item,
-                                const internal_hooks *const hooks) {
+static sbJSON *create_reference(sbJSON const *item,
+                                internal_hooks const *const hooks) {
     sbJSON *reference = NULL;
     if (item == NULL) {
         return NULL;
@@ -1775,12 +1775,12 @@ bool sbJSON_AddItemToArray(sbJSON *array, sbJSON *item) {
 }
 
 /* helper function to cast away const */
-static void *cast_away_const(const void *string) { return (void *)string; }
+static void *cast_away_const(void const *string) { return (void *)string; }
 
-static bool add_item_to_object(sbJSON *const object, const char *const string,
+static bool add_item_to_object(sbJSON *const object, char const *const string,
                                sbJSON *const item,
-                               const internal_hooks *const hooks,
-                               const bool constant_key) {
+                               internal_hooks const *const hooks,
+                               bool const constant_key) {
     char *new_key = NULL;
     uint16_t new_type = sbJSON_Invalid;
     bool is_reference = false;
@@ -1797,7 +1797,7 @@ static bool add_item_to_object(sbJSON *const object, const char *const string,
         new_type = item->type;
         string_is_const = true;
     } else {
-        new_key = (char *)sbJSON_strdup((const unsigned char *)string, hooks);
+        new_key = (char *)sbJSON_strdup((unsigned char const *)string, hooks);
         if (new_key == NULL) {
             return false;
         }
@@ -1819,12 +1819,12 @@ static bool add_item_to_object(sbJSON *const object, const char *const string,
     return add_item_to_array(object, item);
 }
 
-bool sbJSON_AddItemToObject(sbJSON *object, const char *string, sbJSON *item) {
+bool sbJSON_AddItemToObject(sbJSON *object, char const *string, sbJSON *item) {
     return add_item_to_object(object, string, item, &global_hooks, false);
 }
 
 /* Add an item to an object with constant string as key */
-bool sbJSON_AddItemToObjectCS(sbJSON *object, const char *string,
+bool sbJSON_AddItemToObjectCS(sbJSON *object, char const *string,
                               sbJSON *item) {
     return add_item_to_object(object, string, item, &global_hooks, true);
 }
@@ -1833,14 +1833,14 @@ bool sbJSON_AddItemReferenceToArray(sbJSON *array, sbJSON *item) {
     return add_item_to_array(array, create_reference(item, &global_hooks));
 }
 
-bool sbJSON_AddItemReferenceToObject(sbJSON *object, const char *string,
+bool sbJSON_AddItemReferenceToObject(sbJSON *object, char const *string,
                                      sbJSON *item) {
     return add_item_to_object(object, string,
                               create_reference(item, &global_hooks),
                               &global_hooks, false);
 }
 
-sbJSON *sbJSON_AddNullToObject(sbJSON *const object, const char *const name) {
+sbJSON *sbJSON_AddNullToObject(sbJSON *const object, char const *const name) {
     sbJSON *null = sbJSON_CreateNull();
     if (add_item_to_object(object, name, null, &global_hooks, false)) {
         return null;
@@ -1850,7 +1850,7 @@ sbJSON *sbJSON_AddNullToObject(sbJSON *const object, const char *const name) {
     return NULL;
 }
 
-sbJSON *sbJSON_AddTrueToObject(sbJSON *const object, const char *const name) {
+sbJSON *sbJSON_AddTrueToObject(sbJSON *const object, char const *const name) {
     sbJSON *true_item = sbJSON_CreateTrue();
     if (add_item_to_object(object, name, true_item, &global_hooks, false)) {
         return true_item;
@@ -1860,7 +1860,7 @@ sbJSON *sbJSON_AddTrueToObject(sbJSON *const object, const char *const name) {
     return NULL;
 }
 
-sbJSON *sbJSON_AddFalseToObject(sbJSON *const object, const char *const name) {
+sbJSON *sbJSON_AddFalseToObject(sbJSON *const object, char const *const name) {
     sbJSON *false_item = sbJSON_CreateFalse();
     if (add_item_to_object(object, name, false_item, &global_hooks, false)) {
         return false_item;
@@ -1870,8 +1870,8 @@ sbJSON *sbJSON_AddFalseToObject(sbJSON *const object, const char *const name) {
     return NULL;
 }
 
-sbJSON *sbJSON_AddBoolToObject(sbJSON *const object, const char *const name,
-                               const bool boolean) {
+sbJSON *sbJSON_AddBoolToObject(sbJSON *const object, char const *const name,
+                               bool const boolean) {
     sbJSON *bool_item = sbJSON_CreateBool(boolean);
     if (add_item_to_object(object, name, bool_item, &global_hooks, false)) {
         return bool_item;
@@ -1882,8 +1882,8 @@ sbJSON *sbJSON_AddBoolToObject(sbJSON *const object, const char *const name,
 }
 
 sbJSON *sbJSON_AddDoubleNumberToObject(sbJSON *const object,
-                                       const char *const name,
-                                       const double number) {
+                                       char const *const name,
+                                       double const number) {
     sbJSON *number_item = sbJSON_CreateDoubleNumber(number);
     if (add_item_to_object(object, name, number_item, &global_hooks, false)) {
         return number_item;
@@ -1894,7 +1894,7 @@ sbJSON *sbJSON_AddDoubleNumberToObject(sbJSON *const object,
 }
 
 sbJSON *sbJSON_AddIntegerNumberToObject(sbJSON *const object,
-                                        const char *const name,
+                                        char const *const name,
                                         const int64_t number) {
     sbJSON *number_item = sbJSON_CreateIntegerNumber(number);
     if (add_item_to_object(object, name, number_item, &global_hooks, false)) {
@@ -1905,8 +1905,8 @@ sbJSON *sbJSON_AddIntegerNumberToObject(sbJSON *const object,
     return NULL;
 }
 
-sbJSON *sbJSON_AddStringToObject(sbJSON *const object, const char *const name,
-                                 const char *const string) {
+sbJSON *sbJSON_AddStringToObject(sbJSON *const object, char const *const name,
+                                 char const *const string) {
     sbJSON *string_item = sbJSON_CreateString(string);
     if (add_item_to_object(object, name, string_item, &global_hooks, false)) {
         return string_item;
@@ -1916,8 +1916,8 @@ sbJSON *sbJSON_AddStringToObject(sbJSON *const object, const char *const name,
     return NULL;
 }
 
-sbJSON *sbJSON_AddRawToObject(sbJSON *const object, const char *const name,
-                              const char *const raw) {
+sbJSON *sbJSON_AddRawToObject(sbJSON *const object, char const *const name,
+                              char const *const raw) {
     sbJSON *raw_item = sbJSON_CreateRaw(raw);
     if (add_item_to_object(object, name, raw_item, &global_hooks, false)) {
         return raw_item;
@@ -1927,7 +1927,7 @@ sbJSON *sbJSON_AddRawToObject(sbJSON *const object, const char *const name,
     return NULL;
 }
 
-sbJSON *sbJSON_AddObjectToObject(sbJSON *const object, const char *const name) {
+sbJSON *sbJSON_AddObjectToObject(sbJSON *const object, char const *const name) {
     sbJSON *object_item = sbJSON_CreateObject();
     if (add_item_to_object(object, name, object_item, &global_hooks, false)) {
         return object_item;
@@ -1937,7 +1937,7 @@ sbJSON *sbJSON_AddObjectToObject(sbJSON *const object, const char *const name) {
     return NULL;
 }
 
-sbJSON *sbJSON_AddArrayToObject(sbJSON *const object, const char *const name) {
+sbJSON *sbJSON_AddArrayToObject(sbJSON *const object, char const *const name) {
     sbJSON *array = sbJSON_CreateArray();
     if (add_item_to_object(object, name, array, &global_hooks, false)) {
         return array;
@@ -1989,13 +1989,13 @@ void sbJSON_DeleteItemFromArray(sbJSON *array, int which) {
     sbJSON_Delete(sbJSON_DetachItemFromArray(array, which));
 }
 
-sbJSON *sbJSON_DetachItemFromObject(sbJSON *object, const char *string) {
+sbJSON *sbJSON_DetachItemFromObject(sbJSON *object, char const *string) {
     sbJSON *to_detach = sbJSON_GetObjectItem(object, string);
 
     return sbJSON_DetachItemViaPointer(object, to_detach);
 }
 
-void sbJSON_DeleteItemFromObject(sbJSON *object, const char *string) {
+void sbJSON_DeleteItemFromObject(sbJSON *object, char const *string) {
     sbJSON_Delete(sbJSON_DetachItemFromObject(object, string));
 }
 
@@ -2079,7 +2079,7 @@ bool sbJSON_ReplaceItemInArray(sbJSON *array, int which, sbJSON *newitem) {
         array, get_array_item(array, (size_t)which), newitem);
 }
 
-static bool replace_item_in_object(sbJSON *object, const char *string,
+static bool replace_item_in_object(sbJSON *object, char const *string,
                                    sbJSON *replacement) {
     if ((replacement == NULL) || (string == NULL)) {
         return false;
@@ -2090,7 +2090,7 @@ static bool replace_item_in_object(sbJSON *object, const char *string,
         sbJSON_free(replacement->string);
     }
     replacement->string =
-        (char *)sbJSON_strdup((const unsigned char *)string, &global_hooks);
+        (char *)sbJSON_strdup((unsigned char const *)string, &global_hooks);
     if (replacement->string == NULL) {
         return false;
     }
@@ -2101,7 +2101,7 @@ static bool replace_item_in_object(sbJSON *object, const char *string,
                                         replacement);
 }
 
-bool sbJSON_ReplaceItemInObject(sbJSON *object, const char *string,
+bool sbJSON_ReplaceItemInObject(sbJSON *object, char const *string,
                                 sbJSON *newitem) {
     return replace_item_in_object(object, string, newitem);
 }
@@ -2168,12 +2168,12 @@ sbJSON *sbJSON_CreateIntegerNumber(int64_t num) {
     return item;
 }
 
-sbJSON *sbJSON_CreateString(const char *string) {
+sbJSON *sbJSON_CreateString(char const *string) {
     sbJSON *item = sbJSON_New_Item(&global_hooks);
     if (item) {
         item->type = sbJSON_String;
         item->u.valuestring =
-            (char *)sbJSON_strdup((const unsigned char *)string, &global_hooks);
+            (char *)sbJSON_strdup((unsigned char const *)string, &global_hooks);
         if (!item->u.valuestring) {
             sbJSON_Delete(item);
             return NULL;
@@ -2183,7 +2183,7 @@ sbJSON *sbJSON_CreateString(const char *string) {
     return item;
 }
 
-sbJSON *sbJSON_CreateStringReference(const char *string) {
+sbJSON *sbJSON_CreateStringReference(char const *string) {
     sbJSON *item = sbJSON_New_Item(&global_hooks);
     if (item != NULL) {
         item->type = sbJSON_String;
@@ -2194,7 +2194,7 @@ sbJSON *sbJSON_CreateStringReference(const char *string) {
     return item;
 }
 
-sbJSON *sbJSON_CreateObjectReference(const sbJSON *child) {
+sbJSON *sbJSON_CreateObjectReference(sbJSON const *child) {
     sbJSON *item = sbJSON_New_Item(&global_hooks);
     if (item != NULL) {
         item->type = sbJSON_Object;
@@ -2205,7 +2205,7 @@ sbJSON *sbJSON_CreateObjectReference(const sbJSON *child) {
     return item;
 }
 
-sbJSON *sbJSON_CreateArrayReference(const sbJSON *child) {
+sbJSON *sbJSON_CreateArrayReference(sbJSON const *child) {
     sbJSON *item = sbJSON_New_Item(&global_hooks);
     if (item != NULL) {
         item->type = sbJSON_Array;
@@ -2216,12 +2216,12 @@ sbJSON *sbJSON_CreateArrayReference(const sbJSON *child) {
     return item;
 }
 
-sbJSON *sbJSON_CreateRaw(const char *raw) {
+sbJSON *sbJSON_CreateRaw(char const *raw) {
     sbJSON *item = sbJSON_New_Item(&global_hooks);
     if (item) {
         item->type = sbJSON_Raw;
         item->u.valuestring =
-            (char *)sbJSON_strdup((const unsigned char *)raw, &global_hooks);
+            (char *)sbJSON_strdup((unsigned char const *)raw, &global_hooks);
         if (!item->u.valuestring) {
             sbJSON_Delete(item);
             return NULL;
@@ -2250,7 +2250,7 @@ sbJSON *sbJSON_CreateObject(void) {
 }
 
 /* Create Arrays: */
-sbJSON *sbJSON_CreateIntArray(const int *numbers, int count) {
+sbJSON *sbJSON_CreateIntArray(int const *numbers, int count) {
     size_t i = 0;
     sbJSON *n = NULL;
     sbJSON *p = NULL;
@@ -2283,7 +2283,7 @@ sbJSON *sbJSON_CreateIntArray(const int *numbers, int count) {
     return a;
 }
 
-sbJSON *sbJSON_CreateFloatArray(const float *numbers, int count) {
+sbJSON *sbJSON_CreateFloatArray(float const *numbers, int count) {
     size_t i = 0;
     sbJSON *n = NULL;
     sbJSON *p = NULL;
@@ -2316,7 +2316,7 @@ sbJSON *sbJSON_CreateFloatArray(const float *numbers, int count) {
     return a;
 }
 
-sbJSON *sbJSON_CreateDoubleArray(const double *numbers, int count) {
+sbJSON *sbJSON_CreateDoubleArray(double const *numbers, int count) {
     size_t i = 0;
     sbJSON *n = NULL;
     sbJSON *p = NULL;
@@ -2349,7 +2349,7 @@ sbJSON *sbJSON_CreateDoubleArray(const double *numbers, int count) {
     return a;
 }
 
-sbJSON *sbJSON_CreateStringArray(const char *const *strings, int count) {
+sbJSON *sbJSON_CreateStringArray(char const *const *strings, int count) {
     size_t i = 0;
     sbJSON *n = NULL;
     sbJSON *p = NULL;
@@ -2384,7 +2384,7 @@ sbJSON *sbJSON_CreateStringArray(const char *const *strings, int count) {
 
 /* Duplication */
 // TODO: This is missing regular tests (outside of the utils tests)
-sbJSON *sbJSON_Duplicate(const sbJSON *item, bool recurse) {
+sbJSON *sbJSON_Duplicate(sbJSON const *item, bool recurse) {
     sbJSON *newitem = NULL;
     sbJSON *child = NULL;
     sbJSON *next = NULL;
@@ -2547,7 +2547,7 @@ void sbJSON_Minify(char *json) {
     *into = '\0';
 }
 
-bool sbJSON_IsInvalid(const sbJSON *const item) {
+bool sbJSON_IsInvalid(sbJSON const *const item) {
     if (item == NULL) {
         return false;
     }
@@ -2555,7 +2555,7 @@ bool sbJSON_IsInvalid(const sbJSON *const item) {
     return item->type == sbJSON_Invalid;
 }
 
-bool sbJSON_IsFalse(const sbJSON *const item) {
+bool sbJSON_IsFalse(sbJSON const *const item) {
     if (item == NULL) {
         return false;
     }
@@ -2567,7 +2567,7 @@ bool sbJSON_IsFalse(const sbJSON *const item) {
     return !item->u.valuebool;
 }
 
-bool sbJSON_IsTrue(const sbJSON *const item) {
+bool sbJSON_IsTrue(sbJSON const *const item) {
     if (item == NULL) {
         return false;
     }
@@ -2579,7 +2579,7 @@ bool sbJSON_IsTrue(const sbJSON *const item) {
     return item->u.valuebool;
 }
 
-bool sbJSON_IsBool(const sbJSON *const item) {
+bool sbJSON_IsBool(sbJSON const *const item) {
     if (item == NULL) {
         return false;
     }
@@ -2587,7 +2587,7 @@ bool sbJSON_IsBool(const sbJSON *const item) {
     return item->type == sbJSON_Bool;
 }
 
-bool sbJSON_IsNull(const sbJSON *const item) {
+bool sbJSON_IsNull(sbJSON const *const item) {
     if (item == NULL) {
         return false;
     }
@@ -2595,7 +2595,7 @@ bool sbJSON_IsNull(const sbJSON *const item) {
     return item->type == sbJSON_Null;
 }
 
-bool sbJSON_IsNumber(const sbJSON *const item) {
+bool sbJSON_IsNumber(sbJSON const *const item) {
     if (item == NULL) {
         return false;
     }
@@ -2603,7 +2603,7 @@ bool sbJSON_IsNumber(const sbJSON *const item) {
     return item->type == sbJSON_Number;
 }
 
-bool sbJSON_IsString(const sbJSON *const item) {
+bool sbJSON_IsString(sbJSON const *const item) {
     if (item == NULL) {
         return false;
     }
@@ -2611,7 +2611,7 @@ bool sbJSON_IsString(const sbJSON *const item) {
     return item->type == sbJSON_String;
 }
 
-bool sbJSON_IsArray(const sbJSON *const item) {
+bool sbJSON_IsArray(sbJSON const *const item) {
     if (item == NULL) {
         return false;
     }
@@ -2619,7 +2619,7 @@ bool sbJSON_IsArray(const sbJSON *const item) {
     return item->type == sbJSON_Array;
 }
 
-bool sbJSON_IsObject(const sbJSON *const item) {
+bool sbJSON_IsObject(sbJSON const *const item) {
     if (item == NULL) {
         return false;
     }
@@ -2627,7 +2627,7 @@ bool sbJSON_IsObject(const sbJSON *const item) {
     return item->type == sbJSON_Object;
 }
 
-bool sbJSON_IsRaw(const sbJSON *const item) {
+bool sbJSON_IsRaw(sbJSON const *const item) {
     if (item == NULL) {
         return false;
     }
@@ -2639,7 +2639,7 @@ bool sbJSON_IsRaw(const sbJSON *const item) {
 // Duplicate keys make comparison impossible. Would need
 // keys to have an order as well. Starting to be ridiculous.
 // Duplicate keys should be opt-in and not parse by default (do they?).
-bool sbJSON_Compare(const sbJSON *const a, const sbJSON *const b) {
+bool sbJSON_Compare(sbJSON const *const a, sbJSON const *const b) {
     if (a == b) {
         return true;
     }
