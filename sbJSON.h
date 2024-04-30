@@ -162,8 +162,6 @@ bool sbj_is_raw(sbJSON const *const item);
 
 /* These calls create a sbJSON item of the appropriate type. */
 sbJSON *sbj_create_null(void);
-sbJSON *sbj_create_true(void);
-sbJSON *sbj_create_false(void);
 sbJSON *sbj_create_bool(bool boolean);
 sbJSON *sbj_create_double_number(double num);
 sbJSON *sbj_create_integer_number(int64_t num);

@@ -1851,7 +1851,7 @@ sbJSON *sbj_add_null_to_object(sbJSON *const object, char const *const name) {
 }
 
 sbJSON *sbj_add_true_to_object(sbJSON *const object, char const *const name) {
-    sbJSON *true_item = sbj_create_true();
+    sbJSON *true_item = sbj_create_bool(true);
     if (add_item_to_object(object, name, true_item, &global_hooks, false)) {
         return true_item;
     }
@@ -1861,7 +1861,7 @@ sbJSON *sbj_add_true_to_object(sbJSON *const object, char const *const name) {
 }
 
 sbJSON *sbj_add_false_to_object(sbJSON *const object, char const *const name) {
-    sbJSON *false_item = sbj_create_false();
+    sbJSON *false_item = sbj_create_bool(false);
     if (add_item_to_object(object, name, false_item, &global_hooks, false)) {
         return false_item;
     }
@@ -2111,26 +2111,6 @@ sbJSON *sbj_create_null(void) {
     sbJSON *item = sbJSON_New_Item(&global_hooks);
     if (item) {
         item->type = sbJSON_Null;
-    }
-
-    return item;
-}
-
-sbJSON *sbj_create_true(void) {
-    sbJSON *item = sbJSON_New_Item(&global_hooks);
-    if (item) {
-        item->type = sbJSON_Bool;
-        item->u.valuebool = true;
-    }
-
-    return item;
-}
-
-sbJSON *sbj_create_false(void) {
-    sbJSON *item = sbJSON_New_Item(&global_hooks);
-    if (item) {
-        item->type = sbJSON_Bool;
-        item->u.valuebool = false;
     }
 
     return item;

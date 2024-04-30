@@ -725,7 +725,7 @@ static void sbjson_set_bool_value_must_not_break_objects(void) {
 
     TEST_ASSERT_TRUE((sbj_set_bool_value(refobj, 1) == sbJSON_Invalid));
 
-    bobj = sbj_create_false();
+    bobj = sbj_create_bool(false);
     TEST_ASSERT_TRUE(!sbj_get_bool_value(bobj));
     TEST_ASSERT_TRUE((sbj_set_bool_value(bobj, 1)));
     TEST_ASSERT_TRUE(sbj_get_bool_value(bobj));
