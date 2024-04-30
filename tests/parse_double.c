@@ -64,8 +64,8 @@ static void parse_double() {
     TEST_ASSERT_TRUE(test_double("[2.2250738585072014e-308]", 2.2250738585072014e-308)); // Min normal positive double
     TEST_ASSERT_TRUE(test_double("[1.7976931348623157e+308]", 1.7976931348623157e+308)); // Max double
     TEST_ASSERT_TRUE(test_double("[1e-10000]", 0.0));                                   // must underflow
-    //TEST_ASSERT_TRUE(test_double("[18446744073709551616]", 18446744073709551616.0));    // 2^64 (max of uint64_t + 1, force to use double)
-    //TEST_ASSERT_TRUE(test_double("[-9223372036854775809]", -9223372036854775809.0));    // -2^63 - 1(min of int64_t + 1, force to use double)
+    TEST_ASSERT_TRUE(test_double("[18446744073709551616]", 18446744073709551616.0));    // 2^64 (max of uint64_t + 1, force to use double)
+    TEST_ASSERT_TRUE(test_double("[-9223372036854775809]", -9223372036854775809.0));    // -2^63 - 1(min of int64_t + 1, force to use double)
     TEST_ASSERT_TRUE(test_double("[0.9868011474609375]", 0.9868011474609375));          // https://github.com/miloyip/rapidjson/issues/120
     TEST_ASSERT_TRUE(test_double("[123e34]", 123e34));                                  // Fast Path Cases In Disguise
     TEST_ASSERT_TRUE(test_double("[45913141877270640000.0]", 45913141877270640000.0));

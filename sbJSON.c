@@ -288,6 +288,25 @@ loop_end:
 
     unsigned char *after_end = NULL;
 
+    if (!decimal_number) {
+        int64_t number =
+            strtoll((const char *)number_c_string, (char **)&after_end, 10);
+        if (number_c_string == after_end) {
+            return false; /* parse_error */
+        }
+
+        // TODO: When a number is exactly LLONG_MAX, it will be classified
+        // as a double which is a bug!
+        if (number == LLONG_MAX) {
+            // Number too large to be stored as an integer.
+            after_end = NULL;
+            decimal_number = true;
+        } else {
+            item->type = sbJSON_Number;
+            sbJSON_SetIntegerNumberValue(item, number);
+        }
+    }
+
     if (decimal_number) {
         double number =
             strtod((const char *)number_c_string, (char **)&after_end);
@@ -296,14 +315,6 @@ loop_end:
         }
         item->type = sbJSON_Number;
         sbJSON_SetDoubleNumberValue(item, number);
-    } else {
-        int64_t number =
-            strtoll((const char *)number_c_string, (char **)&after_end, 10);
-        if (number_c_string == after_end) {
-            return false; /* parse_error */
-        }
-        item->type = sbJSON_Number;
-        sbJSON_SetIntegerNumberValue(item, number);
     }
 
     input_buffer->offset += (size_t)(after_end - number_c_string);
