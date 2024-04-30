@@ -26,12 +26,12 @@ typedef struct SbJSON {
     bool is_number_double;
     int32_t child_count;
 
-    union U {
-        char *valuestring;
-        int64_t valueint;
-        double valuedouble;
-        bool valuebool;
-    } u;
+    union Value {
+        char *string_;
+        int64_t int_;
+        double double_;
+        bool bool_;
+    } value;
 
     char *string;
 } SbJSON;
@@ -68,6 +68,8 @@ SbJSON *sbj_create_object(char const* name);
 SbJSON *sbj_create_array(char const* name);
 
 void sbj_attach_item(SbJSON *object, char const* name, SbJSON *item);
+void sbj_detatch_item_by_pointer(SbJSON *object, SbJSON *item);
+bool sbj_try_detatch_item_by_name(SbJSON *object, char const* name);
 
 // returns the new item, attached to the object
 SbJSON *sbj_add_null(SbJSON *object, char const* name);
@@ -110,7 +112,7 @@ SbJSON *sbj_slow_get_array_item(SbJSON const *array, int index);
 
 // null on failure
 SbJSON *sbj_lookup(SbJSON const *object, char const* name);
-SbJSON *obj_lookup_kind(SbJSON const *object, char const* name, SbJSONKind kind);
+SbJSON *sbj_lookup_kind(SbJSON const *object, char const* name, SbJSONKind kind);
 
 bool sbj_get_boolean(SbJSON *item);
 int64_t sbj_get_integer(SbJSON *item);
