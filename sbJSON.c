@@ -1468,6 +1468,10 @@ static bool parse_object(sbJSON *const item, parse_buffer *const input_buffer) {
             current_item = new_item;
         }
 
+        if (input_buffer->offset+1 >= input_buffer->length) {
+            goto fail; /* nothing comes after the comma */
+        }
+
         /* parse the name of the child */
         input_buffer->offset++;
         buffer_skip_whitespace(input_buffer);
