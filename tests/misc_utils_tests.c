@@ -56,7 +56,7 @@ static void sbjson_utils_functions_shouldnt_crash_with_null_pointers(void) {
     TEST_ASSERT_NULL(sbJSONUtils_FindPointerFromObjectTo(NULL, item));
     sbJSONUtils_SortObject(NULL);
 
-    sbJSON_Delete(item);
+    sbj_delete(item);
 }
 
 int main(void) {

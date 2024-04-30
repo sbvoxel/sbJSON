@@ -29,7 +29,7 @@
 void reset(sbJSON *item);
 void reset(sbJSON *item) {
     if ((item != NULL) && (item->child != NULL)) {
-        sbJSON_Delete(item->child);
+        sbj_delete(item->child);
     }
 
     if (!item->is_reference && (item->type == sbJSON_String || item->type == sbJSON_Raw)) {

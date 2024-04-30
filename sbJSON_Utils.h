@@ -49,16 +49,16 @@ int sbJSONUtils_ApplyPatches(sbJSON *const object, const sbJSON *const patches);
 ApplyPatches, use:
 //int sbJSONUtils_AtomicApplyPatches(sbJSON **object, sbJSON *patches)
 //{
-//    sbJSON *modme = sbJSON_Duplicate(*object, 1);
+//    sbJSON *modme = sbj_duplicate(*object, 1);
 //    int error = sbJSONUtils_ApplyPatches(modme, patches);
 //    if (!error)
 //    {
-//        sbJSON_Delete(*object);
+//        sbj_delete(*object);
 //        *object = modme;
 //    }
 //    else
 //    {
-//        sbJSON_Delete(modme);
+//        sbj_delete(modme);
 //    }
 //
 //    return error;

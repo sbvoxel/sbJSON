@@ -63,35 +63,35 @@ static void json_pointer_tests(void) {
                        "\"m~n\": 8"
                        "}";
 
-    root = sbJSON_Parse(json);
+    root = sbj_parse(json);
 
     TEST_ASSERT_EQUAL_PTR(sbJSONUtils_GetPointer(root, ""), root);
     TEST_ASSERT_EQUAL_PTR(sbJSONUtils_GetPointer(root, "/foo"),
-                          sbJSON_GetObjectItem(root, "foo"));
+                          sbj_get_object_item(root, "foo"));
     TEST_ASSERT_EQUAL_PTR(sbJSONUtils_GetPointer(root, "/foo/0"),
-                          sbJSON_GetObjectItem(root, "foo")->child);
+                          sbj_get_object_item(root, "foo")->child);
     TEST_ASSERT_EQUAL_PTR(sbJSONUtils_GetPointer(root, "/foo/0"),
-                          sbJSON_GetObjectItem(root, "foo")->child);
+                          sbj_get_object_item(root, "foo")->child);
     TEST_ASSERT_EQUAL_PTR(sbJSONUtils_GetPointer(root, "/"),
-                          sbJSON_GetObjectItem(root, ""));
+                          sbj_get_object_item(root, ""));
     TEST_ASSERT_EQUAL_PTR(sbJSONUtils_GetPointer(root, "/a~1b"),
-                          sbJSON_GetObjectItem(root, "a/b"));
+                          sbj_get_object_item(root, "a/b"));
     TEST_ASSERT_EQUAL_PTR(sbJSONUtils_GetPointer(root, "/c%d"),
-                          sbJSON_GetObjectItem(root, "c%d"));
+                          sbj_get_object_item(root, "c%d"));
     TEST_ASSERT_EQUAL_PTR(sbJSONUtils_GetPointer(root, "/c^f"),
-                          sbJSON_GetObjectItem(root, "c^f"));
+                          sbj_get_object_item(root, "c^f"));
     TEST_ASSERT_EQUAL_PTR(sbJSONUtils_GetPointer(root, "/c|f"),
-                          sbJSON_GetObjectItem(root, "c|f"));
+                          sbj_get_object_item(root, "c|f"));
     TEST_ASSERT_EQUAL_PTR(sbJSONUtils_GetPointer(root, "/i\\j"),
-                          sbJSON_GetObjectItem(root, "i\\j"));
+                          sbj_get_object_item(root, "i\\j"));
     TEST_ASSERT_EQUAL_PTR(sbJSONUtils_GetPointer(root, "/k\"l"),
-                          sbJSON_GetObjectItem(root, "k\"l"));
+                          sbj_get_object_item(root, "k\"l"));
     TEST_ASSERT_EQUAL_PTR(sbJSONUtils_GetPointer(root, "/ "),
-                          sbJSON_GetObjectItem(root, " "));
+                          sbj_get_object_item(root, " "));
     TEST_ASSERT_EQUAL_PTR(sbJSONUtils_GetPointer(root, "/m~0n"),
-                          sbJSON_GetObjectItem(root, "m~n"));
+                          sbj_get_object_item(root, "m~n"));
 
-    sbJSON_Delete(root);
+    sbj_delete(root);
 }
 
 static void misc_tests(void) {
@@ -107,10 +107,10 @@ static void misc_tests(void) {
     char *pointer = NULL;
 
     printf("JSON Pointer construct\n");
-    object = sbJSON_CreateObject();
-    nums = sbJSON_CreateIntArray(numbers, 10);
-    num6 = sbJSON_GetArrayItem(nums, 6);
-    sbJSON_AddItemToObject(object, "numbers", nums);
+    object = sbj_create_object();
+    nums = sbj_create_int_array(numbers, 10);
+    num6 = sbj_get_array_item(nums, 6);
+    sbj_add_item_to_object(object, "numbers", nums);
 
     pointer = sbJSONUtils_FindPointerFromObjectTo(object, num6);
     TEST_ASSERT_EQUAL_STRING("/numbers/6", pointer);
@@ -124,23 +124,23 @@ static void misc_tests(void) {
     TEST_ASSERT_EQUAL_STRING("", pointer);
     free(pointer);
 
-    object1 = sbJSON_CreateObject();
+    object1 = sbj_create_object();
     object2 = sbJSON_CreateString("m~n");
-    sbJSON_AddItemToObject(object1, "m~n", object2);
+    sbj_add_item_to_object(object1, "m~n", object2);
     pointer = sbJSONUtils_FindPointerFromObjectTo(object1, object2);
     TEST_ASSERT_EQUAL_STRING("/m~0n", pointer);
     free(pointer);
 
-    object3 = sbJSON_CreateObject();
+    object3 = sbj_create_object();
     object4 = sbJSON_CreateString("m/n");
-    sbJSON_AddItemToObject(object3, "m/n", object4);
+    sbj_add_item_to_object(object3, "m/n", object4);
     pointer = sbJSONUtils_FindPointerFromObjectTo(object3, object4);
     TEST_ASSERT_EQUAL_STRING("/m~1n", pointer);
     free(pointer);
 
-    sbJSON_Delete(object);
-    sbJSON_Delete(object1);
-    sbJSON_Delete(object3);
+    sbj_delete(object);
+    sbj_delete(object1);
+    sbj_delete(object3);
 }
 
 static void sort_tests(void) {
@@ -152,10 +152,10 @@ static void sort_tests(void) {
     sbJSON *current_element = NULL;
 
     /* JSON Sort test: */
-    sortme = sbJSON_CreateObject();
+    sortme = sbj_create_object();
     for (i = 0; i < 26; i++) {
         buf[0] = random[i];
-        sbJSON_AddItemToObject(sortme, buf, sbJSON_CreateIntegerNumber(1));
+        sbj_add_item_to_object(sortme, buf, sbj_create_integer_number(1));
     }
 
     sbJSONUtils_SortObject(sortme);
@@ -170,7 +170,7 @@ static void sort_tests(void) {
         current_element = current_element->next;
     }
 
-    sbJSON_Delete(sortme);
+    sbj_delete(sortme);
 }
 
 static void merge_tests(void) {
@@ -181,17 +181,17 @@ static void merge_tests(void) {
     /* Merge tests: */
     printf("JSON Merge Patch tests\n");
     for (i = 0; i < 15; i++) {
-        sbJSON *object_to_be_merged = sbJSON_Parse(merges[i][0]);
-        sbJSON *patch = sbJSON_Parse(merges[i][1]);
-        patchtext = sbJSON_PrintUnformatted(patch);
+        sbJSON *object_to_be_merged = sbj_parse(merges[i][0]);
+        sbJSON *patch = sbj_parse(merges[i][1]);
+        patchtext = sbj_print_unformatted(patch);
         object_to_be_merged = sbJSONUtils_MergePatch(object_to_be_merged, patch);
-        after = sbJSON_PrintUnformatted(object_to_be_merged);
+        after = sbj_print_unformatted(object_to_be_merged);
         TEST_ASSERT_EQUAL_STRING(merges[i][2], after);
 
         free(patchtext);
         free(after);
-        sbJSON_Delete(object_to_be_merged);
-        sbJSON_Delete(patch);
+        sbj_delete(object_to_be_merged);
+        sbj_delete(patch);
     }
 }
 
@@ -201,16 +201,16 @@ static void generate_merge_tests(void) {
 
     /* Generate Merge tests: */
     for (i = 0; i < 15; i++) {
-        sbJSON *from = sbJSON_Parse(merges[i][0]);
-        sbJSON *to = sbJSON_Parse(merges[i][2]);
+        sbJSON *from = sbj_parse(merges[i][0]);
+        sbJSON *to = sbj_parse(merges[i][2]);
         sbJSON *patch = sbJSONUtils_GenerateMergePatch(from, to);
         from = sbJSONUtils_MergePatch(from, patch);
-        patchedtext = sbJSON_PrintUnformatted(from);
+        patchedtext = sbj_print_unformatted(from);
         TEST_ASSERT_EQUAL_STRING(merges[i][2], patchedtext);
 
-        sbJSON_Delete(from);
-        sbJSON_Delete(to);
-        sbJSON_Delete(patch);
+        sbj_delete(from);
+        sbj_delete(to);
+        sbj_delete(patch);
         free(patchedtext);
     }
 }

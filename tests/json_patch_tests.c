@@ -36,9 +36,9 @@ static sbJSON *parse_test_file(const char *const filename) {
     file = read_file(filename);
     TEST_ASSERT_NOT_NULL_MESSAGE(file, "Failed to read file.");
 
-    json = sbJSON_Parse(file);
+    json = sbj_parse(file);
     TEST_ASSERT_NOT_NULL_MESSAGE(json, "Failed to parse test json.");
-    TEST_ASSERT_TRUE_MESSAGE(sbJSON_IsArray(json), "Json is not an array.");
+    TEST_ASSERT_TRUE_MESSAGE(sbj_is_array(json), "Json is not an array.");
 
     free(file);
 
@@ -57,29 +57,29 @@ static bool test_apply_patch(const sbJSON *const test) {
     bool successful = false;
 
     /* extract all the data out of the test */
-    comment = sbJSON_GetObjectItem(test, "comment");
-    if (sbJSON_IsString(comment)) {
+    comment = sbj_get_object_item(test, "comment");
+    if (sbj_is_string(comment)) {
         printf("Testing \"%s\"\n", comment->u.valuestring);
     } else {
         printf("Testing unknown\n");
     }
 
-    disabled = sbJSON_GetObjectItem(test, "disabled");
-    if (sbJSON_IsTrue(disabled)) {
+    disabled = sbj_get_object_item(test, "disabled");
+    if (sbj_is_true(disabled)) {
         printf("SKIPPED\n");
         return true;
     }
 
-    doc = sbJSON_GetObjectItem(test, "doc");
+    doc = sbj_get_object_item(test, "doc");
     TEST_ASSERT_NOT_NULL_MESSAGE(doc, "No \"doc\" in the test.");
-    patch = sbJSON_GetObjectItem(test, "patch");
+    patch = sbj_get_object_item(test, "patch");
     TEST_ASSERT_NOT_NULL_MESSAGE(patch, "No \"patch\"in the test.");
     /* Make a working copy of 'doc' */
-    object = sbJSON_Duplicate(doc, true);
+    object = sbj_duplicate(doc, true);
     TEST_ASSERT_NOT_NULL(object);
 
-    expected = sbJSON_GetObjectItem(test, "expected");
-    error_element = sbJSON_GetObjectItem(test, "error");
+    expected = sbj_get_object_item(test, "expected");
+    error_element = sbj_get_object_item(test, "error");
     if (error_element != NULL) {
         /* excepting an error */
         TEST_ASSERT_TRUE_MESSAGE(
@@ -95,11 +95,11 @@ static bool test_apply_patch(const sbJSON *const test) {
         successful = true;
 
         if (expected != NULL) {
-            successful = sbJSON_Compare(object, expected);
+            successful = sbj_compare(object, expected);
         }
     }
 
-    sbJSON_Delete(object);
+    sbj_delete(object);
 
     if (successful) {
         printf("OK\n");
@@ -121,22 +121,22 @@ static bool test_generate_test(sbJSON *test) {
 
     char *printed_patch = NULL;
 
-    disabled = sbJSON_GetObjectItem(test, "disabled");
-    if (sbJSON_IsTrue(disabled)) {
+    disabled = sbj_get_object_item(test, "disabled");
+    if (sbj_is_true(disabled)) {
         printf("SKIPPED\n");
         return true;
     }
 
-    doc = sbJSON_GetObjectItem(test, "doc");
+    doc = sbj_get_object_item(test, "doc");
     TEST_ASSERT_NOT_NULL_MESSAGE(doc, "No \"doc\" in the test.");
 
     /* Make a working copy of 'doc' */
-    object = sbJSON_Duplicate(doc, true);
+    object = sbj_duplicate(doc, true);
     TEST_ASSERT_NOT_NULL(object);
 
-    expected = sbJSON_GetObjectItem(test, "expected");
+    expected = sbj_get_object_item(test, "expected");
     if (expected == NULL) {
-        sbJSON_Delete(object);
+        sbj_delete(object);
         /* if there is no expected output, this test doesn't make sense */
         return true;
     }
@@ -144,7 +144,7 @@ static bool test_generate_test(sbJSON *test) {
     patch = sbJSONUtils_GeneratePatches(doc, expected);
     TEST_ASSERT_NOT_NULL_MESSAGE(patch, "Failed to generate patches.");
 
-    printed_patch = sbJSON_Print(patch);
+    printed_patch = sbj_print(patch);
     printf("%s\n", printed_patch);
     free(printed_patch);
 
@@ -153,10 +153,10 @@ static bool test_generate_test(sbJSON *test) {
         0, sbJSONUtils_ApplyPatches(object, patch),
         "Failed to apply generated patch.");
 
-    successful = sbJSON_Compare(object, expected);
+    successful = sbj_compare(object, expected);
 
-    sbJSON_Delete(patch);
-    sbJSON_Delete(object);
+    sbj_delete(patch);
+    sbj_delete(object);
 
     if (successful) {
         printf("generated patch: OK\n");
@@ -177,7 +177,7 @@ static void sbjson_utils_should_pass_json_patch_test_tests(void) {
         failed |= !test_generate_test(test);
     }
 
-    sbJSON_Delete(tests);
+    sbj_delete(tests);
 
     TEST_ASSERT_FALSE_MESSAGE(failed, "Some tests failed.");
 }
@@ -192,7 +192,7 @@ static void sbjson_utils_should_pass_json_patch_test_spec_tests(void) {
         failed |= !test_generate_test(test);
     }
 
-    sbJSON_Delete(tests);
+    sbj_delete(tests);
 
     TEST_ASSERT_FALSE_MESSAGE(failed, "Some tests failed.");
 }
@@ -207,7 +207,7 @@ static void sbjson_utils_should_pass_json_patch_test_sbjson_utils_tests(void) {
         failed |= !test_generate_test(test);
     }
 
-    sbJSON_Delete(tests);
+    sbj_delete(tests);
 
     TEST_ASSERT_FALSE_MESSAGE(failed, "Some tests failed.");
 }

@@ -48,7 +48,7 @@ static int print_preallocated(sbJSON *root) {
     size_t len_fail = 0;
 
     /* formatted print */
-    out = sbJSON_Print(root);
+    out = sbj_print(root);
 
     /* create buffer to succeed */
     /* the extra 5 bytes are because of inaccuracies when reserving memory */
@@ -68,12 +68,12 @@ static int print_preallocated(sbJSON *root) {
     }
 
     /* Print to buffer */
-    if (!sbJSON_PrintPreallocated(root, buf, (int)len, 1)) {
-        printf("sbJSON_PrintPreallocated failed!\n");
+    if (!sbj_print_preallocated(root, buf, (int)len, 1)) {
+        printf("sbj_print_preallocated failed!\n");
         if (strcmp(out, buf) != 0) {
-            printf("sbJSON_PrintPreallocated not the same as sbJSON_Print!\n");
-            printf("sbJSON_Print result:\n%s\n", out);
-            printf("sbJSON_PrintPreallocated result:\n%s\n", buf);
+            printf("sbj_print_preallocated not the same as sbj_print!\n");
+            printf("sbj_print result:\n%s\n", out);
+            printf("sbj_print_preallocated result:\n%s\n", buf);
         }
         free(out);
         free(buf_fail);
@@ -85,11 +85,11 @@ static int print_preallocated(sbJSON *root) {
     printf("%s\n", buf);
 
     /* force it to fail */
-    if (sbJSON_PrintPreallocated(root, buf_fail, (int)len_fail, 1)) {
-        printf("sbJSON_PrintPreallocated failed to show error with insufficient "
+    if (sbj_print_preallocated(root, buf_fail, (int)len_fail, 1)) {
+        printf("sbj_print_preallocated failed to show error with insufficient "
                "memory!\n");
-        printf("sbJSON_Print result:\n%s\n", out);
-        printf("sbJSON_PrintPreallocated result:\n%s\n", buf_fail);
+        printf("sbj_print result:\n%s\n", out);
+        printf("sbj_print_preallocated result:\n%s\n", buf_fail);
         free(out);
         free(buf_fail);
         free(buf);
@@ -129,96 +129,96 @@ static void create_objects(void) {
     /* Here we construct some JSON standards, from the JSON site. */
 
     /* Our "Video" datatype: */
-    root = sbJSON_CreateObject();
-    sbJSON_AddItemToObject(root, "name",
+    root = sbj_create_object();
+    sbj_add_item_to_object(root, "name",
                           sbJSON_CreateString("Jack (\"Bee\") Nimble"));
-    sbJSON_AddItemToObject(root, "format", fmt = sbJSON_CreateObject());
-    sbJSON_AddStringToObject(fmt, "type", "rect");
-    sbJSON_AddIntegerNumberToObject(fmt, "width", 1920);
-    sbJSON_AddIntegerNumberToObject(fmt, "height", 1080);
-    sbJSON_AddFalseToObject(fmt, "interlace");
-    sbJSON_AddIntegerNumberToObject(fmt, "frame rate", 24);
+    sbj_add_item_to_object(root, "format", fmt = sbj_create_object());
+    sbj_add_string_to_object(fmt, "type", "rect");
+    sbj_add_integer_number_to_object(fmt, "width", 1920);
+    sbj_add_integer_number_to_object(fmt, "height", 1080);
+    sbj_add_false_to_object(fmt, "interlace");
+    sbj_add_integer_number_to_object(fmt, "frame rate", 24);
 
     /* Print to text */
     if (print_preallocated(root) != 0) {
-        sbJSON_Delete(root);
+        sbj_delete(root);
         exit(EXIT_FAILURE);
     }
-    sbJSON_Delete(root);
+    sbj_delete(root);
 
     /* Our "days of the week" array: */
-    root = sbJSON_CreateStringArray(strings, 7);
+    root = sbj_create_string_array(strings, 7);
 
     if (print_preallocated(root) != 0) {
-        sbJSON_Delete(root);
+        sbj_delete(root);
         exit(EXIT_FAILURE);
     }
-    sbJSON_Delete(root);
+    sbj_delete(root);
 
     /* Our matrix: */
-    root = sbJSON_CreateArray();
+    root = sbj_create_array();
     for (i = 0; i < 3; i++) {
-        sbJSON_AddItemToArray(root, sbJSON_CreateIntArray(numbers[i], 3));
+        sbj_add_item_to_array(root, sbj_create_int_array(numbers[i], 3));
     }
 
-    /* sbJSON_ReplaceItemInArray(root, 1, sbJSON_CreateString("Replacement")); */
+    /* sbj_replace_item_in_array(root, 1, sbJSON_CreateString("Replacement")); */
 
     if (print_preallocated(root) != 0) {
-        sbJSON_Delete(root);
+        sbj_delete(root);
         exit(EXIT_FAILURE);
     }
-    sbJSON_Delete(root);
+    sbj_delete(root);
 
     /* Our "gallery" item: */
-    root = sbJSON_CreateObject();
-    sbJSON_AddItemToObject(root, "Image", img = sbJSON_CreateObject());
-    sbJSON_AddIntegerNumberToObject(img, "Width", 800);
-    sbJSON_AddIntegerNumberToObject(img, "Height", 600);
-    sbJSON_AddStringToObject(img, "Title", "View from 15th Floor");
-    sbJSON_AddItemToObject(img, "Thumbnail", thm = sbJSON_CreateObject());
-    sbJSON_AddStringToObject(thm, "Url",
+    root = sbj_create_object();
+    sbj_add_item_to_object(root, "Image", img = sbj_create_object());
+    sbj_add_integer_number_to_object(img, "Width", 800);
+    sbj_add_integer_number_to_object(img, "Height", 600);
+    sbj_add_string_to_object(img, "Title", "View from 15th Floor");
+    sbj_add_item_to_object(img, "Thumbnail", thm = sbj_create_object());
+    sbj_add_string_to_object(thm, "Url",
                             "http:/*www.example.com/image/481989943");
-    sbJSON_AddIntegerNumberToObject(thm, "Height", 125);
-    sbJSON_AddStringToObject(thm, "Width", "100");
-    sbJSON_AddItemToObject(img, "IDs", sbJSON_CreateIntArray(ids, 4));
+    sbj_add_integer_number_to_object(thm, "Height", 125);
+    sbj_add_string_to_object(thm, "Width", "100");
+    sbj_add_item_to_object(img, "IDs", sbj_create_int_array(ids, 4));
 
     if (print_preallocated(root) != 0) {
-        sbJSON_Delete(root);
+        sbj_delete(root);
         exit(EXIT_FAILURE);
     }
-    sbJSON_Delete(root);
+    sbj_delete(root);
 
     /* Our array of "records": */
-    root = sbJSON_CreateArray();
+    root = sbj_create_array();
     for (i = 0; i < 2; i++) {
-        sbJSON_AddItemToArray(root, fld = sbJSON_CreateObject());
-        sbJSON_AddStringToObject(fld, "precision", fields[i].precision);
-        sbJSON_AddDoubleNumberToObject(fld, "Latitude", fields[i].lat);
-        sbJSON_AddDoubleNumberToObject(fld, "Longitude", fields[i].lon);
-        sbJSON_AddStringToObject(fld, "Address", fields[i].address);
-        sbJSON_AddStringToObject(fld, "City", fields[i].city);
-        sbJSON_AddStringToObject(fld, "State", fields[i].state);
-        sbJSON_AddStringToObject(fld, "Zip", fields[i].zip);
-        sbJSON_AddStringToObject(fld, "Country", fields[i].country);
+        sbj_add_item_to_array(root, fld = sbj_create_object());
+        sbj_add_string_to_object(fld, "precision", fields[i].precision);
+        sbj_add_double_number_to_object(fld, "Latitude", fields[i].lat);
+        sbj_add_double_number_to_object(fld, "Longitude", fields[i].lon);
+        sbj_add_string_to_object(fld, "Address", fields[i].address);
+        sbj_add_string_to_object(fld, "City", fields[i].city);
+        sbj_add_string_to_object(fld, "State", fields[i].state);
+        sbj_add_string_to_object(fld, "Zip", fields[i].zip);
+        sbj_add_string_to_object(fld, "Country", fields[i].country);
     }
 
-    /* sbJSON_ReplaceItemInObject(sbJSON_GetArrayItem(root, 1), "City",
-     * sbJSON_CreateIntArray(ids, 4)); */
+    /* sbj_replace_item_in_object(sbj_get_array_item(root, 1), "City",
+     * sbj_create_int_array(ids, 4)); */
 
     if (print_preallocated(root) != 0) {
-        sbJSON_Delete(root);
+        sbj_delete(root);
         exit(EXIT_FAILURE);
     }
-    sbJSON_Delete(root);
+    sbj_delete(root);
 
-    root = sbJSON_CreateObject();
-    sbJSON_AddDoubleNumberToObject(root, "number", 1.0 / zero);
+    root = sbj_create_object();
+    sbj_add_double_number_to_object(root, "number", 1.0 / zero);
 
     if (print_preallocated(root) != 0) {
-        sbJSON_Delete(root);
+        sbj_delete(root);
         exit(EXIT_FAILURE);
     }
-    sbJSON_Delete(root);
+    sbj_delete(root);
 }
 
 int main(void) {

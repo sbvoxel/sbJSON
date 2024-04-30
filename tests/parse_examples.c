@@ -32,7 +32,7 @@ static sbJSON *parse_file(const char *filename) {
     sbJSON *parsed = NULL;
     char *content = read_file(filename);
 
-    parsed = sbJSON_Parse(content);
+    parsed = sbj_parse(content);
 
     if (content != NULL) {
         free(content);
@@ -77,7 +77,7 @@ static void do_test(const char *test_name) {
     TEST_ASSERT_NOT_NULL_MESSAGE(tree, "Failed to read of parse test.");
 
     /* print the parsed tree */
-    actual = sbJSON_Print(tree);
+    actual = sbj_print(tree);
     TEST_ASSERT_NOT_NULL_MESSAGE(actual, "Failed to print tree back to JSON.");
 
     TEST_ASSERT_EQUAL_STRING(expected, actual);
@@ -87,7 +87,7 @@ static void do_test(const char *test_name) {
         free(expected);
     }
     if (tree != NULL) {
-        sbJSON_Delete(tree);
+        sbj_delete(tree);
     }
     if (actual != NULL) {
         free(actual);
@@ -117,7 +117,7 @@ static void file_test6_should_not_be_parsed(void) {
     test6 = read_file("inputs/test6");
     TEST_ASSERT_NOT_NULL_MESSAGE(test6, "Failed to read test6 data.");
 
-    tree = sbJSON_Parse(test6);
+    tree = sbj_parse(test6);
     TEST_ASSERT_NULL_MESSAGE(tree, "Should fail to parse what is not JSON.");
 
     TEST_ASSERT_EQUAL_PTR_MESSAGE(test6, sbJSON_GetErrorPtr(),
@@ -127,7 +127,7 @@ static void file_test6_should_not_be_parsed(void) {
         free(test6);
     }
     if (tree != NULL) {
-        sbJSON_Delete(tree);
+        sbj_delete(tree);
     }
 }
 
@@ -149,14 +149,14 @@ static void test12_should_not_be_parsed(void) {
     const char *test12 = "{ \"name\": ";
     sbJSON *tree = NULL;
 
-    tree = sbJSON_Parse(test12);
+    tree = sbj_parse(test12);
     TEST_ASSERT_NULL_MESSAGE(tree, "Should fail to parse incomplete JSON.");
 
     TEST_ASSERT_EQUAL_PTR_MESSAGE(test12 + strlen(test12), sbJSON_GetErrorPtr(),
                                   "Error pointer is incorrect.");
 
     if (tree != NULL) {
-        sbJSON_Delete(tree);
+        sbj_delete(tree);
     }
 }
 
@@ -179,11 +179,11 @@ static void test13_should_be_parsed_without_null_termination(void) {
     char test_13_wo_null[sizeof(test_13) - 1];
     memcpy(test_13_wo_null, test_13, sizeof(test_13) - 1);
 
-    tree = sbJSON_ParseWithLength(test_13_wo_null, sizeof(test_13) - 1);
+    tree = sbj_parse_with_length(test_13_wo_null, sizeof(test_13) - 1);
     TEST_ASSERT_NOT_NULL_MESSAGE(tree, "Failed to parse valid json.");
 
     if (tree != NULL) {
-        sbJSON_Delete(tree);
+        sbj_delete(tree);
     }
 }
 
@@ -204,10 +204,10 @@ static void test15_should_not_heap_buffer_overflow(void) {
         }
 
         memcpy(exact_size_heap, json_string, len);
-        sbJSON *json = sbJSON_ParseWithLength(exact_size_heap, len);
+        sbJSON *json = sbj_parse_with_length(exact_size_heap, len);
 
         if (json) {
-            sbJSON_Delete(json);
+            sbj_delete(json);
         }
 
         free(exact_size_heap);
@@ -230,12 +230,12 @@ static void test14_should_not_be_parsed(void) {
                            "}"
                            "}";
 
-    tree = sbJSON_ParseWithLength(test_14, sizeof(test_14) - 2);
+    tree = sbj_parse_with_length(test_14, sizeof(test_14) - 2);
     TEST_ASSERT_NULL_MESSAGE(
         tree, "Should not continue after buffer_length is reached.");
 
     if (tree != NULL) {
-        sbJSON_Delete(tree);
+        sbj_delete(tree);
     }
 }
 

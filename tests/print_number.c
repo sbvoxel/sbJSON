@@ -47,9 +47,9 @@ static void assert_print_number(const char *expected, bool is_double, double dou
     item->type = sbJSON_Number;
 
     if (is_double) {
-        sbJSON_SetDoubleNumberValue(item, double_input);
+        sbj_set_double_number_value(item, double_input);
     } else {
-        sbJSON_SetIntegerNumberValue(item, integer_input);
+        sbj_set_integer_number_value(item, integer_input);
     }
 
     TEST_ASSERT_TRUE_MESSAGE(print_number(item, &buffer),

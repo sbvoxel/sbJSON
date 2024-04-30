@@ -13,17 +13,17 @@ static bool bitcompare_double(double a, double b) {
 }
 
 static bool test_double(char const* str, double expected) {
-    sbJSON *json = sbJSON_Parse(str);
+    sbJSON *json = sbj_parse(str);
 
     if (!json) {
         return false;
     }
 
-    if (!sbJSON_IsArray(json)) {
+    if (!sbj_is_array(json)) {
         return false;
     }
 
-    if (!sbJSON_IsNumber(json->child)) {
+    if (!sbj_is_number(json->child)) {
         return false;
     }
 

@@ -29,21 +29,21 @@ static bool compare_from_string(const char *const a, const char *const b) {
     sbJSON *b_json = NULL;
     bool result = false;
 
-    a_json = sbJSON_Parse(a);
+    a_json = sbj_parse(a);
     TEST_ASSERT_NOT_NULL_MESSAGE(a_json, "Failed to parse a.");
-    b_json = sbJSON_Parse(b);
+    b_json = sbj_parse(b);
     TEST_ASSERT_NOT_NULL_MESSAGE(b_json, "Failed to parse b.");
 
-    result = sbJSON_Compare(a_json, b_json);
+    result = sbj_compare(a_json, b_json);
 
-    sbJSON_Delete(a_json);
-    sbJSON_Delete(b_json);
+    sbj_delete(a_json);
+    sbj_delete(b_json);
 
     return result;
 }
 
 static void sbjson_compare_should_compare_null_pointer_as_equal(void) {
-    TEST_ASSERT_TRUE(sbJSON_Compare(NULL, NULL));
+    TEST_ASSERT_TRUE(sbj_compare(NULL, NULL));
 }
 
 static void sbjson_compare_should_compare_invalid_as_equal(void) {
@@ -52,8 +52,8 @@ static void sbjson_compare_should_compare_invalid_as_equal(void) {
     memset(&invalid1, '\0', sizeof(invalid1));
     memset(&invalid2, '\0', sizeof(invalid2));
 
-    TEST_ASSERT_TRUE(sbJSON_Compare(&invalid1, &invalid1));
-    TEST_ASSERT_TRUE(sbJSON_Compare(&invalid1, &invalid2));
+    TEST_ASSERT_TRUE(sbj_compare(&invalid1, &invalid1));
+    TEST_ASSERT_TRUE(sbj_compare(&invalid1, &invalid2));
 }
 
 static void sbjson_compare_should_compare_numbers(void) {
@@ -92,18 +92,18 @@ static void sbjson_compare_should_compare_raw(void) {
     sbJSON *raw1 = NULL;
     sbJSON *raw2 = NULL;
 
-    raw1 = sbJSON_Parse("\"[true, false]\"");
+    raw1 = sbj_parse("\"[true, false]\"");
     TEST_ASSERT_NOT_NULL(raw1);
-    raw2 = sbJSON_Parse("\"[true, false]\"");
+    raw2 = sbj_parse("\"[true, false]\"");
     TEST_ASSERT_NOT_NULL(raw2);
 
     raw1->type = sbJSON_Raw;
     raw2->type = sbJSON_Raw;
 
-    TEST_ASSERT_TRUE(sbJSON_Compare(raw1, raw2));
+    TEST_ASSERT_TRUE(sbj_compare(raw1, raw2));
 
-    sbJSON_Delete(raw1);
-    sbJSON_Delete(raw2);
+    sbj_delete(raw1);
+    sbj_delete(raw2);
 }
 
 static void sbjson_compare_should_compare_arrays(void) {

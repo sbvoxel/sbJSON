@@ -155,7 +155,7 @@ char *sbJSONUtils_FindPointerFromObjectTo(const sbJSON *const object,
                                                                  target);
         /* found the target? */
         if (target_pointer != NULL) {
-            if (sbJSON_IsArray(object)) {
+            if (sbj_is_array(object)) {
                 /* reserve enough memory for a 64 bit integer + '/' and '\0' */
                 unsigned char *full_pointer = (unsigned char *)sbJSON_malloc(
                     strlen((char *)target_pointer) + 20 + sizeof("/"));
@@ -176,7 +176,7 @@ char *sbJSONUtils_FindPointerFromObjectTo(const sbJSON *const object,
                 return (char *)full_pointer;
             }
 
-            if (sbJSON_IsObject(object)) {
+            if (sbj_is_object(object)) {
                 unsigned char *full_pointer = (unsigned char *)sbJSON_malloc(
                     strlen((char *)target_pointer) +
                     pointer_encoded_length(
@@ -201,7 +201,7 @@ char *sbJSONUtils_FindPointerFromObjectTo(const sbJSON *const object,
     return NULL;
 }
 
-/* non broken version of sbJSON_GetArrayItem */
+/* non broken version of sbj_get_array_item */
 static sbJSON *get_array_item(const sbJSON *array, size_t item) {
     sbJSON *child = array ? array->child : NULL;
     while ((child != NULL) && (item > 0)) {
@@ -246,7 +246,7 @@ static sbJSON *get_item_from_pointer(sbJSON *const object, const char *pointer) 
     /* follow path of the pointer */
     while ((pointer[0] == '/') && (current_element != NULL)) {
         pointer++;
-        if (sbJSON_IsArray(current_element)) {
+        if (sbj_is_array(current_element)) {
             size_t index = 0;
             if (!decode_array_index_from_pointer((const unsigned char *)pointer,
                                                  &index)) {
@@ -254,7 +254,7 @@ static sbJSON *get_item_from_pointer(sbJSON *const object, const char *pointer) 
             }
 
             current_element = get_array_item(current_element, index);
-        } else if (sbJSON_IsObject(current_element)) {
+        } else if (sbj_is_object(current_element)) {
             current_element = current_element->child;
             /* GetObjectItem. */
             while ((current_element != NULL) &&
@@ -305,7 +305,7 @@ static void decode_pointer_inplace(unsigned char *string) {
     decoded_string[0] = '\0';
 }
 
-/* non-broken sbJSON_DetachItemFromArray */
+/* non-broken sbj_detach_item_from_array */
 static sbJSON *detach_item_from_array(sbJSON *array, size_t which) {
     sbJSON *c = array->child;
     while (c && (which > 0)) {
@@ -360,15 +360,15 @@ static sbJSON *detach_path(sbJSON *object, const unsigned char *path) {
         get_item_from_pointer(object, (char *)parent_pointer);
     decode_pointer_inplace(child_pointer);
 
-    if (sbJSON_IsArray(parent)) {
+    if (sbj_is_array(parent)) {
         size_t index = 0;
         if (!decode_array_index_from_pointer(child_pointer, &index)) {
             goto cleanup;
         }
         detached_item = detach_item_from_array(parent, index);
-    } else if (sbJSON_IsObject(parent)) {
+    } else if (sbj_is_object(parent)) {
         detached_item =
-            sbJSON_DetachItemFromObject(parent, (char *)child_pointer);
+            sbj_detach_item_from_object(parent, (char *)child_pointer);
     } else {
         /* Couldn't find object to remove child from. */
         goto cleanup;
@@ -561,7 +561,7 @@ static bool compare_json(sbJSON *a, sbJSON *b) {
     return true;
 }
 
-/* non broken version of sbJSON_InsertItemInArray */
+/* non broken version of sbj_insert_item_in_array */
 static bool insert_item_in_array(sbJSON *array, size_t which, sbJSON *newitem) {
     sbJSON *child = array->child;
     while (child && (which > 0)) {
@@ -573,7 +573,7 @@ static bool insert_item_in_array(sbJSON *array, size_t which, sbJSON *newitem) {
         return 0;
     }
     if (child == NULL) {
-        sbJSON_AddItemToArray(array, newitem);
+        sbj_add_item_to_array(array, newitem);
         return 1;
     }
 
@@ -593,14 +593,14 @@ static bool insert_item_in_array(sbJSON *array, size_t which, sbJSON *newitem) {
 }
 
 static sbJSON *get_object_item(const sbJSON *const object, const char *name) {
-    return sbJSON_GetObjectItem(object, name);
+    return sbj_get_object_item(object, name);
 }
 
 enum patch_operation { INVALID, ADD, REMOVE, REPLACE, MOVE, COPY, TEST };
 
 static enum patch_operation decode_patch_operation(const sbJSON *const patch) {
     sbJSON *operation = get_object_item(patch, "op");
-    if (!sbJSON_IsString(operation)) {
+    if (!sbj_is_string(operation)) {
         return INVALID;
     }
 
@@ -644,7 +644,7 @@ static void overwrite_item(sbJSON *const root, const sbJSON replacement) {
         sbJSON_free(root->u.valuestring);
     }
     if (root->child != NULL) {
-        sbJSON_Delete(root->child);
+        sbj_delete(root->child);
     }
 
     memcpy(root, &replacement, sizeof(sbJSON));
@@ -660,7 +660,7 @@ static int apply_patch(sbJSON *object, const sbJSON *patch) {
     int status = 0;
 
     path = get_object_item(patch, "path");
-    if (!sbJSON_IsString(path)) {
+    if (!sbj_is_string(path)) {
         /* malformed patch. */
         status = 2;
         goto cleanup;
@@ -698,7 +698,7 @@ static int apply_patch(sbJSON *object, const sbJSON *patch) {
                 goto cleanup;
             }
 
-            value = sbJSON_Duplicate(value, 1);
+            value = sbj_duplicate(value, 1);
             if (value == NULL) {
                 /* out of memory for add/replace. */
                 status = 8;
@@ -730,7 +730,7 @@ static int apply_patch(sbJSON *object, const sbJSON *patch) {
             status = 13;
             goto cleanup;
         }
-        sbJSON_Delete(old_item);
+        sbj_delete(old_item);
         if (opcode == REMOVE) {
             /* For Remove, this job is done. */
             status = 0;
@@ -759,7 +759,7 @@ static int apply_patch(sbJSON *object, const sbJSON *patch) {
             goto cleanup;
         }
         if (opcode == COPY) {
-            value = sbJSON_Duplicate(value, 1);
+            value = sbj_duplicate(value, 1);
         }
         if (value == NULL) {
             /* out of memory for copy/move. */
@@ -774,7 +774,7 @@ static int apply_patch(sbJSON *object, const sbJSON *patch) {
             status = 7;
             goto cleanup;
         }
-        value = sbJSON_Duplicate(value, 1);
+        value = sbj_duplicate(value, 1);
         if (value == NULL) {
             /* out of memory for add/replace. */
             status = 8;
@@ -802,9 +802,9 @@ static int apply_patch(sbJSON *object, const sbJSON *patch) {
         /* Couldn't find object to add to. */
         status = 9;
         goto cleanup;
-    } else if (sbJSON_IsArray(parent)) {
+    } else if (sbj_is_array(parent)) {
         if (strcmp((char *)child_pointer, "-") == 0) {
-            sbJSON_AddItemToArray(parent, value);
+            sbj_add_item_to_array(parent, value);
             value = NULL;
         } else {
             size_t index = 0;
@@ -819,9 +819,9 @@ static int apply_patch(sbJSON *object, const sbJSON *patch) {
             }
             value = NULL;
         }
-    } else if (sbJSON_IsObject(parent)) {
-        sbJSON_DeleteItemFromObject(parent, (char *)child_pointer);
-        sbJSON_AddItemToObject(parent, (char *)child_pointer, value);
+    } else if (sbj_is_object(parent)) {
+        sbj_delete_item_from_object(parent, (char *)child_pointer);
+        sbj_add_item_to_object(parent, (char *)child_pointer, value);
         value = NULL;
     } else /* parent is not an object */
     {
@@ -832,7 +832,7 @@ static int apply_patch(sbJSON *object, const sbJSON *patch) {
 
 cleanup:
     if (value != NULL) {
-        sbJSON_Delete(value);
+        sbj_delete(value);
     }
     if (parent_pointer != NULL) {
         sbJSON_free(parent_pointer);
@@ -846,7 +846,7 @@ int sbJSONUtils_ApplyPatches(sbJSON *const object,
     const sbJSON *current_patch = NULL;
     int status = 0;
 
-    if (!sbJSON_IsArray(patches)) {
+    if (!sbj_is_array(patches)) {
         /* malformed patches. */
         return 1;
     }
@@ -877,15 +877,15 @@ static void compose_patch(sbJSON *const patches,
         return;
     }
 
-    patch = sbJSON_CreateObject();
+    patch = sbj_create_object();
     if (patch == NULL) {
         return;
     }
-    sbJSON_AddItemToObject(patch, "op",
+    sbj_add_item_to_object(patch, "op",
                            sbJSON_CreateString((const char *)operation));
 
     if (suffix == NULL) {
-        sbJSON_AddItemToObject(patch, "path",
+        sbj_add_item_to_object(patch, "path",
                                sbJSON_CreateString((const char *)path));
     } else {
         size_t suffix_length = pointer_encoded_length(suffix);
@@ -896,15 +896,15 @@ static void compose_patch(sbJSON *const patches,
         sprintf((char *)full_path, "%s/", (const char *)path);
         encode_string_as_pointer(full_path + path_length + 1, suffix);
 
-        sbJSON_AddItemToObject(patch, "path",
+        sbj_add_item_to_object(patch, "path",
                                sbJSON_CreateString((const char *)full_path));
         sbJSON_free(full_path);
     }
 
     if (value != NULL) {
-        sbJSON_AddItemToObject(patch, "value", sbJSON_Duplicate(value, 1));
+        sbj_add_item_to_object(patch, "value", sbj_duplicate(value, 1));
     }
-    sbJSON_AddItemToArray(patches, patch);
+    sbj_add_item_to_array(patches, patch);
 }
 
 void sbJSONUtils_AddPatchToArray(sbJSON *const array,
@@ -1059,7 +1059,7 @@ sbJSON *sbJSONUtils_GeneratePatches(sbJSON *const from, sbJSON *const to) {
         return NULL;
     }
 
-    patches = sbJSON_CreateArray();
+    patches = sbj_create_array();
     create_patches(patches, (const unsigned char *)"", from, to);
 
     return patches;
@@ -1072,36 +1072,36 @@ void sbJSONUtils_SortObject(sbJSON *const object) {
 static sbJSON *merge_patch(sbJSON *target, const sbJSON *const patch) {
     sbJSON *patch_child = NULL;
 
-    if (!sbJSON_IsObject(patch)) {
+    if (!sbj_is_object(patch)) {
         /* scalar value, array or NULL, just duplicate */
-        sbJSON_Delete(target);
-        return sbJSON_Duplicate(patch, 1);
+        sbj_delete(target);
+        return sbj_duplicate(patch, 1);
     }
 
-    if (!sbJSON_IsObject(target)) {
-        sbJSON_Delete(target);
-        target = sbJSON_CreateObject();
+    if (!sbj_is_object(target)) {
+        sbj_delete(target);
+        target = sbj_create_object();
     }
 
     patch_child = patch->child;
     while (patch_child != NULL) {
-        if (sbJSON_IsNull(patch_child)) {
+        if (sbj_is_null(patch_child)) {
             /* NULL is the indicator to remove a value, see RFC7396 */
-            sbJSON_DeleteItemFromObject(target, patch_child->string);
+            sbj_delete_item_from_object(target, patch_child->string);
         } else {
             sbJSON *replace_me = NULL;
             sbJSON *replacement = NULL;
 
             replace_me =
-                sbJSON_DetachItemFromObject(target, patch_child->string);
+                sbj_detach_item_from_object(target, patch_child->string);
 
             replacement = merge_patch(replace_me, patch_child);
             if (replacement == NULL) {
-                sbJSON_Delete(target);
+                sbj_delete(target);
                 return NULL;
             }
 
-            sbJSON_AddItemToObject(target, patch_child->string, replacement);
+            sbj_add_item_to_object(target, patch_child->string, replacement);
         }
         patch_child = patch_child->next;
     }
@@ -1118,10 +1118,10 @@ static sbJSON *generate_merge_patch(sbJSON *const from, sbJSON *const to) {
     sbJSON *patch = NULL;
     if (to == NULL) {
         /* patch to delete everything */
-        return sbJSON_CreateNull();
+        return sbj_create_null();
     }
-    if (!sbJSON_IsObject(to) || !sbJSON_IsObject(from)) {
-        return sbJSON_Duplicate(to, 1);
+    if (!sbj_is_object(to) || !sbj_is_object(from)) {
+        return sbj_duplicate(to, 1);
     }
 
     sort_object(from);
@@ -1129,7 +1129,7 @@ static sbJSON *generate_merge_patch(sbJSON *const from, sbJSON *const to) {
 
     from_child = from->child;
     to_child = to->child;
-    patch = sbJSON_CreateObject();
+    patch = sbj_create_object();
     if (patch == NULL) {
         return NULL;
     }
@@ -1147,21 +1147,21 @@ static sbJSON *generate_merge_patch(sbJSON *const from, sbJSON *const to) {
 
         if (diff < 0) {
             /* from has a value that to doesn't have -> remove */
-            sbJSON_AddItemToObject(patch, from_child->string,
-                                   sbJSON_CreateNull());
+            sbj_add_item_to_object(patch, from_child->string,
+                                   sbj_create_null());
 
             from_child = from_child->next;
         } else if (diff > 0) {
             /* to has a value that from doesn't have -> add to patch */
-            sbJSON_AddItemToObject(patch, to_child->string,
-                                   sbJSON_Duplicate(to_child, 1));
+            sbj_add_item_to_object(patch, to_child->string,
+                                   sbj_duplicate(to_child, 1));
 
             to_child = to_child->next;
         } else {
             /* object key exists in both objects */
             if (!compare_json(from_child, to_child)) {
                 /* not identical --> generate a patch */
-                sbJSON_AddItemToObject(
+                sbj_add_item_to_object(
                     patch, to_child->string,
                     sbJSONUtils_GenerateMergePatch(from_child, to_child));
             }
@@ -1173,7 +1173,7 @@ static sbJSON *generate_merge_patch(sbJSON *const from, sbJSON *const to) {
     }
     if (patch->child == NULL) {
         /* no patch generated */
-        sbJSON_Delete(patch);
+        sbj_delete(patch);
         return NULL;
     }
 

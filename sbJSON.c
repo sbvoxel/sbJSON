@@ -46,16 +46,16 @@ char const *sbJSON_GetErrorPtr(void) {
     return (char const *)(global_error.json + global_error.position);
 }
 
-char *sbJSON_GetStringValue(sbJSON const *const item) {
+char *sbj_get_string_value(sbJSON const *const item) {
     if (item == NULL) {
         return NULL;
     }
 
-    assert(sbJSON_IsString(item));
+    assert(sbj_is_string(item));
     return item->u.valuestring;
 }
 
-char *sbJSON_TryGetStringValue(sbJSON const *const item) {
+char *sbj_try_get_string_value(sbJSON const *const item) {
     if (item == NULL || item->type != sbJSON_String) {
         return NULL;
     }
@@ -64,7 +64,7 @@ char *sbJSON_TryGetStringValue(sbJSON const *const item) {
 }
 
 // TODO: Is this API smart anymore (int vs double)?
-double sbJSON_GetNumberValue(sbJSON const *const item) {
+double sbj_get_number_value(sbJSON const *const item) {
     if (item == NULL) {
         return NAN;
     }
@@ -78,7 +78,7 @@ double sbJSON_GetNumberValue(sbJSON const *const item) {
     }
 }
 
-double sbJSON_TryGetNumberValue(sbJSON const *const item) {
+double sbj_try_get_number_value(sbJSON const *const item) {
     if (item == NULL || item->type != sbJSON_Number) {
         return NAN;
     }
@@ -90,7 +90,7 @@ double sbJSON_TryGetNumberValue(sbJSON const *const item) {
     }
 }
 
-bool sbJSON_GetBoolValue(sbJSON const *const item) {
+bool sbj_get_bool_value(sbJSON const *const item) {
     if (item == NULL) {
         return false; // ...
     }
@@ -99,7 +99,7 @@ bool sbJSON_GetBoolValue(sbJSON const *const item) {
     return item->u.valuebool;
 }
 
-bool sbJSON_TryGetBoolValue(sbJSON const *const item, bool default_bool) {
+bool sbj_try_get_bool_value(sbJSON const *const item, bool default_bool) {
     if (item == NULL) {
         return default_bool;
     }
@@ -194,12 +194,12 @@ static sbJSON *sbJSON_New_Item(internal_hooks const *const hooks) {
 }
 
 /* Delete a sbJSON structure. */
-void sbJSON_Delete(sbJSON *item) {
+void sbj_delete(sbJSON *item) {
     sbJSON *next = NULL;
     while (item != NULL) {
         next = item->next;
         if ((!item->is_reference) && (item->child != NULL)) {
-            sbJSON_Delete(item->child);
+            sbj_delete(item->child);
         }
 
         if (!item->is_reference &&
@@ -306,7 +306,7 @@ loop_end:
             decimal_number = true;
         } else {
             item->type = sbJSON_Number;
-            sbJSON_SetIntegerNumberValue(item, number);
+            sbj_set_integer_number_value(item, number);
         }
     }
 
@@ -317,14 +317,14 @@ loop_end:
             return false; /* parse_error */
         }
         item->type = sbJSON_Number;
-        sbJSON_SetDoubleNumberValue(item, number);
+        sbj_set_double_number_value(item, number);
     }
 
     input_buffer->offset += (size_t)(after_end - number_c_string);
     return true;
 }
 
-void sbJSON_SetDoubleNumberValue(sbJSON *object, double number) {
+void sbj_set_double_number_value(sbJSON *object, double number) {
     if (object == NULL) {
         return;
     }
@@ -334,7 +334,7 @@ void sbJSON_SetDoubleNumberValue(sbJSON *object, double number) {
     object->is_number_double = true;
 }
 
-void sbJSON_SetIntegerNumberValue(sbJSON *object, int64_t number) {
+void sbj_set_integer_number_value(sbJSON *object, int64_t number) {
     if (object == NULL) {
         return;
     }
@@ -344,7 +344,7 @@ void sbJSON_SetIntegerNumberValue(sbJSON *object, int64_t number) {
     object->is_number_double = false;
 }
 
-char *sbJSON_SetValuestring(sbJSON *object, char const *valuestring) {
+char *sbj_set_valuestring(sbJSON *object, char const *valuestring) {
     if (object == NULL) {
         return NULL;
     }
@@ -368,7 +368,7 @@ char *sbJSON_SetValuestring(sbJSON *object, char const *valuestring) {
     return copy;
 }
 
-bool sbJSON_SetBoolValue(sbJSON *object, bool boolValue) {
+bool sbj_set_bool_value(sbJSON *object, bool boolValue) {
     if (object == NULL) {
         return false;
     }
@@ -966,7 +966,7 @@ static parse_buffer *skip_utf8_bom(parse_buffer *const buffer) {
     return buffer;
 }
 
-sbJSON *sbJSON_ParseWithOpts(char const *value, char const **return_parse_end,
+sbJSON *sbj_parse_with_opts(char const *value, char const **return_parse_end,
                              bool require_null_terminated) {
     size_t buffer_length;
 
@@ -977,12 +977,12 @@ sbJSON *sbJSON_ParseWithOpts(char const *value, char const **return_parse_end,
     /* Adding null character size due to require_null_terminated. */
     buffer_length = strlen(value) + sizeof("");
 
-    return sbJSON_ParseWithLengthOpts(value, buffer_length, return_parse_end,
+    return sbj_parse_with_length_opts(value, buffer_length, return_parse_end,
                                       require_null_terminated);
 }
 
 /* Parse an object - create a new root, and populate. */
-sbJSON *sbJSON_ParseWithLengthOpts(char const *value, size_t buffer_length,
+sbJSON *sbj_parse_with_length_opts(char const *value, size_t buffer_length,
                                    char const **return_parse_end,
                                    bool require_null_terminated) {
     parse_buffer buffer = {0, 0, 0, 0, {0, 0, 0}};
@@ -1029,7 +1029,7 @@ sbJSON *sbJSON_ParseWithLengthOpts(char const *value, size_t buffer_length,
 
 fail:
     if (item != NULL) {
-        sbJSON_Delete(item);
+        sbj_delete(item);
     }
 
     if (value != NULL) {
@@ -1054,13 +1054,13 @@ fail:
     return NULL;
 }
 
-/* Default options for sbJSON_Parse */
-sbJSON *sbJSON_Parse(char const *value) {
-    return sbJSON_ParseWithOpts(value, 0, 0);
+/* Default options for sbj_parse */
+sbJSON *sbj_parse(char const *value) {
+    return sbj_parse_with_opts(value, 0, 0);
 }
 
-sbJSON *sbJSON_ParseWithLength(char const *value, size_t buffer_length) {
-    return sbJSON_ParseWithLengthOpts(value, buffer_length, 0, 0);
+sbJSON *sbj_parse_with_length(char const *value, size_t buffer_length) {
+    return sbj_parse_with_length_opts(value, buffer_length, 0, 0);
 }
 
 #define sbjson_min(a, b) (((a) < (b)) ? (a) : (b))
@@ -1125,15 +1125,15 @@ fail:
 }
 
 /* Render a sbJSON item/entity/structure to text. */
-char *sbJSON_Print(sbJSON const *item) {
+char *sbj_print(sbJSON const *item) {
     return (char *)print(item, true, &global_hooks);
 }
 
-char *sbJSON_PrintUnformatted(sbJSON const *item) {
+char *sbj_print_unformatted(sbJSON const *item) {
     return (char *)print(item, false, &global_hooks);
 }
 
-char *sbJSON_PrintBuffered(sbJSON const *item, int prebuffer, bool fmt) {
+char *sbj_print_buffered(sbJSON const *item, int prebuffer, bool fmt) {
     printbuffer p = {0, 0, 0, 0, 0, 0, {0, 0, 0}};
 
     if (prebuffer < 0) {
@@ -1159,7 +1159,7 @@ char *sbJSON_PrintBuffered(sbJSON const *item, int prebuffer, bool fmt) {
     return (char *)p.buffer;
 }
 
-bool sbJSON_PrintPreallocated(sbJSON *item, char *buffer, int const length,
+bool sbj_print_preallocated(sbJSON *item, char *buffer, int const length,
                               bool const format) {
     printbuffer p = {0, 0, 0, 0, 0, 0, {0, 0, 0}};
 
@@ -1377,7 +1377,7 @@ success:
 
 fail:
     if (head != NULL) {
-        sbJSON_Delete(head);
+        sbj_delete(head);
     }
 
     return false;
@@ -1533,7 +1533,7 @@ success:
 
 fail:
     if (head != NULL) {
-        sbJSON_Delete(head);
+        sbj_delete(head);
     }
 
     return false;
@@ -1640,7 +1640,7 @@ static bool print_object(sbJSON const *const item,
 }
 
 /* Get Array size/item / object item. */
-int sbJSON_GetArraySize(sbJSON const *array) {
+int sbj_get_array_size(sbJSON const *array) {
     sbJSON *child = NULL;
     size_t size = 0;
 
@@ -1676,7 +1676,7 @@ static sbJSON *get_array_item(sbJSON const *array, size_t index) {
     return current_child;
 }
 
-sbJSON *sbJSON_GetArrayItem(sbJSON const *array, int index) {
+sbJSON *sbj_get_array_item(sbJSON const *array, int index) {
     if (index < 0) {
         return NULL;
     }
@@ -1705,13 +1705,13 @@ static sbJSON *get_object_item(sbJSON const *const object,
     return current_element;
 }
 
-sbJSON *sbJSON_GetObjectItem(sbJSON const *const object,
+sbJSON *sbj_get_object_item(sbJSON const *const object,
                              char const *const string) {
     return get_object_item(object, string);
 }
 
-bool sbJSON_HasObjectItem(sbJSON const *object, char const *string) {
-    return sbJSON_GetObjectItem(object, string) ? 1 : 0;
+bool sbj_has_object_item(sbJSON const *object, char const *string) {
+    return sbj_get_object_item(object, string) ? 1 : 0;
 }
 
 /* Utility for array list handling. */
@@ -1770,7 +1770,7 @@ static bool add_item_to_array(sbJSON *array, sbJSON *item) {
 }
 
 /* Add item to array/object. */
-bool sbJSON_AddItemToArray(sbJSON *array, sbJSON *item) {
+bool sbj_add_item_to_array(sbJSON *array, sbJSON *item) {
     return add_item_to_array(array, item);
 }
 
@@ -1819,135 +1819,135 @@ static bool add_item_to_object(sbJSON *const object, char const *const string,
     return add_item_to_array(object, item);
 }
 
-bool sbJSON_AddItemToObject(sbJSON *object, char const *string, sbJSON *item) {
+bool sbj_add_item_to_object(sbJSON *object, char const *string, sbJSON *item) {
     return add_item_to_object(object, string, item, &global_hooks, false);
 }
 
 /* Add an item to an object with constant string as key */
-bool sbJSON_AddItemToObjectCS(sbJSON *object, char const *string,
+bool sbj_add_item_to_objectCS(sbJSON *object, char const *string,
                               sbJSON *item) {
     return add_item_to_object(object, string, item, &global_hooks, true);
 }
 
-bool sbJSON_AddItemReferenceToArray(sbJSON *array, sbJSON *item) {
+bool sbj_add_item_reference_to_array(sbJSON *array, sbJSON *item) {
     return add_item_to_array(array, create_reference(item, &global_hooks));
 }
 
-bool sbJSON_AddItemReferenceToObject(sbJSON *object, char const *string,
+bool sbj_add_item_reference_to_object(sbJSON *object, char const *string,
                                      sbJSON *item) {
     return add_item_to_object(object, string,
                               create_reference(item, &global_hooks),
                               &global_hooks, false);
 }
 
-sbJSON *sbJSON_AddNullToObject(sbJSON *const object, char const *const name) {
-    sbJSON *null = sbJSON_CreateNull();
+sbJSON *sbj_add_null_to_object(sbJSON *const object, char const *const name) {
+    sbJSON *null = sbj_create_null();
     if (add_item_to_object(object, name, null, &global_hooks, false)) {
         return null;
     }
 
-    sbJSON_Delete(null);
+    sbj_delete(null);
     return NULL;
 }
 
-sbJSON *sbJSON_AddTrueToObject(sbJSON *const object, char const *const name) {
-    sbJSON *true_item = sbJSON_CreateTrue();
+sbJSON *sbj_add_true_to_object(sbJSON *const object, char const *const name) {
+    sbJSON *true_item = sbj_create_true();
     if (add_item_to_object(object, name, true_item, &global_hooks, false)) {
         return true_item;
     }
 
-    sbJSON_Delete(true_item);
+    sbj_delete(true_item);
     return NULL;
 }
 
-sbJSON *sbJSON_AddFalseToObject(sbJSON *const object, char const *const name) {
-    sbJSON *false_item = sbJSON_CreateFalse();
+sbJSON *sbj_add_false_to_object(sbJSON *const object, char const *const name) {
+    sbJSON *false_item = sbj_create_false();
     if (add_item_to_object(object, name, false_item, &global_hooks, false)) {
         return false_item;
     }
 
-    sbJSON_Delete(false_item);
+    sbj_delete(false_item);
     return NULL;
 }
 
-sbJSON *sbJSON_AddBoolToObject(sbJSON *const object, char const *const name,
+sbJSON *sbj_add_bool_to_object(sbJSON *const object, char const *const name,
                                bool const boolean) {
-    sbJSON *bool_item = sbJSON_CreateBool(boolean);
+    sbJSON *bool_item = sbj_create_bool(boolean);
     if (add_item_to_object(object, name, bool_item, &global_hooks, false)) {
         return bool_item;
     }
 
-    sbJSON_Delete(bool_item);
+    sbj_delete(bool_item);
     return NULL;
 }
 
-sbJSON *sbJSON_AddDoubleNumberToObject(sbJSON *const object,
+sbJSON *sbj_add_double_number_to_object(sbJSON *const object,
                                        char const *const name,
                                        double const number) {
-    sbJSON *number_item = sbJSON_CreateDoubleNumber(number);
+    sbJSON *number_item = sbj_create_double_number(number);
     if (add_item_to_object(object, name, number_item, &global_hooks, false)) {
         return number_item;
     }
 
-    sbJSON_Delete(number_item);
+    sbj_delete(number_item);
     return NULL;
 }
 
-sbJSON *sbJSON_AddIntegerNumberToObject(sbJSON *const object,
+sbJSON *sbj_add_integer_number_to_object(sbJSON *const object,
                                         char const *const name,
                                         const int64_t number) {
-    sbJSON *number_item = sbJSON_CreateIntegerNumber(number);
+    sbJSON *number_item = sbj_create_integer_number(number);
     if (add_item_to_object(object, name, number_item, &global_hooks, false)) {
         return number_item;
     }
 
-    sbJSON_Delete(number_item);
+    sbj_delete(number_item);
     return NULL;
 }
 
-sbJSON *sbJSON_AddStringToObject(sbJSON *const object, char const *const name,
+sbJSON *sbj_add_string_to_object(sbJSON *const object, char const *const name,
                                  char const *const string) {
     sbJSON *string_item = sbJSON_CreateString(string);
     if (add_item_to_object(object, name, string_item, &global_hooks, false)) {
         return string_item;
     }
 
-    sbJSON_Delete(string_item);
+    sbj_delete(string_item);
     return NULL;
 }
 
-sbJSON *sbJSON_AddRawToObject(sbJSON *const object, char const *const name,
+sbJSON *sbj_add_raw_to_object(sbJSON *const object, char const *const name,
                               char const *const raw) {
-    sbJSON *raw_item = sbJSON_CreateRaw(raw);
+    sbJSON *raw_item = sbj_create_raw(raw);
     if (add_item_to_object(object, name, raw_item, &global_hooks, false)) {
         return raw_item;
     }
 
-    sbJSON_Delete(raw_item);
+    sbj_delete(raw_item);
     return NULL;
 }
 
-sbJSON *sbJSON_AddObjectToObject(sbJSON *const object, char const *const name) {
-    sbJSON *object_item = sbJSON_CreateObject();
+sbJSON *sbj_add_object_to_object(sbJSON *const object, char const *const name) {
+    sbJSON *object_item = sbj_create_object();
     if (add_item_to_object(object, name, object_item, &global_hooks, false)) {
         return object_item;
     }
 
-    sbJSON_Delete(object_item);
+    sbj_delete(object_item);
     return NULL;
 }
 
-sbJSON *sbJSON_AddArrayToObject(sbJSON *const object, char const *const name) {
-    sbJSON *array = sbJSON_CreateArray();
+sbJSON *sbj_add_array_to_object(sbJSON *const object, char const *const name) {
+    sbJSON *array = sbj_create_array();
     if (add_item_to_object(object, name, array, &global_hooks, false)) {
         return array;
     }
 
-    sbJSON_Delete(array);
+    sbj_delete(array);
     return NULL;
 }
 
-sbJSON *sbJSON_DetachItemViaPointer(sbJSON *parent, sbJSON *const item) {
+sbJSON *sbj_detach_item_via_pointer(sbJSON *parent, sbJSON *const item) {
     if ((parent == NULL) || (item == NULL)) {
         return NULL;
     }
@@ -1976,31 +1976,31 @@ sbJSON *sbJSON_DetachItemViaPointer(sbJSON *parent, sbJSON *const item) {
     return item;
 }
 
-sbJSON *sbJSON_DetachItemFromArray(sbJSON *array, int which) {
+sbJSON *sbj_detach_item_from_array(sbJSON *array, int which) {
     if (which < 0) {
         return NULL;
     }
 
-    return sbJSON_DetachItemViaPointer(array,
+    return sbj_detach_item_via_pointer(array,
                                        get_array_item(array, (size_t)which));
 }
 
-void sbJSON_DeleteItemFromArray(sbJSON *array, int which) {
-    sbJSON_Delete(sbJSON_DetachItemFromArray(array, which));
+void sbj_delete_item_from_array(sbJSON *array, int which) {
+    sbj_delete(sbj_detach_item_from_array(array, which));
 }
 
-sbJSON *sbJSON_DetachItemFromObject(sbJSON *object, char const *string) {
-    sbJSON *to_detach = sbJSON_GetObjectItem(object, string);
+sbJSON *sbj_detach_item_from_object(sbJSON *object, char const *string) {
+    sbJSON *to_detach = sbj_get_object_item(object, string);
 
-    return sbJSON_DetachItemViaPointer(object, to_detach);
+    return sbj_detach_item_via_pointer(object, to_detach);
 }
 
-void sbJSON_DeleteItemFromObject(sbJSON *object, char const *string) {
-    sbJSON_Delete(sbJSON_DetachItemFromObject(object, string));
+void sbj_delete_item_from_object(sbJSON *object, char const *string) {
+    sbj_delete(sbj_detach_item_from_object(object, string));
 }
 
 /* Replace array/object items with new ones. */
-bool sbJSON_InsertItemInArray(sbJSON *array, int which, sbJSON *newitem) {
+bool sbj_insert_item_in_array(sbJSON *array, int which, sbJSON *newitem) {
     sbJSON *after_inserted = NULL;
 
     if (which < 0 || newitem == NULL) {
@@ -2028,7 +2028,7 @@ bool sbJSON_InsertItemInArray(sbJSON *array, int which, sbJSON *newitem) {
     return true;
 }
 
-bool sbJSON_ReplaceItemViaPointer(sbJSON *const parent, sbJSON *const item,
+bool sbj_replace_item_via_pointer(sbJSON *const parent, sbJSON *const item,
                                   sbJSON *replacement) {
     if ((parent == NULL) || (parent->child == NULL) || (replacement == NULL) ||
         (item == NULL)) {
@@ -2065,17 +2065,17 @@ bool sbJSON_ReplaceItemViaPointer(sbJSON *const parent, sbJSON *const item,
 
     item->next = NULL;
     item->prev = NULL;
-    sbJSON_Delete(item);
+    sbj_delete(item);
 
     return true;
 }
 
-bool sbJSON_ReplaceItemInArray(sbJSON *array, int which, sbJSON *newitem) {
+bool sbj_replace_item_in_array(sbJSON *array, int which, sbJSON *newitem) {
     if (which < 0) {
         return false;
     }
 
-    return sbJSON_ReplaceItemViaPointer(
+    return sbj_replace_item_via_pointer(
         array, get_array_item(array, (size_t)which), newitem);
 }
 
@@ -2097,17 +2097,17 @@ static bool replace_item_in_object(sbJSON *object, char const *string,
 
     replacement->string_is_const = false;
 
-    return sbJSON_ReplaceItemViaPointer(object, get_object_item(object, string),
+    return sbj_replace_item_via_pointer(object, get_object_item(object, string),
                                         replacement);
 }
 
-bool sbJSON_ReplaceItemInObject(sbJSON *object, char const *string,
+bool sbj_replace_item_in_object(sbJSON *object, char const *string,
                                 sbJSON *newitem) {
     return replace_item_in_object(object, string, newitem);
 }
 
 /* Create basic types: */
-sbJSON *sbJSON_CreateNull(void) {
+sbJSON *sbj_create_null(void) {
     sbJSON *item = sbJSON_New_Item(&global_hooks);
     if (item) {
         item->type = sbJSON_Null;
@@ -2116,7 +2116,7 @@ sbJSON *sbJSON_CreateNull(void) {
     return item;
 }
 
-sbJSON *sbJSON_CreateTrue(void) {
+sbJSON *sbj_create_true(void) {
     sbJSON *item = sbJSON_New_Item(&global_hooks);
     if (item) {
         item->type = sbJSON_Bool;
@@ -2126,7 +2126,7 @@ sbJSON *sbJSON_CreateTrue(void) {
     return item;
 }
 
-sbJSON *sbJSON_CreateFalse(void) {
+sbJSON *sbj_create_false(void) {
     sbJSON *item = sbJSON_New_Item(&global_hooks);
     if (item) {
         item->type = sbJSON_Bool;
@@ -2136,7 +2136,7 @@ sbJSON *sbJSON_CreateFalse(void) {
     return item;
 }
 
-sbJSON *sbJSON_CreateBool(bool boolean) {
+sbJSON *sbj_create_bool(bool boolean) {
     sbJSON *item = sbJSON_New_Item(&global_hooks);
     if (item) {
         item->type = sbJSON_Bool;
@@ -2146,7 +2146,7 @@ sbJSON *sbJSON_CreateBool(bool boolean) {
     return item;
 }
 
-sbJSON *sbJSON_CreateDoubleNumber(double num) {
+sbJSON *sbj_create_double_number(double num) {
     sbJSON *item = sbJSON_New_Item(&global_hooks);
     if (item) {
         item->type = sbJSON_Number;
@@ -2157,7 +2157,7 @@ sbJSON *sbJSON_CreateDoubleNumber(double num) {
     return item;
 }
 
-sbJSON *sbJSON_CreateIntegerNumber(int64_t num) {
+sbJSON *sbj_create_integer_number(int64_t num) {
     sbJSON *item = sbJSON_New_Item(&global_hooks);
     if (item) {
         item->type = sbJSON_Number;
@@ -2175,7 +2175,7 @@ sbJSON *sbJSON_CreateString(char const *string) {
         item->u.valuestring =
             (char *)sbJSON_strdup((unsigned char const *)string, &global_hooks);
         if (!item->u.valuestring) {
-            sbJSON_Delete(item);
+            sbj_delete(item);
             return NULL;
         }
     }
@@ -2183,7 +2183,7 @@ sbJSON *sbJSON_CreateString(char const *string) {
     return item;
 }
 
-sbJSON *sbJSON_CreateStringReference(char const *string) {
+sbJSON *sbj_create_string_reference(char const *string) {
     sbJSON *item = sbJSON_New_Item(&global_hooks);
     if (item != NULL) {
         item->type = sbJSON_String;
@@ -2194,7 +2194,7 @@ sbJSON *sbJSON_CreateStringReference(char const *string) {
     return item;
 }
 
-sbJSON *sbJSON_CreateObjectReference(sbJSON const *child) {
+sbJSON *sbj_create_object_reference(sbJSON const *child) {
     sbJSON *item = sbJSON_New_Item(&global_hooks);
     if (item != NULL) {
         item->type = sbJSON_Object;
@@ -2205,7 +2205,7 @@ sbJSON *sbJSON_CreateObjectReference(sbJSON const *child) {
     return item;
 }
 
-sbJSON *sbJSON_CreateArrayReference(sbJSON const *child) {
+sbJSON *sbj_create_array_reference(sbJSON const *child) {
     sbJSON *item = sbJSON_New_Item(&global_hooks);
     if (item != NULL) {
         item->type = sbJSON_Array;
@@ -2216,14 +2216,14 @@ sbJSON *sbJSON_CreateArrayReference(sbJSON const *child) {
     return item;
 }
 
-sbJSON *sbJSON_CreateRaw(char const *raw) {
+sbJSON *sbj_create_raw(char const *raw) {
     sbJSON *item = sbJSON_New_Item(&global_hooks);
     if (item) {
         item->type = sbJSON_Raw;
         item->u.valuestring =
             (char *)sbJSON_strdup((unsigned char const *)raw, &global_hooks);
         if (!item->u.valuestring) {
-            sbJSON_Delete(item);
+            sbj_delete(item);
             return NULL;
         }
     }
@@ -2231,7 +2231,7 @@ sbJSON *sbJSON_CreateRaw(char const *raw) {
     return item;
 }
 
-sbJSON *sbJSON_CreateArray(void) {
+sbJSON *sbj_create_array(void) {
     sbJSON *item = sbJSON_New_Item(&global_hooks);
     if (item) {
         item->type = sbJSON_Array;
@@ -2240,7 +2240,7 @@ sbJSON *sbJSON_CreateArray(void) {
     return item;
 }
 
-sbJSON *sbJSON_CreateObject(void) {
+sbJSON *sbj_create_object(void) {
     sbJSON *item = sbJSON_New_Item(&global_hooks);
     if (item) {
         item->type = sbJSON_Object;
@@ -2250,7 +2250,7 @@ sbJSON *sbJSON_CreateObject(void) {
 }
 
 /* Create Arrays: */
-sbJSON *sbJSON_CreateIntArray(int const *numbers, int count) {
+sbJSON *sbj_create_int_array(int const *numbers, int count) {
     size_t i = 0;
     sbJSON *n = NULL;
     sbJSON *p = NULL;
@@ -2260,12 +2260,12 @@ sbJSON *sbJSON_CreateIntArray(int const *numbers, int count) {
         return NULL;
     }
 
-    a = sbJSON_CreateArray();
+    a = sbj_create_array();
 
     for (i = 0; a && (i < (size_t)count); i++) {
-        n = sbJSON_CreateIntegerNumber(numbers[i]);
+        n = sbj_create_integer_number(numbers[i]);
         if (!n) {
-            sbJSON_Delete(a);
+            sbj_delete(a);
             return NULL;
         }
         if (!i) {
@@ -2283,7 +2283,7 @@ sbJSON *sbJSON_CreateIntArray(int const *numbers, int count) {
     return a;
 }
 
-sbJSON *sbJSON_CreateFloatArray(float const *numbers, int count) {
+sbJSON *sbj_create_float_array(float const *numbers, int count) {
     size_t i = 0;
     sbJSON *n = NULL;
     sbJSON *p = NULL;
@@ -2293,12 +2293,12 @@ sbJSON *sbJSON_CreateFloatArray(float const *numbers, int count) {
         return NULL;
     }
 
-    a = sbJSON_CreateArray();
+    a = sbj_create_array();
 
     for (i = 0; a && (i < (size_t)count); i++) {
-        n = sbJSON_CreateDoubleNumber((double)numbers[i]);
+        n = sbj_create_double_number((double)numbers[i]);
         if (!n) {
-            sbJSON_Delete(a);
+            sbj_delete(a);
             return NULL;
         }
         if (!i) {
@@ -2316,7 +2316,7 @@ sbJSON *sbJSON_CreateFloatArray(float const *numbers, int count) {
     return a;
 }
 
-sbJSON *sbJSON_CreateDoubleArray(double const *numbers, int count) {
+sbJSON *sbj_create_double_array(double const *numbers, int count) {
     size_t i = 0;
     sbJSON *n = NULL;
     sbJSON *p = NULL;
@@ -2326,12 +2326,12 @@ sbJSON *sbJSON_CreateDoubleArray(double const *numbers, int count) {
         return NULL;
     }
 
-    a = sbJSON_CreateArray();
+    a = sbj_create_array();
 
     for (i = 0; a && (i < (size_t)count); i++) {
-        n = sbJSON_CreateDoubleNumber(numbers[i]);
+        n = sbj_create_double_number(numbers[i]);
         if (!n) {
-            sbJSON_Delete(a);
+            sbj_delete(a);
             return NULL;
         }
         if (!i) {
@@ -2349,7 +2349,7 @@ sbJSON *sbJSON_CreateDoubleArray(double const *numbers, int count) {
     return a;
 }
 
-sbJSON *sbJSON_CreateStringArray(char const *const *strings, int count) {
+sbJSON *sbj_create_string_array(char const *const *strings, int count) {
     size_t i = 0;
     sbJSON *n = NULL;
     sbJSON *p = NULL;
@@ -2359,12 +2359,12 @@ sbJSON *sbJSON_CreateStringArray(char const *const *strings, int count) {
         return NULL;
     }
 
-    a = sbJSON_CreateArray();
+    a = sbj_create_array();
 
     for (i = 0; a && (i < (size_t)count); i++) {
         n = sbJSON_CreateString(strings[i]);
         if (!n) {
-            sbJSON_Delete(a);
+            sbj_delete(a);
             return NULL;
         }
         if (!i) {
@@ -2384,7 +2384,7 @@ sbJSON *sbJSON_CreateStringArray(char const *const *strings, int count) {
 
 /* Duplication */
 // TODO: This is missing regular tests (outside of the utils tests)
-sbJSON *sbJSON_Duplicate(sbJSON const *item, bool recurse) {
+sbJSON *sbj_duplicate(sbJSON const *item, bool recurse) {
     sbJSON *newitem = NULL;
     sbJSON *child = NULL;
     sbJSON *next = NULL;
@@ -2433,7 +2433,7 @@ sbJSON *sbJSON_Duplicate(sbJSON const *item, bool recurse) {
     /* Walk the ->next chain for the child. */
     child = item->child;
     while (child != NULL) {
-        newchild = sbJSON_Duplicate(
+        newchild = sbj_duplicate(
             child,
             true); /* Duplicate (with recurse) each item in the ->next chain */
         if (!newchild) {
@@ -2460,7 +2460,7 @@ sbJSON *sbJSON_Duplicate(sbJSON const *item, bool recurse) {
 
 fail:
     if (newitem != NULL) {
-        sbJSON_Delete(newitem);
+        sbj_delete(newitem);
     }
 
     return NULL;
@@ -2509,7 +2509,7 @@ static void minify_string(char **input, char **output) {
     }
 }
 
-void sbJSON_Minify(char *json) {
+void sbj_minify(char *json) {
     char *into = json;
 
     if (json == NULL) {
@@ -2547,7 +2547,7 @@ void sbJSON_Minify(char *json) {
     *into = '\0';
 }
 
-bool sbJSON_IsInvalid(sbJSON const *const item) {
+bool sbj_is_invalid(sbJSON const *const item) {
     if (item == NULL) {
         return false;
     }
@@ -2555,7 +2555,7 @@ bool sbJSON_IsInvalid(sbJSON const *const item) {
     return item->type == sbJSON_Invalid;
 }
 
-bool sbJSON_IsFalse(sbJSON const *const item) {
+bool sbj_is_false(sbJSON const *const item) {
     if (item == NULL) {
         return false;
     }
@@ -2567,7 +2567,7 @@ bool sbJSON_IsFalse(sbJSON const *const item) {
     return !item->u.valuebool;
 }
 
-bool sbJSON_IsTrue(sbJSON const *const item) {
+bool sbj_is_true(sbJSON const *const item) {
     if (item == NULL) {
         return false;
     }
@@ -2579,7 +2579,7 @@ bool sbJSON_IsTrue(sbJSON const *const item) {
     return item->u.valuebool;
 }
 
-bool sbJSON_IsBool(sbJSON const *const item) {
+bool sbj_is_bool(sbJSON const *const item) {
     if (item == NULL) {
         return false;
     }
@@ -2587,7 +2587,7 @@ bool sbJSON_IsBool(sbJSON const *const item) {
     return item->type == sbJSON_Bool;
 }
 
-bool sbJSON_IsNull(sbJSON const *const item) {
+bool sbj_is_null(sbJSON const *const item) {
     if (item == NULL) {
         return false;
     }
@@ -2595,7 +2595,7 @@ bool sbJSON_IsNull(sbJSON const *const item) {
     return item->type == sbJSON_Null;
 }
 
-bool sbJSON_IsNumber(sbJSON const *const item) {
+bool sbj_is_number(sbJSON const *const item) {
     if (item == NULL) {
         return false;
     }
@@ -2603,7 +2603,7 @@ bool sbJSON_IsNumber(sbJSON const *const item) {
     return item->type == sbJSON_Number;
 }
 
-bool sbJSON_IsString(sbJSON const *const item) {
+bool sbj_is_string(sbJSON const *const item) {
     if (item == NULL) {
         return false;
     }
@@ -2611,7 +2611,7 @@ bool sbJSON_IsString(sbJSON const *const item) {
     return item->type == sbJSON_String;
 }
 
-bool sbJSON_IsArray(sbJSON const *const item) {
+bool sbj_is_array(sbJSON const *const item) {
     if (item == NULL) {
         return false;
     }
@@ -2619,7 +2619,7 @@ bool sbJSON_IsArray(sbJSON const *const item) {
     return item->type == sbJSON_Array;
 }
 
-bool sbJSON_IsObject(sbJSON const *const item) {
+bool sbj_is_object(sbJSON const *const item) {
     if (item == NULL) {
         return false;
     }
@@ -2627,7 +2627,7 @@ bool sbJSON_IsObject(sbJSON const *const item) {
     return item->type == sbJSON_Object;
 }
 
-bool sbJSON_IsRaw(sbJSON const *const item) {
+bool sbj_is_raw(sbJSON const *const item) {
     if (item == NULL) {
         return false;
     }
@@ -2639,7 +2639,7 @@ bool sbJSON_IsRaw(sbJSON const *const item) {
 // Duplicate keys make comparison impossible. Would need
 // keys to have an order as well. Starting to be ridiculous.
 // Duplicate keys should be opt-in and not parse by default (do they?).
-bool sbJSON_Compare(sbJSON const *const a, sbJSON const *const b) {
+bool sbj_compare(sbJSON const *const a, sbJSON const *const b) {
     if (a == b) {
         return true;
     }
@@ -2684,7 +2684,7 @@ bool sbJSON_Compare(sbJSON const *const a, sbJSON const *const b) {
         sbJSON *b_element = b->child;
 
         for (; (a_element != NULL) && (b_element != NULL);) {
-            if (!sbJSON_Compare(a_element, b_element)) {
+            if (!sbj_compare(a_element, b_element)) {
                 return false;
             }
 
@@ -2709,7 +2709,7 @@ bool sbJSON_Compare(sbJSON const *const a, sbJSON const *const b) {
                 return false;
             }
 
-            if (!sbJSON_Compare(a_element, b_element)) {
+            if (!sbj_compare(a_element, b_element)) {
                 return false;
             }
         }
@@ -2723,7 +2723,7 @@ bool sbJSON_Compare(sbJSON const *const a, sbJSON const *const b) {
                 return false;
             }
 
-            if (!sbJSON_Compare(b_element, a_element)) {
+            if (!sbj_compare(b_element, a_element)) {
                 return false;
             }
         }

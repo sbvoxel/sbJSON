@@ -53,7 +53,7 @@ static char *create_monitor(void) {
     sbJSON *height = NULL;
     size_t index = 0;
 
-    sbJSON *monitor = sbJSON_CreateObject();
+    sbJSON *monitor = sbj_create_object();
     if (monitor == NULL) {
         goto end;
     }
@@ -64,42 +64,42 @@ static char *create_monitor(void) {
     }
     /* after creation was successful, immediately add it to the monitor,
      * thereby transferring ownership of the pointer to it */
-    sbJSON_AddItemToObject(monitor, "name", name);
+    sbj_add_item_to_object(monitor, "name", name);
 
-    resolutions = sbJSON_CreateArray();
+    resolutions = sbj_create_array();
     if (resolutions == NULL) {
         goto end;
     }
-    sbJSON_AddItemToObject(monitor, "resolutions", resolutions);
+    sbj_add_item_to_object(monitor, "resolutions", resolutions);
 
     for (index = 0; index < (sizeof(resolution_numbers) / (2 * sizeof(int)));
          ++index) {
-        resolution = sbJSON_CreateObject();
+        resolution = sbj_create_object();
         if (resolution == NULL) {
             goto end;
         }
-        sbJSON_AddItemToArray(resolutions, resolution);
+        sbj_add_item_to_array(resolutions, resolution);
 
-        width = sbJSON_CreateIntegerNumber(resolution_numbers[index][0]);
+        width = sbj_create_integer_number(resolution_numbers[index][0]);
         if (width == NULL) {
             goto end;
         }
-        sbJSON_AddItemToObject(resolution, "width", width);
+        sbj_add_item_to_object(resolution, "width", width);
 
-        height = sbJSON_CreateIntegerNumber(resolution_numbers[index][1]);
+        height = sbj_create_integer_number(resolution_numbers[index][1]);
         if (height == NULL) {
             goto end;
         }
-        sbJSON_AddItemToObject(resolution, "height", height);
+        sbj_add_item_to_object(resolution, "height", height);
     }
 
-    string = sbJSON_Print(monitor);
+    string = sbj_print(monitor);
     if (string == NULL) {
         fprintf(stderr, "Failed to print monitor.\n");
     }
 
 end:
-    sbJSON_Delete(monitor);
+    sbj_delete(monitor);
     return string;
 }
 
@@ -110,41 +110,41 @@ static char *create_monitor_with_helpers(void) {
     sbJSON *resolutions = NULL;
     size_t index = 0;
 
-    sbJSON *monitor = sbJSON_CreateObject();
+    sbJSON *monitor = sbj_create_object();
 
-    if (sbJSON_AddStringToObject(monitor, "name", "Awesome 4K") == NULL) {
+    if (sbj_add_string_to_object(monitor, "name", "Awesome 4K") == NULL) {
         goto end;
     }
 
-    resolutions = sbJSON_AddArrayToObject(monitor, "resolutions");
+    resolutions = sbj_add_array_to_object(monitor, "resolutions");
     if (resolutions == NULL) {
         goto end;
     }
 
     for (index = 0; index < (sizeof(resolution_numbers) / (2 * sizeof(int)));
          ++index) {
-        sbJSON *resolution = sbJSON_CreateObject();
+        sbJSON *resolution = sbj_create_object();
 
-        if (sbJSON_AddIntegerNumberToObject(resolution, "width",
+        if (sbj_add_integer_number_to_object(resolution, "width",
                                     resolution_numbers[index][0]) == NULL) {
             goto end;
         }
 
-        if (sbJSON_AddIntegerNumberToObject(resolution, "height",
+        if (sbj_add_integer_number_to_object(resolution, "height",
                                     resolution_numbers[index][1]) == NULL) {
             goto end;
         }
 
-        sbJSON_AddItemToArray(resolutions, resolution);
+        sbj_add_item_to_array(resolutions, resolution);
     }
 
-    string = sbJSON_Print(monitor);
+    string = sbj_print(monitor);
     if (string == NULL) {
         fprintf(stderr, "Failed to print monitor.\n");
     }
 
 end:
-    sbJSON_Delete(monitor);
+    sbj_delete(monitor);
     return string;
 }
 
@@ -154,7 +154,7 @@ static int supports_full_hd(const char *const monitor) {
     const sbJSON *resolutions = NULL;
     const sbJSON *name = NULL;
     int status = 0;
-    sbJSON *monitor_json = sbJSON_Parse(monitor);
+    sbJSON *monitor_json = sbj_parse(monitor);
     if (monitor_json == NULL) {
         const char *error_ptr = sbJSON_GetErrorPtr();
         if (error_ptr != NULL) {
@@ -164,17 +164,17 @@ static int supports_full_hd(const char *const monitor) {
         goto end;
     }
 
-    name = sbJSON_GetObjectItem(monitor_json, "name");
-    if (sbJSON_IsString(name) && (name->u.valuestring != NULL)) {
+    name = sbj_get_object_item(monitor_json, "name");
+    if (sbj_is_string(name) && (name->u.valuestring != NULL)) {
         printf("Checking monitor \"%s\"\n", name->u.valuestring);
     }
 
-    resolutions = sbJSON_GetObjectItem(monitor_json, "resolutions");
+    resolutions = sbj_get_object_item(monitor_json, "resolutions");
     sbJSON_ArrayForEach(resolution, resolutions) {
-        sbJSON *width = sbJSON_GetObjectItem(resolution, "width");
-        sbJSON *height = sbJSON_GetObjectItem(resolution, "height");
+        sbJSON *width = sbj_get_object_item(resolution, "width");
+        sbJSON *height = sbj_get_object_item(resolution, "height");
 
-        if (!sbJSON_IsNumber(width) || !sbJSON_IsNumber(height)) {
+        if (!sbj_is_number(width) || !sbj_is_number(height)) {
             status = 0;
             goto end;
         }
@@ -189,7 +189,7 @@ static int supports_full_hd(const char *const monitor) {
     }
 
 end:
-    sbJSON_Delete(monitor_json);
+    sbj_delete(monitor_json);
     return status;
 }
 
