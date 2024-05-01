@@ -187,33 +187,6 @@ static void test13_should_be_parsed_without_null_termination(void) {
     }
 }
 
-/* Address Sanitizer */
-static void test15_should_not_heap_buffer_overflow(void) {
-    char const* strings[] = {
-        "{\"1\":1,",
-        "{\"1\":1, ",
-    };
-
-    for (size_t i = 0; i < sizeof(strings) / sizeof(strings[0]); i+=1) {
-        char const* json_string = strings[i];
-        size_t len = strlen(json_string);
-
-        char *exact_size_heap = malloc(len);
-        if (exact_size_heap == NULL) {
-            continue;
-        }
-
-        memcpy(exact_size_heap, json_string, len);
-        sbJSON *json = sbj_parse_with_length(exact_size_heap, len);
-
-        if (json) {
-            sbj_delete(json);
-        }
-
-        free(exact_size_heap);
-    }
-}
-
 static void test14_should_not_be_parsed(void) {
     sbJSON *tree = NULL;
     const char test_14[] = "{"
@@ -236,6 +209,28 @@ static void test14_should_not_be_parsed(void) {
 
     if (tree != NULL) {
         sbj_delete(tree);
+    }
+}
+
+/* Address Sanitizer */
+static void test15_should_not_heap_buffer_overflow(void) {
+    char const* strings[] = {
+        "{\"1\":1,",
+        "{\"1\":1, ",
+    };
+
+    for (size_t i = 0; i < sizeof(strings) / sizeof(strings[0]); i+=1) {
+        char const* json_string = strings[i];
+        size_t len = strlen(json_string);
+
+        char *exact_size_heap = malloc(len);
+        TEST_ASSERT_NOT_NULL(exact_size_heap);
+
+        memcpy(exact_size_heap, json_string, len);
+        sbJSON *json = sbj_parse_with_length(exact_size_heap, len);
+
+        sbj_delete(json);
+        free(exact_size_heap);
     }
 }
 

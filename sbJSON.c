@@ -2379,6 +2379,7 @@ sbJSON *sbj_duplicate(sbJSON const *item, bool recurse) {
     if (!newitem) {
         goto fail;
     }
+
     /* Copy over all vars */
     newitem->type = item->type;
     newitem->is_reference = false;
