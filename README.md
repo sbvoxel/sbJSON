@@ -13,7 +13,7 @@ sbjson is a work in progress fork of [cJSON](https://github.com/DaveGamble/cJSON
 - Alters preconditions
 	- cJSON in general will check for multiple kinds of issues and return early if it detects any of them. This can hide issues.
 	- SbJSON will respect preconditions by either assuming or asserting them to be met, which is made easier by the improved API design.
-- Simple CMake build system, or alternatively you can copy paste sbJSON.c and sbJSON.h directly into your project.
+- Simple CMake build system, or alternatively you can copy paste sbjson.c and sbjson.h directly into your project.
 - Bug fixes (heap buffer overflow).
 - Much quicker development with an attention to details. Needed because cJSON is still unfortunately fairly flawed.
 
