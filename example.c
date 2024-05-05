@@ -21,7 +21,7 @@
   THE SOFTWARE.
 */
 
-#include "sbJSON.h"
+#include "sbjson.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

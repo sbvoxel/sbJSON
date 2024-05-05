@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.18)
-project(SbJSON)
+project(sbjson)
 
-add_library(sbJSON sbJSON.c)
+add_library(sbjson sbjson.c)
 
-option(BUILD_UTILS "Enable building the sbJSON_Utils library." OFF)
+option(BUILD_UTILS "Enable building the sbjson_utils library." OFF)
 if(BUILD_UTILS)
-    add_library(sbjson_utils sbJSON_Utils.c)
+    add_library(sbjson_utils sbjson_utils.c)
 endif()
 
 option(BUILD_TESTS "Enable building the tests" ON)
@@ -16,9 +16,9 @@ if(BUILD_TESTS)
 
     # This is just an example program.
     add_executable(example example.c)
-    target_link_libraries(example sbJSON)
+    target_link_libraries(example sbjson)
 
     add_subdirectory(tests)
 endif()
 
-install(TARGETS sbJSON DESTINATION lib)
+install(TARGETS sbjson DESTINATION lib)

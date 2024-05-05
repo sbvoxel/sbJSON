@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../sbJSON_Utils.h"
+#include "../sbjson_utils.h"
 #include "common.h"
 #include "unity.h"
 

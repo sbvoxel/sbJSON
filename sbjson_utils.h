@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-#include "sbJSON.h"
+#include "sbjson.h"
 
 /* Implement RFC6901 (https://tools.ietf.org/html/rfc6901) JSON Pointer spec. */
 sbJSON *sbJSONUtils_GetPointer(sbJSON *const object, const char *pointer);

@@ -24,7 +24,7 @@
 #ifndef CJSON_TESTS_COMMON_H
 #define CJSON_TESTS_COMMON_H
 
-#include "../sbJSON.c"
+#include "../sbjson.c"
 
 void reset(sbJSON *item);
 void reset(sbJSON *item) {

@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "sbJSON_Utils.h"
+#include "sbjson_utils.h"
 
 static unsigned char *sbJSONUtils_strdup(const unsigned char *const string) {
     size_t length = 0;

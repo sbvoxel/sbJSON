@@ -34,7 +34,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "sbJSON.h"
+#include "sbjson.h"
 
 typedef struct {
     unsigned char const *json;
