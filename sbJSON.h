@@ -179,9 +179,7 @@ sbJSON *sbj_create_string_reference(char const *string);
 sbJSON *sbj_create_object_reference(sbJSON const *child);
 sbJSON *sbj_create_array_reference(sbJSON const *child);
 
-/* These utilities create an Array of count items.
- * The parameter count cannot be greater than the number of elements in the
- * number array, otherwise array access will be out of bounds.*/
+/* These utilities create an Array of count items. */
 sbJSON *sbj_create_int_array(int const *numbers, int count);
 sbJSON *sbj_create_float_array(float const *numbers, int count);
 sbJSON *sbj_create_double_array(double const *numbers, int count);

@@ -967,7 +967,7 @@ static parse_buffer *skip_utf8_bom(parse_buffer *const buffer) {
 }
 
 sbJSON *sbj_parse_with_opts(char const *value, char const **return_parse_end,
-                             bool require_null_terminated) {
+                            bool require_null_terminated) {
     size_t buffer_length;
 
     if (NULL == value) {
@@ -1160,7 +1160,7 @@ char *sbj_print_buffered(sbJSON const *item, int prebuffer, bool fmt) {
 }
 
 bool sbj_print_preallocated(sbJSON *item, char *buffer, int const length,
-                              bool const format) {
+                            bool const format) {
     printbuffer p = {0, 0, 0, 0, 0, 0, {0, 0, 0}};
 
     if ((length < 0) || (buffer == NULL)) {
@@ -1706,7 +1706,7 @@ static sbJSON *get_object_item(sbJSON const *const object,
 }
 
 sbJSON *sbj_get_object_item(sbJSON const *const object,
-                             char const *const string) {
+                            char const *const string) {
     return get_object_item(object, string);
 }
 
@@ -1834,7 +1834,7 @@ bool sbj_add_item_reference_to_array(sbJSON *array, sbJSON *item) {
 }
 
 bool sbj_add_item_reference_to_object(sbJSON *object, char const *string,
-                                     sbJSON *item) {
+                                      sbJSON *item) {
     return add_item_to_object(object, string,
                               create_reference(item, &global_hooks),
                               &global_hooks, false);
@@ -1882,8 +1882,8 @@ sbJSON *sbj_add_bool_to_object(sbJSON *const object, char const *const name,
 }
 
 sbJSON *sbj_add_double_number_to_object(sbJSON *const object,
-                                       char const *const name,
-                                       double const number) {
+                                        char const *const name,
+                                        double const number) {
     sbJSON *number_item = sbj_create_double_number(number);
     if (add_item_to_object(object, name, number_item, &global_hooks, false)) {
         return number_item;
@@ -1894,8 +1894,8 @@ sbJSON *sbj_add_double_number_to_object(sbJSON *const object,
 }
 
 sbJSON *sbj_add_integer_number_to_object(sbJSON *const object,
-                                        char const *const name,
-                                        const int64_t number) {
+                                         char const *const name,
+                                         const int64_t number) {
     sbJSON *number_item = sbj_create_integer_number(number);
     if (add_item_to_object(object, name, number_item, &global_hooks, false)) {
         return number_item;
