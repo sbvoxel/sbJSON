@@ -1482,7 +1482,7 @@ static bool parse_object(sbJSON *const item, parse_buffer *const input_buffer) {
             current_item = new_item;
         }
 
-        if (input_buffer->offset + 1 >= input_buffer->length) {
+        if (cannot_access_at_index(input_buffer, 1)) {
             goto fail; /* nothing comes after the comma */
         }
 
