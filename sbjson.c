@@ -685,7 +685,7 @@ static bool parse_string(sbJSON *const item, parse_buffer *const input_buffer) {
     unsigned char *output = NULL;
 
     /* not a string */
-    if (buffer_at_offset(input_buffer)[0] != '\"') {
+    if (cannot_access_at_index(input_buffer, 0) || buffer_at_offset(input_buffer)[0] != '\"') {
         goto fail;
     }
 
